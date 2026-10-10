@@ -58,7 +58,8 @@ Personen mit aktivem Kopfgeld fesseln und abliefern. Alle Behörden handeln im g
 ```
 ArA-LawSystem/
   fxmanifest.lua                 Head Dev
-  config/main.lua                Head Dev  (Behoerden, Stationen, Items, Kern, Leitstelle)
+  config/main.lua                Head Dev  (Behoerden, Items, Kern, Leitstelle)
+  config/stations/*.lua          Head Dev  (eine Datei pro Stadt: Punkte, Blip, Zellen, Schuesse-Zone)
   config/justice.lua             Agent A
   config/investigation.lua       Agent B
   config/escort.lua              Agent B

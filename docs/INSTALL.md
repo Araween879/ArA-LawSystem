@@ -20,7 +20,9 @@
 4. Webhooks (optional) in `config/server_only.lua` eintragen.
 5. **Kompletter Server-Neustart** (neue Items werden nur beim Start von vorp_inventory gelesen).
 6. Im Spiel als Admin `/lawcoords` an jeder Station benutzen und die mit `ANPASSEN` markierten
-   Koordinaten in `config/main.lua`, `config/justice.lua`, `config/escort.lua` prüfen.
+   Koordinaten prüfen. Jede Stadt hat ihre eigene Datei in `config/stations/<stadt>.lua`
+   (alle Punkte, Blip, Zellen, Schüsse-Alarm). Neue Station: `config/stations/_vorlage.lua` kopieren.
+   Nach dem Start stehen in der Server-Konsole die aktiven Stationen und ggf. Hinweise auf Tippfehler.
 
 ## Neustart-Umfang
 | Änderung | Neustart |

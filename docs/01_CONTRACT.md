@@ -33,13 +33,13 @@ Jeder schreibt **nur** in seine Dateien. Fremde Dateien werden gelesen, nie geä
 
 | Besitzer | Dateien |
 |---|---|
-| Head Dev | `fxmanifest.lua`, `config/main.lua`, `config/server_only.lua`, `shared/**`, `server/core/**`, `server/zz_boot.lua`, `client/core/**`, `client/zz_boot.lua`, `locales/de_core.lua`, `locales/en_core.lua`, `sql/**`, `docs/00_*`, `docs/01_*`, `docs/INSTALL.md` |
+| Head Dev | `fxmanifest.lua`, `config/main.lua`, `config/stations/**`, `config/server_only.lua`, `shared/**`, `server/core/**`, `server/zz_boot.lua`, `client/core/**`, `client/zz_boot.lua`, `locales/de_core.lua`, `locales/en_core.lua`, `sql/**`, `docs/00_*`, `docs/01_*`, `docs/INSTALL.md` |
 | Agent A | `config/justice.lua`, `server/justice/*.lua`, `client/justice/*.lua`, `locales/de_justice.lua`, `locales/en_justice.lua`, `docs/A_REPORT.md` |
 | Agent B | `config/investigation.lua`, `config/escort.lua`, `server/investigation/*.lua`, `server/escort/*.lua`, `client/investigation/*.lua`, `client/escort/*.lua`, `locales/de_investigation.lua`, `locales/en_investigation.lua`, `locales/de_escort.lua`, `locales/en_escort.lua`, `docs/B_REPORT.md` |
 | Agent C | `html/**`, `locales/de_ui.lua`, `locales/en_ui.lua`, `docs/C_REPORT.md` |
 
 Ladereihenfolge (fxmanifest, fest): `config/main.lua` → `config/justice.lua` → `config/investigation.lua` →
-`config/escort.lua` → `shared/*.lua` → `locales/*.lua` → Server: `server/core/*.lua` (nummeriert) →
+`config/escort.lua` → `config/stations/*.lua` → `shared/*.lua` (darin `shared/03_stations.lua`: baut die Stationen) → `locales/*.lua` → Server: `server/core/*.lua` (nummeriert) →
 `server/justice/*.lua` → `server/investigation/*.lua` → `server/escort/*.lua` → `server/zz_boot.lua`.
 Client analog. **Modul-Dateien dürfen beim Laden nur definieren und registrieren** (Funktionen,
 `Law.Net.On`, `Law.Cb.Register`, `Law.Modules.Register`, `Law.Items.RegisterUsable`,
@@ -439,7 +439,15 @@ if affected ~= 1 then return Law.Result(false, 'already_done') end
 
 ## 9. Stationen & Punkt-Typen
 
-`Config.Stations[key] = { label, depts = { 'sheriff', ... } | nil (alle), blip = {...}, points = { <typ> = { coords=vector3, heading?, radius? } | { {…},{…} } } }`
+Eine Datei je Station: `config/stations/<key>.lua` (Vorlage mit allen Feldern: `config/stations/_vorlage.lua`).
+
+`Config.Stations[key] = { enabled, label, depts = { 'sheriff', ... } | nil (alle), jailTo = '<Knast-Ort>'?, blip = { enabled, name, sprite, style, color?, coords? }, points = { <typ> = { coords=vector3, heading?, radius?, spawn?, enabled? } | { {…},{…} } }, cells = { enabled, label, center, radius, spawn, release, work }?, shotsZone = { enabled, coords, radius, label? }? }`
+
+`shared/03_stations.lua` (laedt nach allen Configs, Client + Server) baut daraus beim Start:
+Stationen/Punkte mit `enabled = false` werden entfernt (der restliche Code sieht sie nie),
+`cells` → `Config.Jail.Locations[key]`, `jailTo` → `Config.Jail.StationLocation[key]`,
+`shotsZone` → Eintrag in `Config.Dispatch.ShotsFired.Zones`. `spawn` als vector3 wird zu vector4 (Richtung 0.0).
+Fehlerhafte Eintraege werden mit Warnung uebersprungen.
 
 | Punkt-Typ | Besitzer | Wer | Aktion |
 |---|---|---|---|

@@ -14,7 +14,8 @@ shared_scripts {
     'config/justice.lua',
     'config/investigation.lua',
     'config/escort.lua',
-    'shared/*.lua',
+    'config/stations/*.lua',    -- eine Datei pro Stadt (neue Datei = neue Station)
+    'shared/*.lua',             -- shared/03_stations.lua baut daraus die Stationen
     'locales/*.lua',
 }
 
