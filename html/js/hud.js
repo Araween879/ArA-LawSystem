@@ -66,23 +66,28 @@
     });
 
     // ------------------------------------------------------------------
+    // Gleicher Aufbau und gleiche Groesse wie das Dienst-Abzeichen (duty):
+    // Zeile 1 = Zustand, Zeile 2 = "Bluthund" (+ Witterung bei einer Verfolgung).
+    // Laengere Texte (d.text) kommen zusaetzlich als Benachrichtigung vom Client.
     var STRENGTH = { fresh: 3, medium: 2, weak: 1 };
+    function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
     hud('k9', function (box, d) {
         var state = LAW.str(d.state, 'idle');
-        var n = STRENGTH[d.strength] || 0;
-        var dots = el('div', 'scent');
-        for (var i = 1; i <= 3; i++) dots.appendChild(el('span', 'scent__dot' + (i <= n ? ' is-on' : '')));
+        var hasScent = d.strength !== undefined && d.strength !== null;
         box.className = box.className.replace(/\bk9--\S+/g, '').trim() + ' k9--' + state;
+        var sub = [el('span', { cls: 'hud-k9__name', text: t('ui_hud_k9') })];
+        if (hasScent) {
+            var n = STRENGTH[d.strength] || 0;
+            var dots = el('span', 'scent');
+            for (var i = 1; i <= 3; i++) dots.appendChild(el('span', 'scent__dot' + (i <= n ? ' is-on' : '')));
+            sub.push(el('span', { cls: 'hud-k9__sep', text: '·' }), dots,
+                el('span', { cls: 'hud-k9__scentv', text: LAW.has('ui_k9_strength_' + d.strength) ? t('ui_k9_strength_' + d.strength) : String(d.strength) }));
+        }
         ui.fill(box, [
             ui.icon('dog', 'hud-k9__icon'),
-            el('div', 'hud-k9__main', [
-                el('div', { cls: 'hud-k9__title', text: t('ui_hud_k9') }),
-                el('div', { cls: 'hud-k9__state', text: LAW.has('ui_k9_state_' + state) ? t('ui_k9_state_' + state) : state }),
-                d.strength !== undefined && d.strength !== null ? el('div', 'hud-k9__scent', [
-                    el('span', { cls: 'hud-k9__scentl', text: t('ui_hud_k9_scent') }), dots,
-                    el('span', { cls: 'hud-k9__scentv', text: LAW.has('ui_k9_strength_' + d.strength) ? t('ui_k9_strength_' + d.strength) : String(d.strength) }),
-                ]) : null,
-                d.text ? el('div', { cls: 'hud-k9__text', text: String(d.text) }) : null,
+            el('div', 'hud-k9__txt', [
+                el('div', { cls: 'hud-k9__state', text: cap(LAW.has('ui_k9_state_' + state) ? t('ui_k9_state_' + state) : state) }),
+                el('div', 'hud-k9__sub', sub),
             ]),
         ]);
     });

@@ -24,6 +24,13 @@
    (alle Punkte, Blip, Zellen, Schüsse-Alarm). Neue Station: `config/stations/_vorlage.lua` kopieren.
    Nach dem Start stehen in der Server-Konsole die aktiven Stationen und ggf. Hinweise auf Tippfehler.
 
+## Update von einer älteren Version
+- **`sql/items.sql` erneut einspielen** (gefahrlos wiederholbar): legt neue Items an (z. B. `law_sterilecloth` –
+  Steriles Tuch zum Aufnehmen von Blut) und setzt neue Beschriftungen. Danach **voller Server-Neustart**.
+- Für neue Items ein Bild in `vorp_inventory/html/img/items/<item>.png` ablegen (z. B. `law_sterilecloth.png`),
+  sonst zeigt das Inventar ein leeres Feld.
+- Neue DB-Spalten legt das Script beim Start selbst an.
+
 ## Neustart-Umfang
 | Änderung | Neustart |
 |---|---|
@@ -47,4 +54,7 @@
 | `/sheriff <Text>` | alle | Notruf an die Leitstelle |
 | `/panik` | Behörde im Dienst | Panikknopf |
 | `/einsatz <Nr>` | Behörde im Dienst | Einsatz annehmen + Route |
+| `F12` / `/hund` | Hundeführer im Dienst | Bluthund-Menü (Taste in `config/main.lua` → `Config.Keys.K9Menu`) |
 | `/lawcoords` | Admin | Position als vector3/vector4 in F8 |
+| `/lawcells` | Admin | Zellentüren (grün = zu, rot = offen) und Zellen (blau) im Spiel anzeigen |
+| `/editlawinterface` | alle | eigene Anzeigen (Job, Hinweise, Haft …) verschieben/vergrößern, pro Spieler gespeichert |

@@ -8,8 +8,9 @@ Beim Start muss in der Server-Konsole stehen: `[ArA-Law] gestartet - N Module` u
 Meldung „Items fehlen in der Tabelle items“.
 
 ## 0. Koordinaten (einmalig)
-- [ ] An jeder Station mit `/lawcoords` prüfen: Dienstpult, Lager, Eingang, Wagen-Spawn. Falsche Werte in `config/main.lua` korrigieren → `restart ArA-LawSystem`.
-- [ ] Sisika: Zentrum, Radius, Spawn, Arbeitspunkte (`config/justice.lua`).
+- [ ] An jeder Station mit `/lawcoords` prüfen: Dienstpult, Lager, Eingang, Wagen-Spawn. Falsche Werte in `config/stations/<stadt>.lua` (Block `points`, Wagen-Spawn = `points.garage.spawn`) korrigieren → `restart ArA-LawSystem`.
+- [ ] Sisika: Zentrum, Radius, Spawn, Arbeitspunkte (`config/stations/sisika.lua`, Block `cells`).
+- [ ] Server-Konsole: `Stationen aktiv (9): …` und **keine** gelben „Stationen: …“-Hinweise.
 
 ## 1. Kern
 | # | Schritt | Erwartet |
@@ -22,7 +23,8 @@ Meldung „Items fehlen in der Tabelle items“.
 | 1.6 | A: Behörde → Einstellen → B wählen, Rang 0 | **B bekommt Rückfrage**, nach „Annehmen“ ist B Anwärter |
 | 1.7 | A: Rang von B ändern, dann entlassen | Rang-Anzeige bei B aktuell, danach arbeitslos |
 | 1.8 | A: Kasse einzahlen / auszahlen | Kassenbuch zeigt beide Buchungen |
-| 1.9 | A: Dienstwagen ausparken, einparken | Wagen steht am Spawn, verschwindet beim Einparken |
+| 1.8b | Jeder: `/editlawinterface` → Anzeigen ziehen, Mausrad, Speichern; `restart ArA-LawSystem` | Alle 9 Rahmen sichtbar; nach Neustart stehen Job-Abzeichen/Hinweise an der gespeicherten Stelle; Esc verwirft |
+| 1.9 | A: Dienstwagen ausparken, einparken | Menü zeigt Kategorien (Gefangene, Personen, Streife …), gesperrte Wagen mit „Ab Rang: …“; Wagen steht am Spawn, verschwindet beim Einparken |
 | 1.10 | B: `/sheriff Hilfe` | A: Toast + Blip, `/einsatz <Nr>` setzt Route |
 | 1.11 | A: `/panik` | Alarm an alle im Dienst |
 | 1.12 | B schießt in Valentine in die Luft | Nach 5–15 s Einsatz „Schüsse gemeldet“ bei A |
@@ -75,16 +77,42 @@ Meldung „Items fehlen in der Tabelle items“.
 | 5.7 | B feilt mit Waffenfeile die Seriennummer ab | Seriennummer „ABGEFEILT“ |
 | 5.8 | A: Schmauchspurentest an B direkt nach Schuss | positiv; nach 15 Min. negativ |
 | 5.9 | B verkauft registrierte Waffe am Schalter an C („Verkaufen / umschreiben“) | C bekommt Rückfrage; nach Annahme Waffe + neuer Waffenschein bei C, Register zeigt C, alter Schein von B „UNGÜLTIG“ |
+| 5.10 | B und C prügeln sich mit Fäusten (ca. 10 Treffer) | Bei manchen Treffern Blut (rote Marker) an der Stelle des Getroffenen |
+| 5.11 | C schießt B an | Blutspur an B's Stelle |
+| 5.12 | A sichert das Blut **ohne** steriles Tuch / **mit** sterilem Tuch | „Du brauchst ein steriles Tuch…“ / Item „Blutprobe“ mit „Witterung für den Hund bis … Uhr“ |
+| 5.13 | C greift B mit Messer oder Axt an | Blut **und** Kleidungsfetzen (blauer Marker) bei B |
+| 5.14 | A sichert den Kleidungsfetzen (Beweisbeutel) | Item „Kleidungsfetzen“ |
+
+## 5b. Zellen mit Türen (Valentine)
+| # | Schritt | Erwartet |
+|---|---|---|
+| 5b.1 | Admin: `/lawcells` in der Station | Zellentüren grün (zu), Gittertüren (`doors`, `locked = false`) rot (offen), blaue Kreise in den Zellen; neben einer Tür steht ihr Name |
+| 5b.2 | A an Zellentür: „Zelle 1 aufschließen" | Tür lässt sich öffnen (bei allen Spielern) |
+| 5b.3 | A führt gefesselten B in die Zelle, schließt ab, „Häftling einbuchen" | Formular; nach Absenden: B bleibt in der Zelle (**kein Teleport**), Haft-HUD läuft |
+| 5b.4 | Tür offen / B steht draußen im Gang direkt vor dem Gitter | „Häftling einbuchen“ erscheint gar nicht, nur „Zelle … abschließen“ / B taucht in der Auswahl nicht auf |
+| 5b.4a | A an abgeschlossener Zellentür, B steht in der Zelle | **ein** Prompt „Zelle … aufschließen / Häftling einbuchen“, Halten öffnet ein Auswahlmenü |
+| 5b.5 | C (kein Gesetz) mit Dietrich an der Tür: „Schloss knacken" | Fortschritt, Erfolg/Fehlschlag; bei Erfolg Tür offen + Alarm an A |
+| 5b.6 | B verlässt die offene Zelle | Flucht: Haftbefehl, Alarm |
+| 5b.7 | Haftzeit läuft ab (Zeit per Dienstbuch verkürzen) | B wird nach draußen teleportiert, Tür bleibt zu |
+| 5b.8 | `restart ArA-LawSystem` | Zellentüren wieder abgeschlossen, Gittertüren wieder offen |
+| 5b.9 | Kopfgeldjäger C gibt gefesselten B (aktives Kopfgeld) an der Abgabestelle Valentine ab | B wird in eine freie Zelle teleportiert, Tür zu, Haft-HUD läuft |
+| 5b.10 | Deputy A (im Dienst) gibt B an der Abgabestelle ab | Meldung „Bring den Gefangenen in eine Zelle…“, **nichts** eingelöst, B bleibt gefesselt, **kein** Teleport; nach dem Einbuchen an der Zellentür ist das Kopfgeld erledigt |
+| 5b.11 | 4. Häftling in eine Zelle mit 3 Plätzen einbuchen | „Die Zelle ist voll.“ |
+| 5b.12 | Häftling stellt sich bei geschlossener Tür an die Gitterwand | keine Flucht; liegt er außerhalb des Radius, kommt er zurück in die Zellenmitte |
 
 ## 6. Bluthund
 | # | Schritt | Erwartet |
 |---|---|---|
 | 6.1 | A (Recht k9): Hundepfeife | Bluthund erscheint und folgt |
 | 6.2 | A nimmt Geruchsprobe von gefesseltem B (oder nutzt Blut/Stoff-Beweis von B) | Item Geruchstuch |
-| 6.3 | B läuft 300 m weg und versteckt sich; A: Hund → „Witterung aufnehmen“ | Hund läuft los und folgt **B's Weg**, HUD „frisch“ |
+| 6.3 | B läuft 300 m weg und versteckt sich; A: F12 → „Witterung aufnehmen“ | Hund läuft los und folgt **B's Weg**, HUD „frisch“ |
 | 6.4 | A bleibt > 60 m zurück | Hund wartet |
 | 6.5 | Hund erreicht B | „Gefunden“, Hund bellt bei B |
-| 6.6 | Probe von einer Person, die seit > 30 Min. nicht in 200 m war | „Keine Witterung“, Abklingzeit |
+| 6.6 | Probe von einer Person, die seit > 60 Min. nicht in 200 m war | „Keine Witterung“, Abklingzeit |
+| 6.7 | Blutprobe von B (5.12) dem Hund zeigen, B ist weggelaufen | Hund folgt B's Fährte |
+| 6.8 | Dieselbe Blutprobe > 60 Min. nach der Tat | Menü zeigt „verflogen“, Hund nimmt keine Witterung auf |
+| 6.9 | Kleidungsfetzen von B (5.14) mehrmals benutzen | Badge „unbegrenzt“, Hund folgt jedes Mal |
+| 6.10 | B wird eingebucht (Knast), danach Kleidungsfetzen/Blutprobe dem Hund zeigen | „verflogen“ – Geruch ist weg |
 
 ## 7. Eskorten
 | # | Schritt | Erwartet |

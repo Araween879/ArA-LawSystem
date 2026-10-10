@@ -288,6 +288,11 @@ end
 function Law.Notify(src, text, kind, ms)
     ms = ms or 5000
     kind = kind or 'info'
+    if Config.General.NotifyStyle ~= 'vorp' then
+        -- Client entscheidet: eigene (verschiebbare) Anzeige, vor dem NUI-Start vorp
+        TriggerClientEvent('ara_law:cl:core:notify', src, text, kind, ms)
+        return
+    end
     if kind == 'objective' then
         Law.VORP.NotifyObjective(src, text, ms)
     elseif kind == 'left' then

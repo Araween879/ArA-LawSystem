@@ -327,6 +327,7 @@ seinen eigenen Events (`arrest:setCuffed`, `jail:*`) – beide Quellen kommen vo
 | `all` | alles | Kern |
 | `duty` | Dienst an/aus | Kern |
 | `badge` | Marke zeigen | Kern |
+| `layout` | Oberflaeche anpassen (`/editlawinterface`): Rahmen ueber HUDs/Hinweisen/Marke, Aktion `layout:save { layout }`; Layout `{ key = { x, y, s } }` pro Spieler in Resource-KVP `ara_law_layout`, wird mit `init.layout` angewendet | Kern |
 | `storage` | Dienstlager | Kern |
 | `armory` | Waffenkammer | Kern |
 | `garage` | Dienstwagen | Kern |
@@ -425,10 +426,11 @@ if affected ~= 1 then return Law.Result(false, 'already_done') end
 | `bountylicns` (vorhanden) | Kopfgeldjäger-Lizenz | A | benutzbar: Lizenz vorzeigen (Dokument). Gültigkeit steht in DB |
 | `law_badge` | Dienstmarke | Kern | benutzbar: Marke zeigen |
 | `law_fineticket` | Bußgeldbescheid | A | benutzbar: Dokument anzeigen, metadata `{ fine_id, description }` |
-| `law_evidence_bag` | Beweismittelbeutel | B | Verbrauch beim Sichern |
+| `law_evidence_bag` | Beweismittelbeutel | B | Verbrauch beim Sichern (Hülsen, Kleidung) |
+| `law_sterilecloth` | Steriles Tuch | B | Verbrauch beim Sichern von Blut |
 | `law_casing` | Patronenhülse (Beweis) | B | metadata `{ evidence_id, description }` |
-| `law_bloodsample` | Blutprobe (Beweis) | B | metadata `{ evidence_id, description }` |
-| `law_clothscrap` | Stofffetzen (Beweis) | B | metadata `{ evidence_id, description }` |
+| `law_bloodsample` | Blutprobe (Beweis) | B | metadata `{ evidence_id, description }`; Geruchsträger 60 Min. ab Tat |
+| `law_clothscrap` | Kleidungsfetzen (Beweis) | B | metadata `{ evidence_id, description }`; Geruchsträger unbegrenzt bis zur nächsten Haft |
 | `law_scentcloth` | Geruchstuch | B | metadata `{ evidence_id, description, uses }` |
 | `law_whistle` | Hundepfeife | B | benutzbar: Bluthund rufen/heimschicken |
 | `law_gunfile` | Waffenfeile | B | benutzbar: Seriennummer abfeilen |
@@ -441,12 +443,20 @@ if affected ~= 1 then return Law.Result(false, 'already_done') end
 
 Eine Datei je Station: `config/stations/<key>.lua` (Vorlage mit allen Feldern: `config/stations/_vorlage.lua`).
 
-`Config.Stations[key] = { enabled, label, depts = { 'sheriff', ... } | nil (alle), jailTo = '<Knast-Ort>'?, blip = { enabled, name, sprite, style, color?, coords? }, points = { <typ> = { coords=vector3, heading?, radius?, spawn?, enabled? } | { {…},{…} } }, cells = { enabled, label, center, radius, spawn, release, work }?, shotsZone = { enabled, coords, radius, label? }? }`
+`Config.Stations[key] = { enabled, label, jobs = { 'sheriff', ... } | nil (alle; alter Name depts), jailTo = '<Knast-Ort>'?, blip = { enabled, name, sprite, style, color?, coords? }, points = { <typ> = { coords=vector3, heading?, radius?, spawn?, enabled?, jobs? } | { {…},{…} } }, cells = { enabled, label, center, radius, spawn, release, work }?, shotsZone = { enabled, coords, radius, label? }? }`
 
 `shared/03_stations.lua` (laedt nach allen Configs, Client + Server) baut daraus beim Start:
 Stationen/Punkte mit `enabled = false` werden entfernt (der restliche Code sieht sie nie),
 `cells` → `Config.Jail.Locations[key]`, `jailTo` → `Config.Jail.StationLocation[key]`,
+`prison` → `Config.Jail.Locations[key]` (`mode = 'prison'`, Teleport, z.B. Sisika; alte Form `cells` mit center ohne `list` gilt auch),
+`cells = { release, list = { { label, door, doorCoords, center, radius, capacity, heading, enabled } } }` → `Config.Jail.Locations[key]` (`mode = 'cells'`, `cells = { [Nummer in list] = {...} }`, `cellOrder`), ohne `center` ist die Zelle aus,
+jede Tuer → `Config.Jail.Doors[hash]` und Punkte `celldoor` (auf/zu, Recht jail), `cellbook` (`jail:sentenceCell`), `cellpick` (Dietrich),
+`doors` → weitere Tueren. Tuer-Zustand: Server `server/justice/doors.lua` (GlobalState `ara_law_doors`), Client setzt DoorSystem.
+Zellen-Haft: Einbuchen durch Gesetz ohne Teleport (Person muss hinter dem Gitter stehen, `Law.Cells.Inside`), Kopfgeldjaeger-Abgabe teleportiert in eine freie Zelle; Flucht = Zelle verlassen (Kreis + Gitterseite, Hoehe 3 m), Ende = Teleport nach `release`; DB-Spalte `ara_law_jail.cell` = Nummer in `cells.list`.
 `shotsZone` → Eintrag in `Config.Dispatch.ShotsFired.Zones`. `spawn` als vector3 wird zu vector4 (Richtung 0.0).
+Stations-`jobs` landet als `st.depts` (wie bisher von `Law.Stations.AllowsDept` und dem Client geprueft).
+`jobs` am Punkt: Client zeigt den Prompt nur diesen Jobs, `Law.Stations.NearPoint` (Server) ignoriert den Punkt fuer alle anderen.
+Abstand zu Punkten (Client-Prompt und `NearPoint`) wird waagerecht gemessen; Hoehenunterschied bis `Config.Points.HeightTolerance` (2,5 m, Server bei Zonen bis `radius`).
 Fehlerhafte Eintraege werden mit Warnung uebersprungen.
 
 | Punkt-Typ | Besitzer | Wer | Aktion |
@@ -455,7 +465,7 @@ Fehlerhafte Eintraege werden mit Warnung uebersprungen.
 | `boss` | Kern | `boss_*` | Dienstbuch Tab „Behörde" |
 | `storage` | Kern | `storage` | vorp-Lager `ara_law_storage_<dept>` |
 | `armory` | Kern | `armory` | Menü Waffen/Ausrüstung (Kasse zahlt) |
-| `garage` | Kern | `garage` | Gefangenenwagen/Pferd ausparken/einparken; `spawn = vector4` |
+| `garage` | Kern | `garage` | Dienstwagen-Menue (Kategorie → Wagen aus `Config.Garage.Categories/Vehicles`, Filter `jobs`/`stations`/`minGrade`) ausparken/einparken; `spawn = vector4` |
 | `counter` | Kern öffnet (`core:counterOpen`), Tab-Daten A/B | alle | Schalter-NUI |
 | `board` | Kern öffnet (`core:boardOpen`), Daten A (`bounty:board`, `npc:accept`) | alle | Steckbriefbrett-NUI |
 | `jail` | A | `jail` | Einbuchen (Formular Haftstrafe) |

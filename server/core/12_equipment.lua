@@ -123,9 +123,49 @@ end)
 --------------------------------------------------------------------------
 Law.Garage = Law.Garage or { active = {} }  -- [src] = { netId, model, station }
 
-local function garageSet(ctx)
-    local key = ctx.deptCfg and ctx.deptCfg.garage
-    return key and Config.Garage.Sets[key] or nil
+--- Ab welchem Rang? minGrade = Zahl oder { job = rang } (fehlender Job = 0)
+local function minGradeFor(v, job)
+    local m = v.minGrade
+    if type(m) == 'table' then return tonumber(m[job]) or 0 end
+    return tonumber(m) or 0
+end
+
+--- Sieht dieser Spieler den Wagen an dieser Garage? (an, Job, Station)
+local function vehicleVisible(v, ctx, stationKey)
+    if type(v) ~= 'table' or v.enabled == false or type(v.model) ~= 'string' then return false end
+    if v.jobs and not Law.Contains(v.jobs, ctx.dept) then return false end
+    if v.stations and not Law.Contains(v.stations, stationKey) then return false end
+    return true
+end
+
+local function vehicles()
+    return Config.Garage.Vehicles or {}
+end
+
+-- Beim Start: Tippfehler in Config.Garage melden
+do
+    local cats = {}
+    for _, c in ipairs(Config.Garage.Categories or {}) do cats[c.id] = true end
+    for i, v in ipairs(vehicles()) do
+        local name = ('Config.Garage.Vehicles[%d] (%s)'):format(i, tostring(v.label or v.model))
+        if type(v.model) ~= 'string' or v.model == '' then
+            Law.Warn('%s: model fehlt - Wagen wird nie angezeigt', name)
+        end
+        if not cats[v.category] then
+            Law.Warn('%s: Kategorie "%s" gibt es nicht in Config.Garage.Categories - steht unter "Sonstige"', name, tostring(v.category))
+        end
+        for _, j in ipairs(v.jobs or {}) do
+            if not Config.Departments[j] then Law.Warn('%s: Job "%s" gibt es nicht (Tippfehler?)', name, tostring(j)) end
+        end
+        if type(v.minGrade) == 'table' then
+            for j in pairs(v.minGrade) do
+                if not Config.Departments[j] then Law.Warn('%s: minGrade fuer unbekannten Job "%s"', name, tostring(j)) end
+            end
+        end
+        for _, st in ipairs(v.stations or {}) do
+            if not Config.Stations[st] then Law.Warn('%s: Station "%s" gibt es nicht oder sie ist aus', name, tostring(st)) end
+        end
+    end
 end
 
 Law.Cb.Register('garage:list', { perm = 'garage', rate = 1000 }, function(src, ctx)
@@ -133,22 +173,37 @@ Law.Cb.Register('garage:list', { perm = 'garage', rate = 1000 }, function(src, c
     if not stationKey or not Law.Stations.AllowsDept(stationKey, ctx.dept) then
         return Law.Result(false, 'not_at_point')
     end
-    local set = garageSet(ctx) or {}
     local list = {}
-    for i, v in ipairs(set) do
-        list[#list + 1] = { index = i, model = v.model, label = v.label, allowed = (v.minGrade or 0) <= ctx.grade }
+    for i, v in ipairs(vehicles()) do
+        if vehicleVisible(v, ctx, stationKey) then
+            local need = minGradeFor(v, ctx.job)
+            local g = need > 0 and Law.GetGrade(ctx.job, need) or nil
+            list[#list + 1] = {
+                index = i, category = v.category, label = v.label or v.model, desc = v.desc,
+                allowed = need <= ctx.grade, needGrade = g and g.label or nil,
+            }
+        end
     end
-    return Law.Result(true, { vehicles = list, hasActive = Law.Garage.active[src] ~= nil })
+    local a = Law.Garage.active[src]
+    local st = Config.Stations[stationKey]
+    return Law.Result(true, {
+        vehicles = list, hasActive = a ~= nil, activeLabel = a and a.label or nil,
+        stationLabel = st and st.label or stationKey,
+    })
 end)
 
 --- Freigabe zum Ausparken. Client spawnt und meldet NetId per garage:spawned.
 Law.Cb.Register('garage:request', { perm = 'garage', rate = 1000, notCuffed = true }, function(src, ctx, index)
     index = Law.ToInt(index, 1)
-    local set = garageSet(ctx)
-    local v = set and index and set[index]
-    if not v or (v.minGrade or 0) > ctx.grade then return Law.Result(false, 'invalid') end
+    local v = index and vehicles()[index]
+    if not v then return Law.Result(false, 'invalid') end
     local stationKey, point = Law.Stations.NearPoint(src, 'garage')
-    if not stationKey or not point or not point.spawn then return Law.Result(false, 'not_at_point') end
+    if not stationKey or not point or not point.spawn or not Law.Stations.AllowsDept(stationKey, ctx.dept) then
+        return Law.Result(false, 'not_at_point')
+    end
+    if not vehicleVisible(v, ctx, stationKey) or minGradeFor(v, ctx.job) > ctx.grade then
+        return Law.Result(false, 'invalid')
+    end
     local current = Law.Garage.active[src]
     if current and current.pending and Law.Now() - current.pending > 30 then
         Law.Garage.active[src] = nil -- Spawn nie gemeldet (Client abgestuerzt o.ae.)
@@ -158,7 +213,7 @@ Law.Cb.Register('garage:request', { perm = 'garage', rate = 1000, notCuffed = tr
     if not Law.RateLimit(src, 'garage:cooldown', (Config.Garage.Cooldown or 60) * 1000) then
         return Law.Result(false, 'cooldown')
     end
-    Law.Garage.active[src] = { netId = nil, model = v.model, station = stationKey, pending = Law.Now() }
+    Law.Garage.active[src] = { netId = nil, model = v.model, label = v.label or v.model, station = stationKey, pending = Law.Now() }
     local s = point.spawn
     return Law.Result(true, { model = v.model, spawn = { x = s.x, y = s.y, z = s.z, w = s.w } })
 end)

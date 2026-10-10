@@ -170,7 +170,8 @@ end)
 local function locationOptions()
     local out = {}
     for key, l in pairs(Config.Jail.Locations or {}) do
-        if l.enabled ~= false then out[#out + 1] = { value = key, label = l.label or key } end
+        -- Zellen mit Tueren nicht hier: dort wird an der Zellentuer eingebucht
+        if l.enabled ~= false and l.mode ~= 'cells' then out[#out + 1] = { value = key, label = l.label or key } end
     end
     table.sort(out, function(a, b) return a.label < b.label end)
     return out
@@ -208,6 +209,67 @@ Law.Stations.RegisterPoint('jail', {
         if not values then return end
         local res = Law.Cb.Await('jail:sentence', values.target, values.codes, values.minutes, values.bail, values.note, values.location)
         Law.Notify(res and res.msg or L('err_failed'))
+    end,
+})
+
+--------------------------------------------------------------------------
+-- Einbuchen an der Zellentuer (Zellen mit Tueren, kein Teleport hinein)
+-- Tuer abgeschlossen + jemand steht IN der Zelle -> Prompt erscheint.
+--------------------------------------------------------------------------
+local function cellOf(stationKey, idx)
+    local loc = Config.Jail.Locations[stationKey]
+    return loc and loc.mode == 'cells' and (loc.cells or {})[idx] or nil
+end
+
+--- Spieler, die gerade in der Zelle stehen und noch nicht eingebucht sind
+local function playersInCell(cell)
+    local out = {}
+    local me = PlayerPedId()
+    for _, pid in ipairs(GetActivePlayers()) do
+        local ped = GetPlayerPed(pid)
+        if ped ~= me and DoesEntityExist(ped) then
+            -- wirklich hinter dem Gitter (nicht im Gang davor)
+            if Law.Cells.Inside(cell, GetEntityCoords(ped), 'book') then
+                local sid = GetPlayerServerId(pid)
+                if Law.Justice.StateOf(sid, 'law_jailed') ~= true then
+                    out[#out + 1] = { value = sid, label = Law.Util.PlayerName(sid) }
+                end
+            end
+        end
+    end
+    return out
+end
+
+Law.Stations.RegisterPoint('cellbook', {
+    perm = 'jail', duty = true,
+    distance = (Config.Jail.Cells and Config.Jail.Cells.DoorReach) or 2.0,
+    label = function(_, point) return L('prompt_cell_book', point.label or '') end,
+    canShow = function(stationKey, point)
+        if not Law.Doors.IsLocked(point.door) then return false end
+        local cell = cellOf(stationKey, point.cell)
+        return cell ~= nil and #playersInCell(cell) > 0
+    end,
+    onUse = function(stationKey, point)
+        local cell = cellOf(stationKey, point.cell)
+        if not cell then return end
+        local players = playersInCell(cell)
+        if #players == 0 then return Law.Notify(L('jail_nobody_in_cell')) end
+        local values = Law.UI.Form({
+            id = 'jailcell', title = L('form_cell_title', cell.label), subtitle = Config.Stations[stationKey] and Config.Stations[stationKey].label or nil,
+            submitLabel = L('form_jail_submit'), summary = 'penalcode',
+            fields = {
+                { name = 'target', type = 'select', label = L('form_target'), required = true, options = players, default = players[1].value },
+                { name = 'codes', type = 'penalcode', label = L('form_codes'), required = true, options = Law.Justice.PenalOptions() },
+                { name = 'minutes', type = 'number', label = L('form_extra_minutes'), min = 0, max = Config.Jail.MaxExtraMinutes, default = 0,
+                  help = L('form_extra_minutes_help') },
+                { name = 'bail', type = 'money', label = L('form_bail'), min = 0, max = Config.Jail.Bail.MaxAmount, default = 0,
+                  help = L('form_bail_help') },
+                { name = 'note', type = 'text', label = L('form_note'), maxLength = 120, placeholder = L('form_note_placeholder') },
+            },
+        })
+        if not values then return end
+        local res = Law.Cb.Await('jail:sentenceCell', point.door, values.target, values.codes, values.minutes, values.bail, values.note)
+        Law.Notify(res and res.msg or L('err_failed'), res and res.ok and 'success' or 'error')
     end,
 })
 

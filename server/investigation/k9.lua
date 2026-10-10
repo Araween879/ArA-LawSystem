@@ -92,6 +92,11 @@ Law.Cb.Register('k9:request', { perm = 'k9', rate = 2000, notCuffed = true, aliv
     local blocked = summonBlocked(src, ctx)
     if blocked then return blocked end
     dogs[src] = { charId = ctx.charId, pendingAt = Law.Now() }
+    -- Eigener Spawn am Zwinger (points.kennel.spawn) -> genau dort, sonst neben dem Prompt
+    if point.spawn then
+        local s = point.spawn
+        return Law.Result(true, { model = KCfg.Model, spawn = { x = s.x, y = s.y, z = s.z, w = s.w or 0.0, exact = true } })
+    end
     local c = Law.Vec(point.coords)
     return Law.Result(true, { model = KCfg.Model, spawn = { x = c.x, y = c.y, z = c.z, w = point.heading or 0.0 } })
 end)
@@ -198,20 +203,40 @@ local function isScentSource(name)
     return true
 end
 
+--- Verbleibende Witterungen: nil = unbegrenzt
+local function usesLeft(itemName, meta)
+    local max = Law.Scent.MaxUses(itemName)
+    if max == 0 then return nil end
+    return tonumber(meta.uses) or max
+end
+
 Law.Cb.Register('k9:scentItems', { perm = 'k9', rate = 1000 }, function(src)
-    local out = {}
+    local out, ids = {}, {}
     for _, it in ipairs(Law.Inv:getUserInventoryItems(src) or {}) do
         local meta = type(it.metadata) == 'table' and it.metadata or {}
         if isScentSource(it.name) and tonumber(meta.evidence_id) then
             local kind = Law.Evidence.TypeByItem[it.name]
+            local uses = usesLeft(it.name, meta)
             out[#out + 1] = {
                 id          = it.id,
                 name        = it.name,
                 typeLabel   = Law.Evidence.TypeLabel(kind),
                 evidenceId  = tonumber(meta.evidence_id),
-                uses        = tonumber(meta.uses) or (SCfg.UsesPerItem or 3),
+                uses        = uses or -1,   -- -1 = unbegrenzt
                 description = meta.description or it.desc or '',
             }
+            if #ids < 50 then ids[#ids + 1] = tonumber(meta.evidence_id) end
+        end
+    end
+    -- Geruch verflogen (zu alt / Person hat seitdem gesessen)? -> im Menue ausgegraut
+    if #ids > 0 then
+        local rows = MySQL.query.await(('SELECT id, owner_charid, created_at, status FROM ara_law_evidence WHERE id IN (%s)')
+            :format(string.rep('?', #ids, ',')), ids) or {}
+        local byId = {}
+        for _, r in ipairs(rows) do byId[tonumber(r.id)] = r end
+        for _, e in ipairs(out) do
+            local r = byId[e.evidenceId]
+            e.faded = r ~= nil and (r.status == 'destroyed' or not Law.Scent.SourceUsable(e.name, r)) or nil
         end
     end
     return Law.Result(true, out)
@@ -258,8 +283,8 @@ Law.Cb.Register('scent:start', { perm = 'k9', rate = 1500, notCuffed = true, ali
     local meta = type(item.metadata) == 'table' and Law.Copy(item.metadata) or {}
     local evId = tonumber(meta.evidence_id)
     if not evId then return Law.Result(false, 'scent_bad_item') end
-    local uses = tonumber(meta.uses) or (SCfg.UsesPerItem or 3)
-    if uses <= 0 then return Law.Result(false, 'scent_used_up') end
+    local uses = usesLeft(item.name, meta)   -- nil = unbegrenzt (z.B. Kleidung)
+    if uses and uses <= 0 then return Law.Result(false, 'scent_used_up') end
 
     local d = dogs[src]
     if not d or not d.netId then return Law.Result(false, 'k9_no_dog') end
@@ -270,9 +295,12 @@ Law.Cb.Register('scent:start', { perm = 'k9', rate = 1500, notCuffed = true, ali
     end
     if not Law.IsNearCoords(src, dogPos, KCfg.SummonDistance or 10.0) then return Law.Result(false, 'k9_dog_far') end
 
-    local row = MySQL.single.await('SELECT owner_charid, status FROM ara_law_evidence WHERE id = ?', { evId })
+    local row = MySQL.single.await('SELECT owner_charid, status, created_at FROM ara_law_evidence WHERE id = ?', { evId })
     local owner = row and tonumber(row.owner_charid)
     if not row or row.status == 'destroyed' or not owner then return Law.Result(false, 'scent_bad_item') end
+    -- Blut nach 60 Min. / alles von vor der letzten Haft: Geruch verflogen
+    local usable, why = Law.Scent.SourceUsable(item.name, row)
+    if not usable then return Law.Result(false, why) end
 
     -- Abklingzeit ab hier - auch wenn der Hund nichts findet
     if not Law.RateLimit(src, 'scent:start:cd', (SCfg.Cooldown or 60) * 1000) then return Law.Result(false, 'cooldown') end
@@ -303,12 +331,14 @@ Law.Cb.Register('scent:start', { perm = 'k9', rate = 1500, notCuffed = true, ali
     local points = nextChunk(s, found, dogPos)
     sessions[src] = s
 
-    -- Geruchstraeger nutzt sich ab
-    uses = uses - 1
-    meta.uses = uses
-    meta.base = meta.base or meta.description
-    meta.description = tostring(meta.base or '') .. ' ' .. L('scent_uses_suffix', uses)
-    Law.Items.SetMetadata(src, itemId, meta)
+    -- Geruchstraeger nutzt sich ab (unbegrenzte wie Kleidung nicht)
+    if uses then
+        uses = uses - 1
+        meta.uses = uses
+        meta.base = meta.base or meta.description
+        meta.description = tostring(meta.base or '') .. ' ' .. Law.Scent.UsesSuffix(uses)
+        Law.Items.SetMetadata(src, itemId, meta)
+    end
 
     Law.Audit(ctx, 'k9.track_start', owner, { evidence = evId, strength = s.strength })
     return Law.Result(true, { sessionId = s.id, points = points, strength = s.strength }, L('k9_track_started'))

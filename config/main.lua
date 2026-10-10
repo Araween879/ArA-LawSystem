@@ -28,6 +28,10 @@ Config.General = {
     AdminGroups  = { 'admin', 'superadmin' },  -- vorp-Gruppen mit Admin-Befehlen
     AskTimeout   = 15000,       -- ms, wie lange der Server auf eine Client-Antwort wartet
     ShowDutyHud  = true,        -- kleines Abzeichen im HUD, solange man im Dienst ist
+    -- Benachrichtigungen des LawSystems:
+    --   'nui'  = eigene Anzeige (Papierzettel) - jeder Spieler kann sie mit /editlawinterface verschieben
+    --   'vorp' = Standard-Meldungen von vorp (feste Position, nicht verschiebbar)
+    NotifyStyle  = 'nui',
     -- Tod zusaetzlich serverseitig an der Ped-Gesundheit pruefen (Schutz gegen
     -- gefaelschtes vorp:ImDead). Nur auf false stellen, wenn Tote im Spiel
     -- nachweislich nicht als tot erkannt werden (z.B. Kopfgeld "tot" geht nicht).
@@ -40,10 +44,22 @@ Config.General = {
 Config.Keys = {
     Prompt   = 0xCEFD9220,  -- E   (INPUT_CONTEXT_Y) - Prompts an Stationen
     Interact = 0x3C0A40F2,  -- F6  - Interaktionsmenue (Spieler in der Naehe / eigene Aktionen)
+    -- Hunde-Menue (Bluthund-Befehle). ACHTUNG: Windows-Tastencode, KEIN Spiel-Hash wie oben,
+    -- weil F12 in RedM keiner Spiel-Taste zugeordnet ist. F12 = 0x7B, F11 = 0x7A, F10 = 0x79,
+    -- F9 = 0x78 (Liste: learn.microsoft.com -> "Virtual-Key Codes"). nil = keine Taste, nur /hund.
+    K9Menu   = 0x7B,
 }
 
 Config.Interact = {
     TargetDistance = 3.0,   -- Reichweite fuer Aktionen am naechsten Spieler (F6)
+}
+
+-- Stations-Punkte: Abstand wird waagerecht gemessen. Der Punkt darf so viele
+-- Meter ueber/unter dem Spieler liegen (z.B. auf Tisch-, Schrank- oder
+-- Schildhoehe eingetragen). Nicht hoeher als ~3 stellen, sonst greifen Punkte
+-- durch Decken/Boeden in mehrstoeckigen Gebaeuden.
+Config.Points = {
+    HeightTolerance = 2.5,
 }
 
 --------------------------------------------------------------------------
@@ -57,6 +73,9 @@ Config.Commands = {
     Panic     = 'panik',       -- Panikknopf (Behoerde im Dienst)
     Accept    = 'einsatz',     -- /einsatz <Nr>  Einsatz annehmen
     Coords    = 'lawcoords',   -- Admin: eigene Position ausgeben
+    EditUi    = 'editlawinterface', -- Jeder: eigene Anzeigen (Job, Hinweise, Haft ...) verschieben + speichern
+    K9        = 'hund',        -- Hunde-Menue (gleiche Funktion wie Taste F12)
+    Cells     = 'lawcells',    -- Admin: Zellentueren + Zellen im Spiel anzeigen (zum Einrichten)
 }
 
 --------------------------------------------------------------------------
@@ -70,6 +89,7 @@ Config.Items = {
     Badge          = 'law_badge',
     FineTicket     = 'law_fineticket',
     EvidenceBag    = 'law_evidence_bag',
+    SterileCloth   = 'law_sterilecloth',
     Casing         = 'law_casing',
     BloodSample    = 'law_bloodsample',
     ClothScrap     = 'law_clothscrap',
@@ -98,7 +118,7 @@ Config.Departments = {
             [3] = { label = 'Undersheriff',  salary = 18, perms = { 'warrant_approve', 'jail_release', 'bounty_manage', 'license_manage', 'boss_hire', 'boss_logs' } },
             [4] = { label = 'Sheriff',       salary = 22, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'county',
+        armory = 'lawman',
     },
     marshal = {
         label = 'US Marshals', short = 'Marshal', badgePrefix = 'USM', color = '#6b6b6b',
@@ -109,7 +129,7 @@ Config.Departments = {
             [2] = { label = 'Marshal',        salary = 17, perms = { 'warrant_approve', 'bounty_manage', 'jail_release', 'evidence_analyze', 'license_manage', 'fine_cancel', 'boss_logs' } },
             [3] = { label = 'Chief Marshal',  salary = 22, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'federal',
+        armory = 'lawman',
     },
     police = {
         label = 'Saint Denis Police', short = 'Police', badgePrefix = 'SDPD', color = '#2b3f5c',
@@ -120,7 +140,7 @@ Config.Departments = {
             [2] = { label = 'Sergeant', salary = 16, perms = { 'k9', 'scent_sample', 'evidence_analyze', 'fine_cancel', 'escort_contracts', 'boss_logs' } },
             [3] = { label = 'Captain',  salary = 21, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'city',
+        armory = 'lawman',
     },
     pinkerton = {
         label = 'Pinkerton-Detektei', short = 'Pinkerton', badgePrefix = 'PNK', color = '#3a2e22',
@@ -131,7 +151,7 @@ Config.Departments = {
             [2] = { label = 'Senior Agent', salary = 17, perms = { 'warrant_create', 'jail', 'fine', 'boss_logs' } },
             [3] = { label = 'Direktor',     salary = 22, perms = { 'all' } },
         },
-        armory = 'detective', garage = 'federal',
+        armory = 'detective',
     },
     prisonguard = {
         label = 'Sisika-Gefaengnis', short = 'Waerter', badgePrefix = 'SIS', color = '#4a4a3a',
@@ -141,7 +161,7 @@ Config.Departments = {
             [1] = { label = 'Oberwaerter', salary = 12, perms = { 'jail_release', 'records_edit', 'armory', 'garage', 'k9', 'scent_sample', 'boss_logs' } },
             [2] = { label = 'Direktor',   salary = 18, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'county',
+        armory = 'lawman',
     },
     judge = {
         label = 'Gericht', short = 'Richter', badgePrefix = 'CRT', color = '#5c1f1f',
@@ -150,7 +170,7 @@ Config.Departments = {
             [0] = { label = 'Richter',     salary = 15, perms = { 'duty', 'badge', 'records_view', 'records_edit', 'warrant_create', 'warrant_approve', 'jail_release', 'fine_cancel', 'bounty_manage', 'license_manage' } },
             [1] = { label = 'Oberrichter', salary = 20, perms = { 'all' } },
         },
-        armory = nil, garage = nil,
+        armory = nil,
     },
 }
 
@@ -173,6 +193,7 @@ Config.Armory = {
             { kind = 'item',   name = 'handcuffs',                 label = 'Handschellen',         price = 5,  minGrade = 0, amount = 1 },
             { kind = 'item',   name = 'handcuffkey',               label = 'Handschellenschluessel', price = 2, minGrade = 0, amount = 1 },
             { kind = 'item',   name = 'law_evidence_bag',          label = 'Beweismittelbeutel',   price = 1,  minGrade = 1, amount = 5 },
+            { kind = 'item',   name = 'law_sterilecloth',          label = 'Steriles Tuch',        price = 1,  minGrade = 1, amount = 5 },
             { kind = 'item',   name = 'law_whistle',               label = 'Hundepfeife',          price = 10, minGrade = 2, amount = 1, perm = 'k9' },
             { kind = 'item',   name = 'law_badge',                 label = 'Dienstmarke',          price = 0,  minGrade = 0, amount = 1 },
             { kind = 'item',   name = 'bandage',                   label = 'Verband',              price = 2,  minGrade = 0, amount = 1 },
@@ -185,6 +206,7 @@ Config.Armory = {
             { kind = 'item',   name = 'handcuffs',                 label = 'Handschellen',         price = 5,  minGrade = 1, amount = 1 },
             { kind = 'item',   name = 'handcuffkey',               label = 'Handschellenschluessel', price = 2, minGrade = 1, amount = 1 },
             { kind = 'item',   name = 'law_evidence_bag',          label = 'Beweismittelbeutel',   price = 1,  minGrade = 0, amount = 5 },
+            { kind = 'item',   name = 'law_sterilecloth',          label = 'Steriles Tuch',        price = 1,  minGrade = 0, amount = 5 },
             { kind = 'item',   name = 'law_whistle',               label = 'Hundepfeife',          price = 10, minGrade = 1, amount = 1, perm = 'k9' },
             { kind = 'item',   name = 'law_badge',                 label = 'Dienstmarke',          price = 0,  minGrade = 0, amount = 1 },
         },
@@ -192,17 +214,66 @@ Config.Armory = {
 }
 
 --------------------------------------------------------------------------
--- Dienstwagen (Gefangenentransport)
+-- Dienstwagen (Garage-Punkt jeder Station)
+-- Menue im Spiel:  1. Kategorie waehlen (Gefangene, Personen, Streife ...)
+--                  2. Wagen waehlen
 --------------------------------------------------------------------------
 Config.Garage = {
     MaxPerOfficer    = 1,
     Cooldown         = 60,     -- Sekunden zwischen zwei Ausparkvorgaengen
-    DespawnOnDutyOff = true,
-    Sets = {
-        county  = { { model = 'wagonprison01x', label = 'Gefangenenwagen', minGrade = 0 } },
-        city    = { { model = 'policewagon01x', label = 'Polizeiwagen', minGrade = 0 }, { model = 'wagonprison01x', label = 'Gefangenenwagen', minGrade = 1 } },
-        federal = { { model = 'wagonprison01x', label = 'Gefangenenwagen', minGrade = 0 } },
+    DespawnOnDutyOff = true,   -- Dienst aus -> Wagen verschwindet
+
+    -- Kategorien = erste Seite im Menue (Reihenfolge = Reihenfolge im Menue).
+    -- Kategorien ohne freigegebenen Wagen werden automatisch ausgeblendet.
+    -- icon: jail, people, badge, box, shield, wagon, horse, star, gun, doc
+    Categories = {
+        { id = 'prisoner',  label = 'Gefangenentransport',   icon = 'jail',   desc = 'Wagen mit Zelle oder Kaefig fuer Festgenommene' },
+        { id = 'transport', label = 'Personentransport',     icon = 'people', desc = 'Kutschen fuer Zeugen, Richter und Begleitschutz' },
+        { id = 'patrol',    label = 'Streife',               icon = 'badge',  desc = 'Leichte, schnelle Wagen fuer die Streife' },
+        { id = 'supply',    label = 'Material & Versorgung', icon = 'box',    desc = 'Lastwagen fuer Ausruestung und Beweismittel' },
+        { id = 'special',   label = 'Sonderfahrzeuge',       icon = 'shield', desc = 'Panzer- und Gatlingwagen - nur hohe Raenge' },
     },
+
+    -- Alle Wagen. Felder:
+    --   category  Kategorie-id von oben
+    --   model     Wagen-Modell (Liste gueltiger Modelle ganz unten)
+    --   label     Name im Menue
+    --   desc      kurze Beschreibung (optional)
+    --   minGrade  ab welchem Rang:  0 = alle  |  { sheriff = 2, police = 1 } je Job (fehlender Job = 0)
+    --   jobs      nil = alle Behoerden mit Garagen-Recht  |  { 'sheriff', 'marshal' } nur diese Jobs
+    --   stations  nil = an jeder Garage  |  { 'saintdenis' } nur an diesen Stationen
+    --   enabled   false = Wagen ausblenden
+    -- Raenge je Behoerde stehen oben in Config.Departments (0 = niedrigster).
+    Vehicles = {
+        -- Gefangenentransport
+        { category = 'prisoner',  model = 'wagonprison01x',        label = 'Gefangenenwagen',         desc = 'Geschlossene Zelle hinten',              minGrade = { police = 1 } },
+        { category = 'prisoner',  model = 'policewagon01x',        label = 'Polizei-Gefangenenwagen', desc = 'Wagen der Saint Denis Police',           minGrade = 0, jobs = { 'police' } },
+        { category = 'prisoner',  model = 'bountywagon01x',        label = 'Kaefigwagen',             desc = 'Offener Kaefig fuer Kopfgeld-Gefangene', minGrade = 1 },
+
+        -- Personentransport
+        { category = 'transport', model = 'coach2',                label = 'Kutsche',                 desc = 'Geschlossene Kutsche',                   minGrade = 1 },
+        { category = 'transport', model = 'coach3',                label = 'Reisekutsche',            desc = 'Fuer laengere Strecken',                 minGrade = 1 },
+        { category = 'transport', model = 'stagecoach001x',        label = 'Postkutsche',             desc = 'Viele Sitzplaetze',                      minGrade = 2 },
+
+        -- Streife
+        { category = 'patrol',    model = 'buggy01',               label = 'Einspaenner',             desc = 'Schnell und wendig',                     minGrade = 0 },
+
+        -- Material & Versorgung
+        { category = 'supply',    model = 'supplywagon',           label = 'Versorgungswagen',        desc = 'Ladeflaeche fuer Ausruestung',           minGrade = 1 },
+        { category = 'supply',    model = 'chuckwagon000x',        label = 'Planwagen',               desc = 'Ueberdachte Ladeflaeche',                minGrade = 1 },
+
+        -- Sonderfahrzeuge
+        { category = 'special',   model = 'wagonarmoured01x',      label = 'Panzerwagen',             desc = 'Gepanzert, fuer gefaehrliche Transporte', minGrade = 2,
+          jobs = { 'sheriff', 'marshal', 'police', 'pinkerton' } },
+        { category = 'special',   model = 'policewagongatling01x', label = 'Gatling-Wagen',           desc = 'Mit Gatling-Geschuetz',                  minGrade = { sheriff = 4, marshal = 3, police = 3 },
+          jobs = { 'sheriff', 'marshal', 'police' } },
+    },
+    -- Weitere gueltige Modelle (rdr3_discoveries):
+    --   Kutschen:  coach2 - coach6, stagecoach001x - stagecoach006x
+    --   Leicht:    buggy01, buggy02, buggy03, cart01 - cart08
+    --   Wagen:     wagon02x - wagon06x, wagontraveller01x, wagondoc01x (Arztwagen)
+    --   Last:      supplywagon, supplywagon2, armysupplywagon, chuckwagon000x, chuckwagon002x, logwagon, oilwagon01x
+    --   Gesetz:    wagonprison01x, policewagon01x, bountywagon01x, wagonarmoured01x, policewagongatling01x
 }
 
 --------------------------------------------------------------------------
@@ -210,7 +281,7 @@ Config.Garage = {
 --------------------------------------------------------------------------
 Config.Duty = {
     OnlyAtPoint = true,   -- Dienst nur am "duty"-Punkt einer Station umschalten
-    PointRadius = 2.0,
+    PointRadius = 2.8,    -- Reichweite des Dienst-Punkts in Metern (Prompt erscheint ab hier; andere Punkte: 1.8)
 }
 
 Config.Payroll = {

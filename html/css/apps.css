@@ -209,7 +209,11 @@
 }
 .app-badge.is-in { opacity: 1; transform: translateX(-50%); }
 .app-badge.is-out { opacity: 0; transform: translateX(-50%) translateY(2vh); }
-.stage--wallet { --iw: 1000; --ih: 560; --sw: clamp(280px, 56vh, 1000px); --bg: url('../img/wallet.svg'); animation: none; filter: drop-shadow(0 1.2em 1.6em rgba(0, 0, 0, .6)); }
+/* Eigene Position (Editor): left/top = linke obere Ecke, ohne Zentrierung */
+.app-badge.is-custom { bottom: auto; transform: translateY(2vh); }
+.app-badge.is-custom.is-in { transform: none; }
+.app-badge.is-custom.is-out { transform: translateY(2vh); }
+.stage--wallet { --iw: 1000; --ih: 560; --sw: calc(clamp(280px, 56vh, 1000px) * .8 * var(--s, 1));  /* Marke: Grundgroesse 80 % */ --bg: url('../img/wallet.svg'); animation: none; filter: drop-shadow(0 1.2em 1.6em rgba(0, 0, 0, .6)); }
 .wallet__badge { display: flex; align-items: center; justify-content: center; }
 .wallet__badge .badge-img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 .6em .6em rgba(0, 0, 0, .55)); }
 .wallet .slot { color: var(--ink); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

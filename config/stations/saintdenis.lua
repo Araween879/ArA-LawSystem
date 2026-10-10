@@ -18,8 +18,8 @@ Config.Stations = Config.Stations or {}
 Config.Stations.saintdenis = {
     enabled = true,                -- false = Station komplett aus (Punkte, Blip, Zellen, Schuesse-Alarm)
     label   = 'Saint Denis',       -- Name im Spiel (Prompts, Formulare, Eskort-Bueros)
-    depts   = nil,                 -- nil = alle Behoerden duerfen hier arbeiten | z.B. { 'sheriff', 'marshal' }
-    jailTo  = 'sisika',            -- Vorauswahl beim Einbuchen: Schluessel eines Knast-Orts ('sisika' oder 'saintdenis' fuer eigene Zellen)
+    jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'sheriff', 'marshal' }
+    jailTo  = 'sisika',            -- Gefaengnis beim Einbuchen am Pult (Transport, Teleport). Zellen hier: an der Zellentuer
 
     -- Karten-Symbol
     blip = {
@@ -28,10 +28,11 @@ Config.Stations.saintdenis = {
         sprite  = 'blip_ambient_sheriff',
         style   = 'BLIP_STYLE_FRIENDLY_ON_RADAR',
         color   = nil,             -- z.B. 'BLIP_MODIFIER_MP_COLOR_32' | nil = Standardfarbe
-        coords  = nil,             -- nil = am Schalter (counter) | sonst vector3(...)
+        coords  = nil,             -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty) | sonst vector3(...)
     },
 
     -- Alle Punkte der Station. Jeder Punkt: coords = vector3(x, y, z)
+    -- Nur bestimmte Jobs an einem Punkt:  armory = { coords = ..., jobs = { 'sheriff' } },
     -- Mehrere Punkte vom selben Typ:  duty = { { coords = ... }, { coords = ... } },
     points = {
         -- Pult / Tresen  (ANPASSEN)
@@ -56,23 +57,35 @@ Config.Stations.saintdenis = {
                      radius = 25.0 },      -- Liefer-/Abholzone der Eskorten
     },
 
-    -- Eigene Zellen in dieser Station (Knast-Ort mit dem Schluessel 'saintdenis').
-    -- Standard ist AUS: alle kommen nach Sisika. Zum Einschalten enabled = true
-    -- setzen, Werte im Spiel pruefen und oben jailTo = 'saintdenis' eintragen.
-    -- Zellentueren laut Spieldaten (rdr3_discoveries, Tuer-Angel - Ped steht ~1 m hoeher):
-    --   vector3(2502.43, -1307.86, 47.95)
-    --   vector3(2499.75, -1309.88, 47.95)
-    --   vector3(2503.64, -1309.88, 47.95)
-    --   vector3(2498.50, -1307.86, 47.95)
+    -- Zellen MIT Tueren (realistisch, kein Teleport hinein):
+    --   1. Zellentuer aufschliessen (Prompt an der Tuer, Recht 'jail')
+    --   2. Haeftling geht SELBST in die Zelle, Tuer abschliessen
+    --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
+    --   4. Haft vorbei -> Teleport nach draussen (release)
+    -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern,
+    -- capacity = wie viele Haeftlinge in die Zelle passen.
+    -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
+    -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
+    -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
+    -- Zellen nicht loeschen/umsortieren, solange Haeftlinge sitzen (die Nummer in der Liste wird
+    -- gespeichert) - zum Abschalten lieber enabled = false in die Zeile schreiben.
     cells = {
         enabled = false,
-        label   = 'Zelle Saint Denis',
-        center  = vector3(2502.43, -1307.86, 48.95),   -- Mitte der Zelle (ANPASSEN)
-        radius  = 8.0,                -- weiter weg = Flucht
-        spawn   = vector4(2502.43, -1307.86, 48.95, 0.00),   -- hier steht der Haeftling (ANPASSEN)
-        release = vector4(2510.00, -1318.00, 48.53, 270.00),   -- hier kommt er bei Entlassung raus
-        work    = {},                 -- Knastarbeit-Punkte (siehe sisika.lua), leer = keine
+        label   = 'Zellen Saint Denis',
+        release = vector4(2510.00, -1318.00, 48.53, 270.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
+        list = {
+            { label = 'Zelle 1', door = 1711767580, doorCoords = vector3(2502.43, -1307.86, 47.95),
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 2', door = 1995743734, doorCoords = vector3(2499.75, -1309.88, 47.95),
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 3', door = 2515591150, doorCoords = vector3(2503.64, -1309.88, 47.95),
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 4', door = 3365520707, doorCoords = vector3(2498.50, -1307.86, 47.95),
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+        },
     },
+    doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }
 
     -- Schuesse-Alarm: Schuesse in diesem Gebiet meldet ein NPC-Zeuge an die Leitstelle
     shotsZone = {

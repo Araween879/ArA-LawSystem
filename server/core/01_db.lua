@@ -93,6 +93,7 @@ local SCHEMA = {
             { 'has_sample', 'TINYINT NOT NULL DEFAULT 0' },
             { 'dangerous',  'TINYINT NOT NULL DEFAULT 0' },
             { 'notes',      'TEXT NULL' },
+            { 'scent_reset_at', TN },   -- letzte Haft: aeltere Geruchstraeger taugen nicht mehr
             { 'updated_at', T },
         },
     },
@@ -206,6 +207,7 @@ local SCHEMA = {
             { 'charid',           'INT NOT NULL' },
             { 'name',             NAME },
             { 'location',         "VARCHAR(32) NOT NULL DEFAULT ''" },
+            { 'cell',             'TINYINT NULL DEFAULT NULL' },  -- Zelle (Zellen mit Tueren), sonst NULL
             { 'sentence_seconds', 'INT NOT NULL DEFAULT 0' },
             { 'served_seconds',   'INT NOT NULL DEFAULT 0' },
             { 'reduced_seconds',  'INT NOT NULL DEFAULT 0' },

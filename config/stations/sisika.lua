@@ -20,7 +20,7 @@ Config.Stations = Config.Stations or {}
 Config.Stations.sisika = {
     enabled = true,                -- false = Station + Gefaengnis aus (siehe ACHTUNG oben)
     label   = 'Sisika-Gefaengnis', -- Name im Spiel
-    depts   = nil,                 -- nil = alle Behoerden | z.B. { 'prisonguard' } nur Waerter
+    jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'prisonguard' } nur Waerter
     jailTo  = 'sisika',            -- hier eingebucht -> bleibt auf Sisika
 
     -- Karten-Symbol
@@ -30,7 +30,7 @@ Config.Stations.sisika = {
         sprite  = 'blip_ambient_sheriff',
         style   = 'BLIP_STYLE_FRIENDLY_ON_RADAR',
         color   = nil,
-        coords  = nil,             -- nil = am Schalter (counter)
+        coords  = nil,             -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty)
     },
 
     -- Punkte der Waerter. Sisika hat bewusst keine Waffenkammer, keine
@@ -43,8 +43,9 @@ Config.Stations.sisika = {
         counter = { coords = vector3(3339.07, -669.41, 45.83) },   -- Schalter (z.B. Kaution, Habseligkeiten)
     },
 
-    -- Das Gefaengnis selbst (Knast-Ort 'sisika')
-    cells = {
+    -- Das Gefaengnis selbst (Knast-Ort 'sisika'): Verurteilte werden hierher TRANSPORTIERT
+    -- (Teleport), weil es keinen Weg auf die Insel gibt. Zellen mit Tueren: siehe Stadt-Dateien.
+    prison = {
         enabled = true,
         label   = 'Sisika-Gefaengnis',
         center  = vector3(3339.23, -670.12, 45.83),          -- Mitte der Insel

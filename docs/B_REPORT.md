@@ -131,7 +131,7 @@ Freigabe/Ablehnung im Dienstbuch (`escort:insuranceDecide`), Verfall nach `Expir
 | `escort:openLoot` | – | Beutefach erneut öffnen (nur Räuber) |
 
 ## 4. Net-Events Client → Server (`Law.Net.On`)
-`evidence:shot(weaponHash)`, `evidence:bleed(isMelee)`, `evidence:openLocker`, `weapons:fileFinish(cancelled)`,
+`evidence:shot(weaponHash)`, `evidence:wound(kind)`, `evidence:openLocker`, `weapons:fileFinish(cancelled)`,
 `k9:spawned(netId)`, `k9:dismiss(silent)`, `k9:died`, `scent:stop(sessionId)`, `escort:wagonSpawned(id, netId)`, `escort:robAbort(netId)`.
 
 ## 5. Events Server → Client (`ara_law:cl:*`)
@@ -144,7 +144,7 @@ NUI-Aktion (Client-Handler): `counter:transferWeapon` **(neu)** → Rückgabe = 
 
 ## 6. Interaktionen, Stationspunkte, HUDs
 - Stationspunkte: `evidence` (Asservatenkammer + Labor), `kennel` (Hund holen/abgeben), `escort` (Eskort-Büro für alle: Start/Abgabe für Leiter, Abholfach für Kunden/Empfänger).
-- Interaktionen (F6): `evidence_mode`, `evidence_gsr` (Ziel), `weapons_inspect` (Ziel), `scent_sample` (Ziel), `k9_follow`, `k9_stay`, `k9_search`, `k9_scent`, `k9_stop`, `k9_home`, `k9_attack` (Ziel, nur `AllowAttack`), `escort_start`, `escort_loot`.
+- Interaktionen (F6): `evidence_mode`, `evidence_gsr` (Ziel), `weapons_inspect` (Ziel), `scent_sample` (Ziel), `escort_start`, `escort_loot`. Hundebefehle (Bei Fuss, Bleib, Absuchen, Witterung, Abbrechen, Nach Hause, Fass! nur mit `AllowAttack`) liegen seit dem Umbau im eigenen Hunde-Menue: Taste `Config.Keys.K9Menu` (F12, Windows-Tastencode ueber `IsRawKeyReleased`) oder `/hund`.
 - Benutzbare Items: `law_gunfile` (jeder), `law_weaponpermit` (Dokument aus DB), `law_whistle` (Recht `k9`).
 - HUDs: `evidence { active, count }`, `k9 { state, strength, text }`, `escort { id, typeLabel, statusLabel, destinationLabel, timeLeft, escortsNear, escortsTotal }`, `robbery { progress, text }`.
 - Dokumente: `evidence` (Laborbericht), `permit` (Waffenschein).
@@ -160,7 +160,7 @@ NUI-Aktion (Client-Handler): `counter:transferWeapon` **(neu)** → Rückgabe = 
 - Alle `.await`-Schreibzugriffe nach einem Abzug (Buchung, Sichern, Registrierung, Geruchsprobe, Überfall, Versicherung) laufen über `Law.DB.Try` mit vollständiger Rückabwicklung.
 
 ## 8. Config-Schlüssel
-- `Config.Evidence`: `Enabled, Lifetime{casing,blood,cloth}, ScanRadius, ScanCooldown, DrawDistance, CollectDistance, PromptDistance, MaxWorld, MaxPerOwner (neu, 40), ShotRateMs, CasingMerge, CasingScatter, BleedRateMs, BleedMinDamage, MeleeClothChance, AnalysisSeconds, RevealCurrentHolder, Gsr{Minutes,Distance}, CasingHasScent, LockerLimit, Colors`
+- `Config.Evidence`: `Enabled, Lifetime{casing,blood,cloth}, ScanRadius, ScanCooldown, DrawDistance, CollectDistance, PromptDistance, MaxWorld, MaxPerOwner (neu, 40), ShotRateMs, CasingMerge, CasingScatter, BleedRateMs, ClothRateMs, Wounds, SharpWeapons, CollectWith, AnalysisSeconds, RevealCurrentHolder, Gsr{Minutes,Distance}, CasingHasScent, LockerLimit, Colors`
 - `Config.Weapons`: `RegisterFee, FeeDepartment, PermitItem, FiledSerial, File{Seconds,Chance,BreakChance}, InspectRequiresCuffs, InspectDistance, Labels`
 - `Config.Scent`: `RecordInterval, MinStep, JumpReset (neu, 150), MaxAge, SniffRadius, Chunk, Tolerance, FoundDistance, Cooldown, UsesPerItem, MaxDogSpeed, SampleDistance, SampleCooldown, SourceItems, Strength{fresh,medium}, FollowLive, SessionTimeout`
 - `Config.K9`: `Model, HandlerMaxDistance, SummonDistance, FromKennel, FromWhistle, DeathCooldown, Search{Radius,Cooldown}, AllowAttack, Invincible, Blip, PointReach, Speed{walk,run}`

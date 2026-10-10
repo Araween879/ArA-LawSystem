@@ -7,8 +7,16 @@
 
 Law.Util = Law.Util or {}
 
+-- Arten aus dem Code -> Arten der NUI-Hinweise
+local TOAST_KIND = { info = 'info', success = 'success', error = 'error', objective = 'info', left = 'info' }
+
 function Law.Notify(text, kind, ms)
     ms = ms or 5000
+    if Config.General.NotifyStyle ~= 'vorp' and Law.UI and Law.UI.IsReady and Law.UI.IsReady() then
+        -- eigene Anzeige: jeder Spieler kann sie mit /editlawinterface verschieben
+        Law.UI.Toast(nil, tostring(text or ''), TOAST_KIND[kind or 'info'] or 'info', ms)
+        return
+    end
     if kind == 'objective' then
         Law.VORP.NotifyObjective(text, ms)
     else

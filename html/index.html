@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/counter.css">
     <link rel="stylesheet" href="css/board.css">
     <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/dev.css">
 </head>
 <body>
@@ -111,6 +112,20 @@
         <button class="xbtn xbtn--doc" id="doc-close" type="button" data-tt="ui_close"></button>
     </section>
 
+    <!-- ============ Oberflaeche anpassen (/editlawinterface) ============ -->
+    <section id="app-layout" class="app app--overlay app--layout hidden">
+        <div id="lay-handles"></div>
+        <div class="lay-bar" id="lay-bar">
+            <div class="lay-bar__head" id="lay-bar-head" data-t="ui_layout_title"></div>
+            <div class="lay-bar__hint" data-t="ui_layout_hint"></div>
+            <div class="lay-bar__btns">
+                <button class="lay-btn lay-btn--save" id="lay-save" type="button" data-t="ui_layout_save"></button>
+                <button class="lay-btn" id="lay-reset" type="button" data-t="ui_layout_reset_all"></button>
+                <button class="lay-btn" id="lay-cancel" type="button" data-t="ui_cancel"></button>
+            </div>
+        </div>
+    </section>
+
     <!-- ============ Marke (ohne Fokus) ============ -->
     <section id="app-badge" class="app-badge hidden"></section>
 
@@ -126,6 +141,7 @@
     <script src="js/counter.js"></script>
     <script src="js/board.js"></script>
     <script src="js/hud.js"></script>
+    <script src="js/layout.js"></script>
     <script src="js/mock_data.js"></script>
     <script src="js/mock.js"></script>
 </body>

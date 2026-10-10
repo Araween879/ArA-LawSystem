@@ -168,6 +168,27 @@ Config.Jail = {
     --                 spawn = vector4(...), release = vector4(...), work = {} },
     Locations = {},
     StationLocation = {},  -- wird aus config/stations/*.lua (jailTo) gefuellt
+
+    -- Zellen in den Stationen (config/stations/<stadt>.lua -> cells):
+    -- Zellentuer aufschliessen -> Haeftling geht SELBST hinein -> abschliessen ->
+    -- an der Tuer "Haeftling einbuchen". KEIN Teleport hinein. Nach Ablauf der
+    -- Haft wird er nach draussen teleportiert (cells.release der Station).
+    Cells = {
+        Radius        = 1.6,    -- Groesse einer Zelle in Metern (wenn bei der Zelle kein radius steht)
+        Capacity      = 2,      -- so viele Haeftlinge passen in eine Zelle (wenn bei der Zelle kein capacity steht)
+        DoorReach     = 2.0,    -- so nah muss man an der Zellentuer stehen (Prompt)
+        LockedOnStart = true,   -- nach Server-Neustart sind alle Zellentueren abgeschlossen
+        -- Ausbruch: Schloss einer Zellentuer mit einem Dietrich knacken (alle ausser Gesetz im Dienst)
+        Lockpick = {
+            Enabled     = true,
+            Item        = 'lockpick',  -- gleiches Item wie bei vorp_doorlocks
+            Seconds     = 20,          -- Dauer des Knackens
+            Chance      = 20,          -- % Erfolg
+            BreakChance = 50,          -- % Dietrich bricht bei Fehlschlag
+            Cooldown    = 60,          -- Sekunden zwischen zwei Versuchen je Spieler
+            Alarm       = true,        -- Leitstelle bekommt einen Alarm, wenn eine Zellentuer aufgebrochen wird
+        },
+    },
     Work = {
         Seconds          = 10,   -- Dauer einer Arbeit
         ReduceSeconds    = 30,   -- Haftzeit-Verkuerzung je Arbeit
