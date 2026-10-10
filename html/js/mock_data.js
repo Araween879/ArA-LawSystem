@@ -194,6 +194,14 @@
         ui_k9_strength_medium: 'mittel', ui_k9_strength_weak: 'schwach', ui_hud_escort: 'Eskorte', ui_hud_escort_dest: 'Ziel',
         ui_hud_escort_time: 'Restzeit', ui_hud_escort_near: 'Begleiter in der Nähe', ui_hud_evidence: 'Spurensuche',
         ui_hud_evidence_count: '%s Spuren in der Nähe', ui_hud_robbery: 'Kiste wird aufgebrochen',
+        ui_layout_title: 'Oberfläche anpassen',
+        ui_layout_hint: 'Ziehen: verschieben\nMausrad: Größe ändern\nDoppelklick: auf Standard zurück\nPfeiltasten: fein verschieben (Shift = schneller)\nEsc: abbrechen ohne Speichern',
+        ui_layout_save: 'Speichern', ui_layout_reset_all: 'Alles zurücksetzen',
+        ui_layout_duty: 'Dienst-Abzeichen (Job)', ui_layout_notify: 'Benachrichtigungen', ui_layout_jail: 'Haftzeit',
+        ui_layout_cuffed: 'Handschellen', ui_layout_robbery: 'Überfall', ui_layout_k9: 'Bluthund', ui_layout_escort: 'Eskorte',
+        ui_layout_evidence: 'Spurensuche', ui_layout_badge: 'Marke',
+        ui_layout_demo_alert_title: '#12 Schüsse gemeldet', ui_layout_demo_alert_text: 'Valentine, Hauptstraße – /einsatz 12',
+        ui_layout_demo_toast_title: 'Beispiel-Meldung', ui_layout_demo_toast_text: 'So sehen Benachrichtigungen aus.',
     };
 
     // ------------------------------------------------------------------

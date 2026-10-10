@@ -418,6 +418,12 @@
             console.log('[Mock] Wegpunkt', payload);
             return ok();
         }
+        if (app === 'layout' && name === 'save') {
+            var lay = payload.layout || {};
+            try { localStorage.setItem('ara_law_layout_mock', JSON.stringify(lay)); } catch (e) { /* egal im Test */ }
+            console.log('[Mock] Layout gespeichert', lay);
+            return ok({ layout: lay }, 'Oberfläche gespeichert. (Test)');
+        }
         if (app === 'ledger' && name === 'openForm') {
             var mk = FORMS[payload.form];
             if (!mk) return fail('no_form', S.ui_err_no_form);
@@ -440,7 +446,9 @@
         switch (endpoint) {
             case 'ready':
                 setTimeout(function () {
-                    send({ type: 'init', data: { locale: 'de', strings: S, currency: '$', resource: 'ArA-LawSystem' } });
+                    var lay = {};
+                    try { lay = JSON.parse(localStorage.getItem('ara_law_layout_mock') || '{}'); } catch (e) { lay = {}; }
+                    send({ type: 'init', data: { locale: 'de', strings: S, currency: '$', resource: 'ArA-LawSystem', layout: lay } });
                 }, 20);
                 return { ok: true };
             case 'close':
@@ -584,6 +592,14 @@
                 send({ type: 'update', app: 'ledger', data: { alertsChanged: true } });
             }],
             ['close (Lua)', function () { send({ type: 'close' }); }],
+        ]],
+        ['Oberfläche', [
+            ['/editlawinterface', function () {
+                var lay = {};
+                try { lay = JSON.parse(localStorage.getItem('ara_law_layout_mock') || '{}'); } catch (e) { lay = {}; }
+                send({ type: 'open', app: 'layout', seq: ++seq, data: { layout: lay, samples: { name: 'Arthur Morgan', seal: 'sheriff',
+                    duty: { deptLabel: 'County Sheriff', gradeLabel: 'Sheriff', badgeNumber: 'SO-0042' } } } });
+            }],
         ]],
     ];
 

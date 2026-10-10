@@ -77,6 +77,7 @@ Law.LocaleAdd('en', {
     armory_item_desc      = 'Price (funds): $%s - Amount: %s',
     armory_badge_weapon   = 'Weapon',
     armory_taken          = 'Taken: %s',
+    layout_saved          = 'Interface saved.',
     garage_title          = 'Service wagon',
     garage_store          = 'Store service wagon',
     garage_none           = 'You have no service wagon out.',

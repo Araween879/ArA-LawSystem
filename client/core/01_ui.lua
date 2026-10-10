@@ -39,6 +39,7 @@ local function sendInit()
             strings  = Law.LocaleUi(),
             currency = Config.General.Currency or '$',
             resource = GetCurrentResourceName(),
+            layout   = Law.Layout and Law.Layout.Load() or nil,   -- eigenes Layout (client/core/06_layout.lua)
         },
     })
 end
@@ -48,6 +49,11 @@ end
 --------------------------------------------------------------------------
 function Law.UI.IsOpen()
     return focused
+end
+
+--- NUI geladen? (vorher gehen Hinweise ueber vorp)
+function Law.UI.IsReady()
+    return nuiReady
 end
 
 function Law.UI.Open(app, data)

@@ -327,6 +327,7 @@ seinen eigenen Events (`arrest:setCuffed`, `jail:*`) – beide Quellen kommen vo
 | `all` | alles | Kern |
 | `duty` | Dienst an/aus | Kern |
 | `badge` | Marke zeigen | Kern |
+| `layout` | Oberflaeche anpassen (`/editlawinterface`): Rahmen ueber HUDs/Hinweisen/Marke, Aktion `layout:save { layout }`; Layout `{ key = { x, y, s } }` pro Spieler in Resource-KVP `ara_law_layout`, wird mit `init.layout` angewendet | Kern |
 | `storage` | Dienstlager | Kern |
 | `armory` | Waffenkammer | Kern |
 | `garage` | Dienstwagen | Kern |

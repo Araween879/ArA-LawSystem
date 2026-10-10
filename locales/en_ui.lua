@@ -519,4 +519,23 @@ Law.LocaleAdd('en', {
     ui_hud_evidence           = 'Evidence search',
     ui_hud_evidence_count     = '%s traces nearby',
     ui_hud_robbery            = 'Breaking open the strongbox',
+
+    -- Customize interface (/editlawinterface)
+    ui_layout_title           = 'Customize interface',
+    ui_layout_hint            = 'Drag: move\nMouse wheel: change size\nDouble-click: back to default\nArrow keys: fine move (Shift = faster)\nEsc: cancel without saving',
+    ui_layout_save            = 'Save',
+    ui_layout_reset_all       = 'Reset all',
+    ui_layout_duty            = 'Duty badge (job)',
+    ui_layout_notify          = 'Notifications',
+    ui_layout_jail            = 'Jail time',
+    ui_layout_cuffed          = 'Handcuffs',
+    ui_layout_robbery         = 'Robbery',
+    ui_layout_k9              = 'Bloodhound',
+    ui_layout_escort          = 'Escort',
+    ui_layout_evidence        = 'Evidence search',
+    ui_layout_badge           = 'Badge',
+    ui_layout_demo_alert_title = '#12 Shots reported',
+    ui_layout_demo_alert_text = 'Valentine, Main Street – /einsatz 12',
+    ui_layout_demo_toast_title = 'Sample notification',
+    ui_layout_demo_toast_text = 'This is how notifications look.',
 })

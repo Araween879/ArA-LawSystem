@@ -85,6 +85,7 @@ Law.LocaleAdd('de', {
     armory_item_desc      = 'Preis (Kasse): $%s - Menge: %s',
     armory_badge_weapon   = 'Waffe',
     armory_taken          = 'Entnommen: %s',
+    layout_saved          = 'Oberflaeche gespeichert.',
     garage_title          = 'Dienstwagen',
     garage_store          = 'Dienstwagen einparken',
     garage_none           = 'Du hast keinen Dienstwagen draussen.',

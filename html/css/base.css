@@ -96,11 +96,12 @@ input, textarea { user-select: text; }
 }
 #toast-layer {
     position: fixed; top: 2.2vh; right: 1.6vw; z-index: 950;
-    width: clamp(240px, 36vh, 620px);
+    width: calc(clamp(240px, 36vh, 620px) * var(--s, 1));
     display: flex; flex-direction: column; gap: .6vh;
     pointer-events: none;
-    font-size: var(--ui);
+    font-size: calc(var(--ui) * var(--s, 1));
 }
+#toast-layer.is-custom { right: auto; bottom: auto; }
 
 /* --------------------------------------------------------------------------
    Buehne mit festem Seitenverhaeltnis (Skill redm-nui-png)

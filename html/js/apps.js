@@ -262,6 +262,13 @@
         root: null,
         nofocus: true,
         setup: function () { this.root = $('app-badge'); },
+        /** sofort ausblenden (Beispiel-Marke im Oberflaechen-Editor) */
+        hideNow: function () {
+            clearTimeout(badgeTimer); clearTimeout(badgeHide);
+            this.root.classList.remove('is-in', 'is-out');
+            this.root.classList.add('hidden');
+            LAW.clear(this.root);
+        },
         open: function (d) {
             var root = this.root;
             var key = LAW.sealKey(d.seal);

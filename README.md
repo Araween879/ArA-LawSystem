@@ -166,6 +166,25 @@ Eine Liste gültiger Wagen-Modelle steht direkt unter `Vehicles` in der Config.
 
 ---
 
+## Oberfläche anpassen (`/editlawinterface`)
+
+Jeder Spieler kann seine Anzeigen selbst anordnen. `/editlawinterface` blendet **alle** Anzeigen mit
+Beispieldaten ein: Dienst-Abzeichen (Job), Benachrichtigungen, Haftzeit, Handschellen, Überfall,
+Bluthund, Eskorte, Spurensuche und Marke.
+
+- **Ziehen** = verschieben · **Mausrad** = Größe · **Doppelklick** = zurück auf Standard
+- **Pfeiltasten** = fein verschieben (Shift = 10 px) · **+ / −** = Größe · **Entf** = zurücksetzen
+- **Speichern** übernimmt, **Esc / Abbrechen** verwirft, **Alles zurücksetzen** = Standard-Layout
+
+Gespeichert wird **pro Spieler auf dem eigenen PC** (RedM-KVP), ohne Datenbank, und es bleibt nach
+Neustarts erhalten. Positionen werden in Prozent gespeichert und passen deshalb auch bei anderer Auflösung.
+
+Damit auch die Benachrichtigungen verschiebbar sind, laufen sie über die eigene Anzeige
+(`config/main.lua` → `Config.General.NotifyStyle = 'nui'`). Mit `'vorp'` kommen wieder die
+vorp-Meldungen an fester Position.
+
+---
+
 ## Befehle
 
 | Befehl | Wer | Zweck |
@@ -177,5 +196,6 @@ Eine Liste gültiger Wagen-Modelle steht direkt unter `Vehicles` in der Config.
 | `/panik` | Behörde im Dienst | Panikknopf |
 | `/einsatz <Nr>` | Behörde im Dienst | Einsatz annehmen |
 | `/lawcoords` | Admin | eigene Position in F8 ausgeben |
+| `/editlawinterface` | alle | eigene Anzeigen verschieben und vergrößern (siehe unten) |
 
 Die Namen der Befehle lassen sich in `config/main.lua` → `Config.Commands` ändern.

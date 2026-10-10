@@ -1,0 +1,66 @@
+/* ==========================================================================
+   Oberflaeche anpassen (/editlawinterface)
+   Rahmen liegen ueber den echten Anzeigen, die Werkzeugleiste ist verschiebbar.
+   ========================================================================== */
+.app--layout { background: rgba(10, 6, 3, .18); align-items: flex-start; justify-content: flex-start; }
+
+/* Waehrend des Bearbeitens: Hinweise unter die Rahmen, nicht anklickbar */
+body.is-layout-editing #toast-layer { z-index: 10; }
+body.is-layout-editing #toast-layer .toast { pointer-events: none; }
+/* Marke unter die HUDs, sonst verdeckt die Beispiel-Marke Ueberfall/Handschellen */
+body.is-layout-editing .app-badge { z-index: 4; }
+
+#lay-handles { position: fixed; inset: 0; }
+
+.lay-handle {
+    position: fixed; cursor: move;
+    border: .14vh dashed rgba(217, 181, 106, .9);
+    border-radius: .3vh;
+    background: rgba(217, 181, 106, .08);
+    box-shadow: 0 0 0 .1vh rgba(0, 0, 0, .55);
+    font-size: var(--ui);
+}
+.lay-handle:hover { background: rgba(217, 181, 106, .16); }
+.lay-handle.is-custom { border-color: rgba(127, 176, 105, .95); }
+.lay-handle.is-sel { border-style: solid; border-width: .22vh; background: rgba(217, 181, 106, .2); }
+.lay-handle.is-drag { background: rgba(217, 181, 106, .28); }
+
+/* Schild ueber dem Rahmen: Name + Groesse; rechtsbuendig, wenn der Rahmen am rechten Rand liegt (per JS) */
+.lay-handle__label {
+    position: absolute; left: 0; bottom: 100%; margin-bottom: .2em;
+    display: flex; gap: .5em; white-space: nowrap; pointer-events: none;
+    font-family: var(--f-type); font-size: .78em; letter-spacing: .04em;
+    color: #f6ead0; background: rgba(26, 17, 10, .92);
+    border: .08em solid rgba(184, 144, 74, .85); border-radius: .2em;
+    padding: .1em .45em;
+}
+.lay-handle.is-right .lay-handle__label { left: auto; right: 0; }
+.lay-handle.is-top .lay-handle__label { bottom: auto; top: 100%; margin: .2em 0 0; }
+.lay-handle__size { color: var(--gold-hi); }
+
+.lay-bar {
+    position: fixed; left: 50%; top: 42vh; transform: translateX(-50%);
+    width: clamp(300px, 46vh, 720px);
+    font-size: var(--ui);
+    color: #efe0bd;
+    background: linear-gradient(180deg, rgba(44, 29, 17, .96) 0%, rgba(26, 17, 10, .96) 100%);
+    border: .1em solid rgba(184, 144, 74, .9);
+    border-radius: .3em;
+    box-shadow: 0 .5em 1.4em rgba(0, 0, 0, .6);
+    z-index: 2;
+}
+.lay-bar__head {
+    cursor: move; padding: .55em .9em .45em;
+    border-bottom: .08em solid rgba(184, 144, 74, .5);
+    font-family: var(--f-head); font-size: 1.15em; letter-spacing: .04em;
+}
+.lay-bar__hint { padding: .6em .9em; font-size: .85em; line-height: 1.45; color: #cdb487; white-space: pre-line; }
+.lay-bar__btns { display: flex; gap: .5em; padding: 0 .9em .8em; }
+.lay-btn {
+    flex: 1 1 0; padding: .45em .6em; border-radius: .25em;
+    border: .08em solid rgba(184, 144, 74, .85); color: #efe0bd; background: rgba(0, 0, 0, .25);
+    font-family: var(--f-type); font-size: .9em;
+}
+.lay-btn:hover { background: rgba(217, 181, 106, .18); }
+.lay-btn--save { background: rgba(127, 176, 105, .25); border-color: rgba(127, 176, 105, .9); }
+.lay-btn--save:hover { background: rgba(127, 176, 105, .4); }

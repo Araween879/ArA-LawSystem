@@ -28,6 +28,10 @@ Config.General = {
     AdminGroups  = { 'admin', 'superadmin' },  -- vorp-Gruppen mit Admin-Befehlen
     AskTimeout   = 15000,       -- ms, wie lange der Server auf eine Client-Antwort wartet
     ShowDutyHud  = true,        -- kleines Abzeichen im HUD, solange man im Dienst ist
+    -- Benachrichtigungen des LawSystems:
+    --   'nui'  = eigene Anzeige (Papierzettel) - jeder Spieler kann sie mit /editlawinterface verschieben
+    --   'vorp' = Standard-Meldungen von vorp (feste Position, nicht verschiebbar)
+    NotifyStyle  = 'nui',
     -- Tod zusaetzlich serverseitig an der Ped-Gesundheit pruefen (Schutz gegen
     -- gefaelschtes vorp:ImDead). Nur auf false stellen, wenn Tote im Spiel
     -- nachweislich nicht als tot erkannt werden (z.B. Kopfgeld "tot" geht nicht).
@@ -65,6 +69,7 @@ Config.Commands = {
     Panic     = 'panik',       -- Panikknopf (Behoerde im Dienst)
     Accept    = 'einsatz',     -- /einsatz <Nr>  Einsatz annehmen
     Coords    = 'lawcoords',   -- Admin: eigene Position ausgeben
+    EditUi    = 'editlawinterface', -- Jeder: eigene Anzeigen (Job, Hinweise, Haft ...) verschieben + speichern
 }
 
 --------------------------------------------------------------------------

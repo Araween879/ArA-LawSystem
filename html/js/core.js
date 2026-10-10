@@ -534,6 +534,8 @@
         LAW.applyStatic();
         Object.keys(LAW.apps).forEach(function (k) { if (LAW.apps[k].onInit) { try { LAW.apps[k].onInit(); } catch (err) { LAW.logError(err); } } });
         Object.keys(LAW.huds).forEach(function (k) { if (LAW.huds[k].onInit) { try { LAW.huds[k].onInit(); } catch (err) { LAW.logError(err); } } });
+        // eigenes Layout des Spielers (/editlawinterface)
+        if (LAW.Layout && d.layout) { try { LAW.Layout.apply(d.layout); } catch (err) { LAW.logError(err); } }
     }
 
     LAW.handleMessage = function (m) {

@@ -23,6 +23,7 @@ Meldung „Items fehlen in der Tabelle items“.
 | 1.6 | A: Behörde → Einstellen → B wählen, Rang 0 | **B bekommt Rückfrage**, nach „Annehmen“ ist B Anwärter |
 | 1.7 | A: Rang von B ändern, dann entlassen | Rang-Anzeige bei B aktuell, danach arbeitslos |
 | 1.8 | A: Kasse einzahlen / auszahlen | Kassenbuch zeigt beide Buchungen |
+| 1.8b | Jeder: `/editlawinterface` → Anzeigen ziehen, Mausrad, Speichern; `restart ArA-LawSystem` | Alle 9 Rahmen sichtbar; nach Neustart stehen Job-Abzeichen/Hinweise an der gespeicherten Stelle; Esc verwirft |
 | 1.9 | A: Dienstwagen ausparken, einparken | Menü zeigt Kategorien (Gefangene, Personen, Streife …), gesperrte Wagen mit „Ab Rang: …“; Wagen steht am Spawn, verschwindet beim Einparken |
 | 1.10 | B: `/sheriff Hilfe` | A: Toast + Blip, `/einsatz <Nr>` setzt Route |
 | 1.11 | A: `/panik` | Alarm an alle im Dienst |
