@@ -71,7 +71,7 @@ Station gehört:
 | `label` | Name der Station im Spiel |
 | `depts` | Welche Behörden hier arbeiten dürfen (`nil` = alle, z. B. `{ 'sheriff' }`) |
 | `jailTo` | Wohin hier eingebucht wird (`'sisika'` oder eigene Zellen) |
-| `blip` | Kartensymbol (an/aus, Name, Symbol, Farbe, Position) |
+| `blip` | Kartensymbol (an/aus, Name, Symbol, Farbe, Position – ohne Angabe am Schalter bzw. Dienst-Punkt) |
 | `points` | Alle Punkte der Station (siehe unten) |
 | `cells` | Eigene Zellen in der Station (Standard: aus, alle kommen nach Sisika) |
 | `shotsZone` | Gebiet für den Schüsse-Alarm der Stadt |
@@ -113,14 +113,21 @@ Werte mit dem Kommentar **ANPASSEN** sind Startwerte und sollten einmal im Spiel
 1. `config/stations/_vorlage.lua` kopieren → `config/stations/vanhorn.lua`
 2. In der Kopie `Config.Stations.vorlage` → `Config.Stations.vanhorn` ändern
    (Kleinbuchstaben, keine Leerzeichen, jeder Name nur einmal).
-3. `enabled = true` setzen und die Punkte eintragen.
-4. `restart ArA-LawSystem`
+3. `enabled = true` setzen und die Punkte eintragen (nicht gebrauchte Punkte löschen).
+4. Optional `shotsZone` (Schüsse-Alarm) und `cells` (eigene Zellen) ausfüllen und dort
+   `enabled = true` setzen – in der Vorlage sind beide aus.
+   Steht die Stadt schon in `config/main.lua` unter `ShotsFired.Zones` (z. B. Van Horn),
+   gilt ab jetzt das Gebiet aus der Stadt-Datei – den alten Eintrag dort löschen.
+5. `restart ArA-LawSystem`
 
 In der Server-Konsole steht nach jedem Start `Stationen aktiv: …`. Tippfehler (falscher Punkt-Name,
-fehlende Koordinaten, `jailTo` auf einen Knast, den es nicht gibt) werden dort gelb gemeldet.
+fehlende Koordinaten, Platzhalter `0.0, 0.0, 0.0`, `jailTo` auf einen Knast, den es nicht gibt)
+werden dort gelb gemeldet – der betroffene Punkt ist dann aus.
 
 > Den Namen (Schlüssel) einer Station, die schon benutzt wurde, **nicht mehr ändern** –
 > Eskort-Aufträge und Häftlinge in eigenen Zellen sind damit in der Datenbank gespeichert.
+> Gleiches beim **Abschalten** einer benutzten Station (oder ihres `escort`-Punkts): offene
+> Eskort-Aufträge und abholbereite Ware dort sind erst wieder erreichbar, wenn sie wieder an ist.
 
 ### Eigene Zellen statt Sisika
 

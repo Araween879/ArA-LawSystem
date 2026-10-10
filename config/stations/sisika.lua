@@ -30,7 +30,7 @@ Config.Stations.sisika = {
         sprite  = 'blip_ambient_sheriff',
         style   = 'BLIP_STYLE_FRIENDLY_ON_RADAR',
         color   = nil,
-        coords  = nil,             -- nil = am Schalter (counter)
+        coords  = nil,             -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty)
     },
 
     -- Punkte der Waerter. Sisika hat bewusst keine Waffenkammer, keine

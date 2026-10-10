@@ -8,8 +8,15 @@
       2. In der Kopie den Schluessel aendern:   Config.Stations.vanhorn = {
          (nur Kleinbuchstaben, keine Leerzeichen, darf nur EINMAL vorkommen)
       3. enabled = true setzen, label/blip/points eintragen
-      4. "restart ArA-LawSystem" - in der Server-Konsole steht danach
+         (Punkte, die du nicht brauchst: Zeile loeschen oder enabled = false)
+      4. Optional: shotsZone (Schuesse-Alarm) und cells (eigene Zellen)
+         eintragen und dort enabled = true setzen - beide sind in der Vorlage AUS.
+         Steht die Stadt schon in config/main.lua unter ShotsFired.Zones
+         (z.B. Van Horn), gilt ab jetzt das Gebiet aus dieser Datei - den
+         Eintrag in config/main.lua dann loeschen.
+      5. "restart ArA-LawSystem" - in der Server-Konsole steht danach
          "Stationen aktiv: ..." und ggf. Hinweise auf Tippfehler
+         (Punkte mit 0.0, 0.0, 0.0 gelten als nicht ausgefuellt und sind aus)
 
     Koordinaten holen: im Spiel als Admin hinstellen und /lawcoords eingeben,
     die Position steht dann in der F8-Konsole (vector3 und vector4).
@@ -19,6 +26,9 @@
     Wichtig: Den Schluessel (hier "vorlage") einer Station, die schon benutzt
     wurde, NICHT mehr aendern - offene Eskort-Auftraege und Haeftlinge in eigenen
     Zellen sind in der Datenbank mit diesem Schluessel gespeichert.
+    Dasselbe beim Abschalten (enabled = false) einer benutzten Station oder ihres
+    escort-Punkts: offene Eskort-Auftraege und abholbereite Ware dort sind dann
+    nicht mehr erreichbar, bis die Station wieder an ist. Vorher abwickeln lassen.
 ]]
 
 Config.Stations = Config.Stations or {}
@@ -53,7 +63,8 @@ Config.Stations.vorlage = {
         sprite  = 'blip_ambient_sheriff',          -- Symbol
         style   = 'BLIP_STYLE_FRIENDLY_ON_RADAR',
         color   = nil,                             -- z.B. 'BLIP_MODIFIER_MP_COLOR_32' | nil = Standard
-        coords  = nil,                             -- nil = am Schalter (counter), sonst vector3(...)
+        coords  = nil,                             -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty);
+                                                   -- gibt es beide nicht: hier vector3(...) eintragen, sonst kein Symbol
     },
 
     --------------------------------------------------------------------------
@@ -104,11 +115,12 @@ Config.Stations.vorlage = {
 
     --------------------------------------------------------------------------
     -- Schuesse-Alarm (optional): Schuesse in diesem Gebiet meldet ein NPC-Zeuge
-    -- an die Leitstelle. Weglassen oder enabled = false = kein Alarm.
-    -- Gebiete ohne Station (z.B. Van Horn) stehen in config/main.lua.
+    -- an die Leitstelle. Zum Einschalten coords/radius eintragen und enabled = true.
+    -- Gebiete OHNE Station stehen in config/main.lua (ShotsFired.Zones). Hat eine
+    -- Stadt dort schon einen Eintrag (z.B. Van Horn), ersetzt dieses Gebiet ihn.
     --------------------------------------------------------------------------
     shotsZone = {
-        enabled = true,
+        enabled = false,
         coords  = vector3(0.0, 0.0, 0.0),   -- Mitte der Stadt
         radius  = 150.0,                    -- Meter
     },

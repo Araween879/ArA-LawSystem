@@ -30,7 +30,7 @@ Config.Stations.strawberry = {
         sprite  = 'blip_ambient_sheriff',
         style   = 'BLIP_STYLE_FRIENDLY_ON_RADAR',
         color   = nil,             -- z.B. 'BLIP_MODIFIER_MP_COLOR_32' | nil = Standardfarbe
-        coords  = nil,             -- nil = am Schalter (counter) | sonst vector3(...)
+        coords  = nil,             -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty) | sonst vector3(...)
     },
 
     -- Alle Punkte der Station. Jeder Punkt: coords = vector3(x, y, z)

@@ -45,6 +45,12 @@ end
 local function isVec3(v) return type(v) == 'vector3' end
 local function isVec4(v) return type(v) == 'vector4' end
 
+--- Gueltige Position? (vector3/vector4 und nicht der Platzhalter 0, 0, 0 aus der Vorlage)
+local function isPos(v)
+    if not (isVec3(v) or isVec4(v)) then return false end
+    return not (v.x == 0.0 and v.y == 0.0 and v.z == 0.0)
+end
+
 --- vector3 oder vector4 -> vector4 (fehlende Richtung = 0.0)
 local function toVec4(v)
     if isVec4(v) then return v end
@@ -52,23 +58,25 @@ local function toVec4(v)
     return nil
 end
 
---- Ein Punkt oder eine Liste von Punkten -> Liste
+--- Ein Punkt oder eine Liste von Punkten -> Liste.
+--- Liste nur, wenn die Tabelle Eintraege [1], [2] ... hat - so wird auch ein
+--- einzelner Punkt mit vertipptem "coords" geprueft und gemeldet.
 local function pointList(p)
-    if not p then return {} end
-    if p.coords then return { p } end
+    if type(p) ~= 'table' then return {} end
+    if p.coords ~= nil or p[1] == nil then return { p } end
     return p
 end
 
 --- Einen Punkt pruefen und angleichen. Liefert den Punkt oder nil (aus).
 local function cleanPoint(key, pType, p)
     if type(p) ~= 'table' or p.enabled == false then return nil end
-    if not (isVec3(p.coords) or isVec4(p.coords)) then
-        warn('%s.points.%s hat keine gueltigen coords (vector3) - Punkt ist aus', key, pType)
+    if not isPos(p.coords) then
+        warn('%s.points.%s hat keine gueltigen coords (vector3, nicht 0/0/0) - Punkt ist aus', key, pType)
         return nil
     end
     if NEEDS_SPAWN[pType] then
         local s = toVec4(p.spawn)
-        if not s then
+        if not s or not isPos(s) then
             warn('%s.points.%s braucht spawn = vector4(x, y, z, richtung) - Punkt ist aus', key, pType)
             return nil
         end
@@ -79,7 +87,7 @@ end
 
 local function buildStation(key, st)
     -- Blip
-    if st.blip == false or (type(st.blip) == 'table' and st.blip.enabled == false) then
+    if type(st.blip) ~= 'table' or st.blip.enabled == false then
         st.blip = nil
     end
 
@@ -88,6 +96,8 @@ local function buildStation(key, st)
     for pType, p in pairs(st.points or {}) do
         if not POINT_TYPES[pType] then
             warn('%s.points.%s ist kein bekannter Punkt-Typ (Tippfehler?) - wird ignoriert', key, tostring(pType))
+        elseif p ~= false and type(p) ~= 'table' then
+            warn('%s.points.%s muss { coords = vector3(...) } sein (oder false) - Punkt ist aus', key, pType)
         elseif p ~= false then
             local list = {}
             for _, one in ipairs(pointList(p)) do
@@ -103,13 +113,23 @@ local function buildStation(key, st)
     end
     st.points = points
 
+    -- Blip braucht eine Position: blip.coords, sonst Schalter, sonst Dienst-Punkt
+    if st.blip and not isPos(st.blip.coords) then
+        st.blip.coords = nil
+        if not points.counter and not points.duty then
+            warn('%s.blip hat keine Position (kein counter/duty-Punkt) - blip.coords setzen, sonst kein Kartensymbol', key)
+        end
+    end
+
     -- Eigene Zellen -> Knast-Ort mit dem Schluessel der Station
     local cells = st.cells
     if type(cells) == 'table' then
-        if not isVec3(cells.center) and not isVec4(cells.center) then
-            warn('%s.cells.center fehlt - Zellen sind aus', key)
-        elseif not toVec4(cells.spawn) or not toVec4(cells.release) then
-            warn('%s.cells braucht spawn und release (vector4) - Zellen sind aus', key)
+        local complete = isPos(cells.center) and isPos(cells.spawn) and isPos(cells.release)
+        if not complete then
+            -- ausgeschaltete, unfertige Zellen (Vorlage) still ueberspringen
+            if cells.enabled ~= false then
+                warn('%s.cells braucht center (vector3), spawn und release (vector4), nicht 0/0/0 - Zellen sind aus', key)
+            end
         else
             if Config.Jail.Locations[key] then
                 warn('Knast-Ort "%s" steht doppelt (config/justice.lua und Station) - die Station gilt', key)
@@ -134,15 +154,23 @@ local function buildStation(key, st)
     -- Schuesse-Alarm-Gebiet
     local z = st.shotsZone
     if type(z) == 'table' and z.enabled ~= false then
-        if isVec3(z.coords) or isVec4(z.coords) then
+        if isPos(z.coords) then
             local zones = Config.Dispatch.ShotsFired.Zones
+            local label = z.label or st.label or key
+            -- Gleichnamiges Gebiet aus config/main.lua (z.B. "Van Horn") ersetzt die Station
+            for i = #zones, 1, -1 do
+                if zones[i].label == label then
+                    table.remove(zones, i)
+                    warn('Schuesse-Gebiet "%s" steht auch in config/main.lua - es gilt das aus %s.lua (dort loeschen)', label, key)
+                end
+            end
             zones[#zones + 1] = {
-                label  = z.label or st.label or key,
+                label  = label,
                 coords = vector3(z.coords.x, z.coords.y, z.coords.z),
                 radius = (tonumber(z.radius) or 150.0) + 0.0,
             }
         else
-            warn('%s.shotsZone.coords fehlt - kein Schuesse-Alarm fuer diese Stadt', key)
+            warn('%s.shotsZone.coords fehlt (oder 0/0/0) - kein Schuesse-Alarm fuer diese Stadt', key)
         end
     end
 end

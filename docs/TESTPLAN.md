@@ -8,8 +8,9 @@ Beim Start muss in der Server-Konsole stehen: `[ArA-Law] gestartet - N Module` u
 Meldung „Items fehlen in der Tabelle items“.
 
 ## 0. Koordinaten (einmalig)
-- [ ] An jeder Station mit `/lawcoords` prüfen: Dienstpult, Lager, Eingang, Wagen-Spawn. Falsche Werte in `config/main.lua` korrigieren → `restart ArA-LawSystem`.
-- [ ] Sisika: Zentrum, Radius, Spawn, Arbeitspunkte (`config/justice.lua`).
+- [ ] An jeder Station mit `/lawcoords` prüfen: Dienstpult, Lager, Eingang, Wagen-Spawn. Falsche Werte in `config/stations/<stadt>.lua` (Block `points`, Wagen-Spawn = `points.garage.spawn`) korrigieren → `restart ArA-LawSystem`.
+- [ ] Sisika: Zentrum, Radius, Spawn, Arbeitspunkte (`config/stations/sisika.lua`, Block `cells`).
+- [ ] Server-Konsole: `Stationen aktiv (9): …` und **keine** gelben „Stationen: …“-Hinweise.
 
 ## 1. Kern
 | # | Schritt | Erwartet |
