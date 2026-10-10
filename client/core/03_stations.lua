@@ -19,6 +19,12 @@ local busy = false
 
 local DEFAULT_DISTANCE = 1.8
 
+--- Waagerechter Abstand + Hoehenunterschied (Punkte duerfen auf Tisch-/Schildhoehe liegen)
+local function distTo(pos, c)
+    local dx, dy = pos.x - c.x, pos.y - c.y
+    return math.sqrt(dx * dx + dy * dy), math.abs(pos.z - c.z)
+end
+
 --- def = { label, law, perm, duty, canShow(stationKey, point), onUse(stationKey, point), hold, distance }
 function Law.Stations.RegisterPoint(pointType, def)
     registry[pointType] = def
@@ -107,13 +113,14 @@ function Law.Stations.Start()
                 local nearestStation, nearestDist = nil, math.huge
                 local active = {}
 
+                local maxDz = (Config.Points and Config.Points.HeightTolerance) or 2.5
                 for _, fp in ipairs(flatPoints) do
                     local def = registry[fp.type]
                     if def and fp.coords then
-                        local d = #(pos - fp.coords)
+                        local d, dz = distTo(pos, fp.coords)
                         if d < 15.0 and sleep > 250 then sleep = 250 end
                         local reach = def.distance or DEFAULT_DISTANCE
-                        if d <= reach and allowed(def, fp.station, fp.point) then
+                        if d <= reach and dz <= maxDz and allowed(def, fp.station, fp.point) then
                             -- je Typ nur der naechste Punkt
                             if not active[fp.type] or d < active[fp.type].dist then
                                 active[fp.type] = { fp = fp, dist = d }

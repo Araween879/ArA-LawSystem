@@ -46,6 +46,14 @@ Config.Interact = {
     TargetDistance = 3.0,   -- Reichweite fuer Aktionen am naechsten Spieler (F6)
 }
 
+-- Stations-Punkte: Abstand wird waagerecht gemessen. Der Punkt darf so viele
+-- Meter ueber/unter dem Spieler liegen (z.B. auf Tisch-, Schrank- oder
+-- Schildhoehe eingetragen). Nicht hoeher als ~3 stellen, sonst greifen Punkte
+-- durch Decken/Boeden in mehrstoeckigen Gebaeuden.
+Config.Points = {
+    HeightTolerance = 2.5,
+}
+
 --------------------------------------------------------------------------
 -- Befehle
 --------------------------------------------------------------------------

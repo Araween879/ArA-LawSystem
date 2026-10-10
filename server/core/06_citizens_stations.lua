@@ -87,18 +87,24 @@ local function pointList(p)
 end
 
 --- Steht der Spieler an einem Punkt dieses Typs? -> stationKey, point
---- maxDist: Default = point.radius oder 3.0
+--- maxDist: Default = point.radius oder 3.0 (waagerecht gemessen)
+--- Hoehe: Punkt darf bis Config.Points.HeightTolerance ueber/unter dem Spieler
+--- liegen (bei Zonen mit groesserem radius bis zum radius) - wie im Client.
 --- Punkte mit `jobs` zaehlen nur fuer Spieler mit einem dieser Jobs.
 function Law.Stations.NearPoint(src, pointType, maxDist)
     local coords = Law.GetCoords(src)
     if not coords then return nil end
     local bestKey, bestPoint, bestDist
     local dept, deptKnown = nil, false
+    local maxDz = (Config.Points and Config.Points.HeightTolerance) or 2.5
     for key, st in pairs(Config.Stations) do
         for _, p in ipairs(pointList(st.points and st.points[pointType])) do
             local limit = maxDist or p.radius or 3.0
-            local d = #(coords - Law.Vec(p.coords))
-            if d <= limit and (not bestDist or d < bestDist) then
+            local c = Law.Vec(p.coords)
+            local dx, dy = coords.x - c.x, coords.y - c.y
+            local d = math.sqrt(dx * dx + dy * dy)
+            local dz = math.abs(coords.z - c.z)
+            if d <= limit and dz <= math.max(maxDz, limit) and (not bestDist or d < bestDist) then
                 local ok = true
                 if p.jobs then
                     if not deptKnown then

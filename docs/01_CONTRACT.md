@@ -449,6 +449,7 @@ Stationen/Punkte mit `enabled = false` werden entfernt (der restliche Code sieht
 `shotsZone` → Eintrag in `Config.Dispatch.ShotsFired.Zones`. `spawn` als vector3 wird zu vector4 (Richtung 0.0).
 Stations-`jobs` landet als `st.depts` (wie bisher von `Law.Stations.AllowsDept` und dem Client geprueft).
 `jobs` am Punkt: Client zeigt den Prompt nur diesen Jobs, `Law.Stations.NearPoint` (Server) ignoriert den Punkt fuer alle anderen.
+Abstand zu Punkten (Client-Prompt und `NearPoint`) wird waagerecht gemessen; Hoehenunterschied bis `Config.Points.HeightTolerance` (2,5 m, Server bei Zonen bis `radius`).
 Fehlerhafte Eintraege werden mit Warnung uebersprungen.
 
 | Punkt-Typ | Besitzer | Wer | Aktion |

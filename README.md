@@ -94,6 +94,8 @@ Station gehört:
 | `escort` | alle / Behörde | Eskort-Büro (`spawn` = Panzerwagen, `radius` = Lieferzone) |
 
 - **Punkt nicht gewünscht?** → `enabled = false` in den Punkt schreiben (oder die Zeile löschen).
+- **Höhe:** Ein Punkt darf bis zu 2,5 m über/unter dem Spieler liegen (z. B. auf Tisch-, Schrank- oder
+  Schildhöhe). Der Abstand zählt waagerecht. Einstellbar in `config/main.lua` → `Config.Points`.
 - **Mehrere Punkte vom gleichen Typ?** → als Liste: `duty = { { coords = ... }, { coords = ... } }`
 - **Nur bestimmte Jobs an einem Punkt?** → `jobs` in den Punkt schreiben:
   `armory = { coords = vector3(...), jobs = { 'sheriff', 'marshal' } }`.

@@ -6,8 +6,8 @@
       2. /lawcoords eingeben -> Position steht in der F8-Konsole
       3. Zahlen hier einfuegen, speichern, "restart ArA-LawSystem"
 
-    Alles mit "ANPASSEN" sind Startwerte (aus vorp_police bzw. geschaetzt)
-    und sollten einmal im Spiel geprueft werden.
+    Punkte eingetragen am 10.10.2026 (im Spiel gemessen). Offen: jail (Startwert).
+    Alles mit "ANPASSEN" sind Startwerte und sollten einmal im Spiel geprueft werden.
     Einen Punkt nicht haben wollen?  ->  enabled = false  in den Punkt schreiben
     Die ganze Station nicht haben?   ->  enabled = false  ganz oben
     Alle Felder sind in config/stations/_vorlage.lua genau erklaert.
@@ -28,32 +28,35 @@ Config.Stations.valentine = {
         sprite  = 'blip_ambient_sheriff',
         style   = 'BLIP_STYLE_FRIENDLY_ON_RADAR',
         color   = nil,             -- z.B. 'BLIP_MODIFIER_MP_COLOR_32' | nil = Standardfarbe
-        coords  = nil,             -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty) | sonst vector3(...)
+        coords  = vector3(-277.47, 806.09, 119.38),   -- nil = am Schalter (counter), sonst am Dienst-Punkt (duty)
     },
 
     -- Alle Punkte der Station. Jeder Punkt: coords = vector3(x, y, z)
     -- Nur bestimmte Jobs an einem Punkt:  armory = { coords = ..., jobs = { 'sheriff' } },
     -- Mehrere Punkte vom selben Typ:  duty = { { coords = ... }, { coords = ... } },
+    -- Punkte duerfen auf Tisch-/Schrankhoehe liegen (bis 2,5 m, Config.Points in config/main.lua).
     points = {
-        -- Pult / Tresen  (ANPASSEN)
-        duty     = { coords = vector3(-277.73, 804.84, 119.38) },   -- Dienst an/aus
-        boss     = { coords = vector3(-277.73, 804.84, 119.38) },   -- Chef: Personal, Kasse, Protokoll (Dienstbuch)
-        counter  = { coords = vector3(-277.73, 804.84, 119.38) },   -- Schalter fuer ALLE Buerger (Bussgeld, Kaution, Lizenzen, Anzeige ...)
-        jail     = { coords = vector3(-277.73, 804.84, 119.38) },   -- Einbuchen: gefesselte Person steht daneben
+        -- Pult / Tresen
+        duty     = { coords = vector3(-278.25, 802.64, 119.38) },   -- Dienst an/aus
+        boss     = { coords = vector3(-277.19, 804.38, 119.38) },   -- Chef: Personal, Kasse, Protokoll (Dienstbuch)
+        jail     = { coords = vector3(-277.73, 804.84, 119.38) },   -- Einbuchen: gefesselte Person steht daneben  (ANPASSEN: noch Startwert)
 
-        -- Hinterzimmer  (ANPASSEN)
-        storage  = { coords = vector3(-276.97, 810.83, 119.38) },   -- Dienstlager der Behoerde (alle Stationen teilen ein Lager)
-        armory   = { coords = vector3(-276.97, 810.83, 119.38) },   -- Waffenkammer (bezahlt die Kasse der Behoerde)
-        evidence = { coords = vector3(-276.97, 810.83, 119.38) },   -- Asservatenkammer + Labor
+        -- Hinterzimmer
+        storage  = { coords = vector3(-277.57, 810.97, 120.11) },   -- Dienstlager der Behoerde (alle Stationen teilen ein Lager)
+        armory   = { coords = vector3(-279.01, 805.08, 120.56) },   -- Waffenkammer (bezahlt die Kasse der Behoerde)
+        evidence = { coords = vector3(-279.84, 809.31, 120.01) },   -- Asservatenkammer + Labor
 
-        -- Eingang / draussen  (ANPASSEN)
-        board    = { coords = vector3(-278.17, 814.88, 119.28) },   -- Steckbriefbrett (Kopfgelder, Auftraege) - fuer alle
-        kennel   = { coords = vector3(-278.17, 814.88, 119.28), heading = 0.0 },   -- Zwinger: Bluthund holen/abgeben
-        dropoff  = { coords = vector3(-278.17, 814.88, 119.28), radius = 8.0 },    -- Abgabe-Zone fuer Gefangene (Kopfgeld/Auftraege)
-        garage   = { coords = vector3(-278.17, 814.88, 119.28),
-                     spawn  = vector4(-283.50, 823.50, 119.30, 190.00) },   -- Dienstwagen: hier erscheint der Wagen
-        escort   = { coords = vector3(-278.17, 814.88, 119.28),
-                     spawn  = vector4(-283.50, 823.50, 119.30, 190.00),      -- Panzerwagen fuer Werttransporte
+        -- Fuer Buerger
+        counter  = { coords = vector3(-274.28, 802.21, 120.38) },   -- Schalter fuer ALLE Buerger (Bussgeld, Kaution, Lizenzen, Anzeige ...)
+        board    = { coords = vector3(-269.56, 807.15, 120.74) },   -- Steckbriefbrett (Kopfgelder, Auftraege) - fuer alle
+        dropoff  = { coords = vector3(-270.10, 809.65, 119.25), radius = 8.0 },   -- Abgabe-Zone fuer Gefangene (Kopfgeld/Auftraege)
+
+        -- Draussen
+        kennel   = { coords = vector3(-281.75, 811.92, 119.95), heading = 281.92 },   -- Zwinger: Bluthund holen/abgeben
+        garage   = { coords = vector3(-272.59, 814.42, 121.26),
+                     spawn  = vector4(-268.55, 821.92, 119.02, 201.61) },   -- Dienstwagen: hier erscheint der Wagen
+        escort   = { coords = vector3(-272.59, 814.42, 121.26),
+                     spawn  = vector4(-268.55, 821.92, 119.02, 201.61),     -- Panzerwagen fuer Werttransporte
                      radius = 25.0 },      -- Liefer-/Abholzone der Eskorten
     },
 
