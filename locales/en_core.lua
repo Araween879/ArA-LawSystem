@@ -46,6 +46,8 @@ Law.LocaleAdd('en', {
     prompt_duty_on        = 'Clock in',
     prompt_duty_off       = 'Clock out',
     prompt_boss           = 'Manage department',
+    prompt_multi          = 'Actions here (%s)',
+    prompt_multi_sub      = 'What do you want to do?',
     prompt_storage        = 'Storage',
     prompt_armory         = 'Armory',
     prompt_counter        = 'Counter',

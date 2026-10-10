@@ -228,9 +228,8 @@ local function playersInCell(cell)
     for _, pid in ipairs(GetActivePlayers()) do
         local ped = GetPlayerPed(pid)
         if ped ~= me and DoesEntityExist(ped) then
-            local c = GetEntityCoords(ped)
-            local dx, dy = c.x - cell.center.x, c.y - cell.center.y
-            if math.sqrt(dx * dx + dy * dy) <= cell.radius + 0.3 and math.abs(c.z - cell.center.z) <= 3.0 then
+            -- wirklich hinter dem Gitter (nicht im Gang davor)
+            if Law.Cells.Inside(cell, GetEntityCoords(ped), 'book') then
                 local sid = GetPlayerServerId(pid)
                 if Law.Justice.StateOf(sid, 'law_jailed') ~= true then
                     out[#out + 1] = { value = sid, label = Law.Util.PlayerName(sid) }

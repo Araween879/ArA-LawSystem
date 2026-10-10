@@ -74,6 +74,8 @@ Config.Stations.valentine = {
     -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
     -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
     -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
+    -- Zellen nicht loeschen/umsortieren, solange Haeftlinge sitzen (die Nummer in der Liste wird
+    -- gespeichert) - zum Abschalten lieber enabled = false in die Zeile schreiben.
     cells = {
         enabled = true,
         label   = 'Zellen Valentine',

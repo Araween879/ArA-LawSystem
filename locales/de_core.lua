@@ -52,6 +52,8 @@ Law.LocaleAdd('de', {
     prompt_duty_on        = 'Dienst beginnen',
     prompt_duty_off       = 'Dienst beenden',
     prompt_boss           = 'Behoerde verwalten',
+    prompt_multi          = 'Aktionen hier (%s)',
+    prompt_multi_sub      = 'Was moechtest du tun?',
     prompt_storage        = 'Dienstlager',
     prompt_armory         = 'Waffenkammer',
     prompt_counter        = 'Schalter',

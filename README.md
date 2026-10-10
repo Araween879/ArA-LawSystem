@@ -153,6 +153,12 @@ Position aus den Spieldaten sind schon eingetragen). So läuft eine Festnahme:
   Spur für den Bluthund). Verlässt der Häftling die Zelle, gilt das als **Flucht** (Haftbefehl, Kopfgeld).
 - **Aufschließen einer belegten Zelle** fragt vorher nach.
 - **Plätze:** `capacity` je Zelle (Valentine: 3). Ist die Zelle voll, lehnt das Einbuchen ab.
+- **Hinter dem Gitter:** Eingebucht wird nur, wer wirklich in der Zelle steht – der Gang vor dem
+  Gitter zählt nie, auch wenn `radius` hineinreicht (das Script kennt die Gitterseite über die Tür).
+- **Eine Taste, ein Menü:** Liegen an einer Stelle mehrere Aktionen (z. B. Zellentür: Aufschließen +
+  Einbuchen, oder Garage + Eskorte), gibt es einen Prompt; Halten öffnet ein Auswahlmenü.
+- Zellen in `cells.list` **nicht löschen oder umsortieren**, solange Häftlinge sitzen
+  (gespeichert wird die Nummer in der Liste) – zum Abschalten `enabled = false` setzen.
 - **Tür zu = kein Ausbruch:** Steht ein Häftling bei abgeschlossener Tür knapp außerhalb der Zelle
   (Glitch, Radius zu klein), wird er zurück in die Zelle gesetzt – Flucht gibt es nur durch eine offene Tür.
 - **Kopfgeld-Abgabe:** Gibt ein **Kopfgeldjäger** (oder Gesetz außer Dienst) an der Abgabestelle

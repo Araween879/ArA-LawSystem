@@ -478,7 +478,8 @@ function Law.Jail.SentenceToCell(targetSrc, stationKey, minutes, reason, officer
     local loc = locationCfg(stationKey)
     if not loc or loc.mode ~= 'cells' then return false, 'no_location' end
     local best, bestN
-    for idx, c in ipairs(loc.cells or {}) do
+    for _, idx in ipairs(loc.cellOrder or {}) do
+        local c = loc.cells[idx]
         if not c.fallback then
             local n = #Law.Justice.InmatesInCell(stationKey, idx)
             if n < (c.capacity or 1) and (not bestN or n < bestN) then best, bestN = idx, n end
@@ -611,7 +612,8 @@ Law.Cb.Register('jail:sentenceCell', { perm = 'jail', rate = 2000, notCuffed = t
     local tctx = Law.Ctx(targetSrc)
     if not tctx then return Law.Result(false, 'no_target') end
     local tc = Law.GetCoords(targetSrc)
-    if not tc or dist2D(tc, cell.center) > cell.radius + 0.3 or math.abs(tc.z - cell.center.z) > 3.0 then
+    -- wirklich hinter dem Gitter (nicht im Gang davor)
+    if not tc or not Law.Cells.Inside(cell, tc, 'book') then
         return Law.Result(false, 'cell_target_outside')
     end
 
@@ -881,7 +883,13 @@ local function checkEscapes()
             local center, radius, _, maxDz = zoneOf(i)
             local c = Law.GetCoords(src)
             local recentlyDead = Law.DiedRecently(src, Config.Jail.DiedRecentlySeconds or 90)
-            local outside = center and c and (dist2D(c, center) > radius or (maxDz and math.abs(c.z - center.z) > maxDz))
+            local inCell = cellOf(i)
+            local outside
+            if inCell then
+                outside = c and not Law.Cells.Inside(inCell, c)   -- Kreis + Gitterseite
+            else
+                outside = center and c and (dist2D(c, center) > radius or (maxDz and math.abs(c.z - center.z) > maxDz))
+            end
             if outside then
                 local ctx = Law.Ctx(src)
                 -- Tod/Respawn ist keine Flucht -> zurueck. Aber hoechstens

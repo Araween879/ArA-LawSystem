@@ -89,7 +89,8 @@ Meldung „Items fehlen in der Tabelle items“.
 | 5b.1 | Admin: `/lawcells` in der Station | Türen grün (zu), blaue Kreise in den Zellen; neben einer Tür steht ihr Name |
 | 5b.2 | A an Zellentür: „Zelle 1 aufschließen" | Tür lässt sich öffnen (bei allen Spielern) |
 | 5b.3 | A führt gefesselten B in die Zelle, schließt ab, „Häftling einbuchen" | Formular; nach Absenden: B bleibt in der Zelle (**kein Teleport**), Haft-HUD läuft |
-| 5b.4 | Einbuchen mit offener Tür / B steht draußen | „Erst die Zellentür abschließen" / „Person steht nicht in der Zelle" |
+| 5b.4 | Einbuchen mit offener Tür / B steht draußen im Gang direkt vor dem Gitter | „Erst die Zellentür abschließen" / B taucht in der Auswahl gar nicht auf |
+| 5b.4a | A an abgeschlossener Zellentür, B steht in der Zelle | **ein** Prompt „Zelle … aufschließen / Häftling einbuchen“, Halten öffnet ein Auswahlmenü |
 | 5b.5 | C (kein Gesetz) mit Dietrich an der Tür: „Schloss knacken" | Fortschritt, Erfolg/Fehlschlag; bei Erfolg Tür offen + Alarm an A |
 | 5b.6 | B verlässt die offene Zelle | Flucht: Haftbefehl, Alarm |
 | 5b.7 | Haftzeit läuft ab (Zeit per Dienstbuch verkürzen) | B wird nach draußen teleportiert, Tür bleibt zu |

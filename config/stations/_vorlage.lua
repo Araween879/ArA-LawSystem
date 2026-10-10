@@ -122,6 +122,8 @@ Config.Stations.vorlage = {
     -- capacity   = wie viele Haeftlinge in die Zelle passen
     -- Als Admin zeigt /lawcells alle Tueren (gruen = zu, rot = offen) und Zellen (blau).
     -- WICHTIG: diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen.
+    -- Zellen nicht loeschen/umsortieren, solange Haeftlinge sitzen (die Nummer in der Liste wird
+    -- gespeichert) - zum Abschalten lieber enabled = false in die Zeile schreiben.
     -- Einstellungen fuer alle Zellen (Dietrich, Reichweite ...): config/justice.lua -> Config.Jail.Cells
     --------------------------------------------------------------------------
     cells = {

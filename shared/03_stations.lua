@@ -222,7 +222,9 @@ local function buildStation(key, st)
     -- Zellen mit Tueren (kein Teleport hinein)
     local cells = st.cells
     if type(cells) == 'table' and cells.list and cells.enabled ~= false then
-        local list = {}
+        -- Schluessel = Position in cells.list (bleibt gleich, auch wenn eine Zelle
+        -- abgeschaltet wird - die DB speichert diese Nummer)
+        local list, order = {}, {}
         local defRadius = (Config.Jail.Cells and Config.Jail.Cells.Radius) or 1.6
         local defCap = (Config.Jail.Cells and Config.Jail.Cells.Capacity) or 2
         for i, c in ipairs(cells.list) do
@@ -239,7 +241,8 @@ local function buildStation(key, st)
                             key, i, tostring(c.label or i))
                         center = vector3(c.doorCoords.x, c.doorCoords.y, c.doorCoords.z + 1.0)
                     end
-                    list[#list + 1] = {
+                    order[#order + 1] = i
+                    list[i] = {
                         label      = c.label or ('Zelle ' .. i),
                         door       = hash,
                         doorCoords = vector3(c.doorCoords.x, c.doorCoords.y, c.doorCoords.z),
@@ -252,7 +255,7 @@ local function buildStation(key, st)
                 end
             end
         end
-        if #list == 0 then
+        if #order == 0 then
             warn('%s.cells: keine gueltige Zelle - Zellen sind aus', key)
         elseif not isPos(cells.release) then
             warn('%s.cells.release (vector4) fehlt - hier kommt der Haeftling nach der Haft raus. Zellen sind aus', key)
@@ -262,22 +265,24 @@ local function buildStation(key, st)
             end
             -- Mittelpunkt/Umkreis aller Zellen (nur fuer "nach Freilassung noch drin?")
             local cx, cy, cz = 0.0, 0.0, 0.0
-            for _, c in ipairs(list) do cx, cy, cz = cx + c.center.x, cy + c.center.y, cz + c.center.z end
-            local mid = vector3(cx / #list, cy / #list, cz / #list)
+            for _, i in ipairs(order) do local c = list[i]; cx, cy, cz = cx + c.center.x, cy + c.center.y, cz + c.center.z end
+            local mid = vector3(cx / #order, cy / #order, cz / #order)
             local r = 0.0
-            for _, c in ipairs(list) do r = math.max(r, #(vector3(c.center.x, c.center.y, mid.z) - mid) + c.radius) end
+            for _, i in ipairs(order) do local c = list[i]; r = math.max(r, #(vector3(c.center.x, c.center.y, mid.z) - mid) + c.radius) end
+            local first = list[order[1]]
             Config.Jail.Locations[key] = {
-                mode    = 'cells',
-                label   = cells.label or ((st.label or key) .. ' (Zellen)'),
-                enabled = true,
-                center  = mid,
-                radius  = r,
-                spawn   = vector4(list[1].center.x, list[1].center.y, list[1].center.z, list[1].heading),
-                release = toVec4(cells.release),
-                work    = {},
-                cells   = list,
+                mode      = 'cells',
+                label     = cells.label or ((st.label or key) .. ' (Zellen)'),
+                enabled   = true,
+                center    = mid,
+                radius    = r,
+                spawn     = vector4(first.center.x, first.center.y, first.center.z, first.heading),
+                release   = toVec4(cells.release),
+                work      = {},
+                cells     = list,    -- [Nummer] = Zelle (kann Luecken haben -> cellOrder benutzen)
+                cellOrder = order,   -- gueltige Nummern aufsteigend
             }
-            for idx, c in ipairs(list) do addDoor(st, key, c.door, c.doorCoords, c.label, idx) end
+            for _, i in ipairs(order) do local c = list[i]; addDoor(st, key, c.door, c.doorCoords, c.label, i) end
         end
     end
 
@@ -363,4 +368,38 @@ end
 
 if IsDuplicityVersion() then
     print(('^2[ArA-Law] Stationen aktiv (%d): %s^7'):format(#active, table.concat(active, ', ')))
+end
+
+--------------------------------------------------------------------------
+-- Zellen: steht eine Position wirklich IN der Zelle?
+-- Kreis um die Zellenmitte (radius) UND auf der Zellenseite des Gitters.
+-- Das Gitter liegt an der Tuer (doorCoords = Scharnier); die Richtung
+-- Tuer -> Zellenmitte zeigt in die Zelle. So zaehlt der Gang vor dem
+-- Gitter nie als Zelle, auch wenn der Kreis hineinreicht.
+--------------------------------------------------------------------------
+Law.Cells = Law.Cells or {}
+
+local BOOK_DEPTH = 0.25   -- Einbuchen: mind. so weit hinter dem Gitter
+local STAY_DEPTH = -0.6   -- Haft: erst so weit VOR dem Gitter gilt man als draussen (Toleranz Gitter-Schraege)
+
+--- Meter hinter dem Gitter (negativ = im Gang davor), nil = Richtung unbekannt
+function Law.Cells.Depth(cell, pos)
+    local d = cell and cell.doorCoords
+    if not d or not pos then return nil end
+    local nx, ny = cell.center.x - d.x, cell.center.y - d.y
+    local len = math.sqrt(nx * nx + ny * ny)
+    if len < 0.3 then return nil end   -- Mitte nicht gemessen (liegt an der Tuer)
+    return ((pos.x - d.x) * nx + (pos.y - d.y) * ny) / len
+end
+
+--- mode 'book' = zum Einbuchen (streng), sonst Haft-Pruefung (mit Toleranz)
+function Law.Cells.Inside(cell, pos, mode)
+    if not cell or not pos then return false end
+    local dx, dy = pos.x - cell.center.x, pos.y - cell.center.y
+    local extra = mode == 'book' and 0.3 or 0.0
+    if math.sqrt(dx * dx + dy * dy) > cell.radius + extra then return false end
+    if math.abs(pos.z - cell.center.z) > 3.0 then return false end
+    local depth = Law.Cells.Depth(cell, pos)
+    if depth == nil then return true end
+    return depth >= (mode == 'book' and BOOK_DEPTH or STAY_DEPTH)
 end
