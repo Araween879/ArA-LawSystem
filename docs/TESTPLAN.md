@@ -86,17 +86,17 @@ Meldung „Items fehlen in der Tabelle items“.
 ## 5b. Zellen mit Türen (Valentine)
 | # | Schritt | Erwartet |
 |---|---|---|
-| 5b.1 | Admin: `/lawcells` in der Station | Türen grün (zu), blaue Kreise in den Zellen; neben einer Tür steht ihr Name |
+| 5b.1 | Admin: `/lawcells` in der Station | Zellentüren grün (zu), Gittertüren (`doors`, `locked = false`) rot (offen), blaue Kreise in den Zellen; neben einer Tür steht ihr Name |
 | 5b.2 | A an Zellentür: „Zelle 1 aufschließen" | Tür lässt sich öffnen (bei allen Spielern) |
 | 5b.3 | A führt gefesselten B in die Zelle, schließt ab, „Häftling einbuchen" | Formular; nach Absenden: B bleibt in der Zelle (**kein Teleport**), Haft-HUD läuft |
-| 5b.4 | Einbuchen mit offener Tür / B steht draußen im Gang direkt vor dem Gitter | „Erst die Zellentür abschließen" / B taucht in der Auswahl gar nicht auf |
+| 5b.4 | Tür offen / B steht draußen im Gang direkt vor dem Gitter | „Häftling einbuchen“ erscheint gar nicht, nur „Zelle … abschließen“ / B taucht in der Auswahl nicht auf |
 | 5b.4a | A an abgeschlossener Zellentür, B steht in der Zelle | **ein** Prompt „Zelle … aufschließen / Häftling einbuchen“, Halten öffnet ein Auswahlmenü |
 | 5b.5 | C (kein Gesetz) mit Dietrich an der Tür: „Schloss knacken" | Fortschritt, Erfolg/Fehlschlag; bei Erfolg Tür offen + Alarm an A |
 | 5b.6 | B verlässt die offene Zelle | Flucht: Haftbefehl, Alarm |
 | 5b.7 | Haftzeit läuft ab (Zeit per Dienstbuch verkürzen) | B wird nach draußen teleportiert, Tür bleibt zu |
-| 5b.8 | `restart ArA-LawSystem` | Türen wieder abgeschlossen |
+| 5b.8 | `restart ArA-LawSystem` | Zellentüren wieder abgeschlossen, Gittertüren wieder offen |
 | 5b.9 | Kopfgeldjäger C gibt gefesselten B (aktives Kopfgeld) an der Abgabestelle Valentine ab | B wird in eine freie Zelle teleportiert, Tür zu, Haft-HUD läuft |
-| 5b.10 | Deputy A (im Dienst) gibt B an der Abgabestelle ab | A bekommt Meldung „Bring den Gefangenen in eine Zelle…“, B bleibt gefesselt, **kein** Teleport |
+| 5b.10 | Deputy A (im Dienst) gibt B an der Abgabestelle ab | Meldung „Bring den Gefangenen in eine Zelle…“, **nichts** eingelöst, B bleibt gefesselt, **kein** Teleport; nach dem Einbuchen an der Zellentür ist das Kopfgeld erledigt |
 | 5b.11 | 4. Häftling in eine Zelle mit 3 Plätzen einbuchen | „Die Zelle ist voll.“ |
 | 5b.12 | Häftling stellt sich bei geschlossener Tür an die Gitterwand | keine Flucht; liegt er außerhalb des Radius, kommt er zurück in die Zellenmitte |
 

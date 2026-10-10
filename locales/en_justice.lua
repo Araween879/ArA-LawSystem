@@ -403,5 +403,5 @@ Law.LocaleAdd('en', {
     err_cell_target_outside   = 'The person is not standing in the cell.',
     err_disabled              = 'This is disabled.',
     err_cell_full             = 'The cell is full.',
-    bounty_book_in_cell       = 'Bounty claimed. Take the prisoner to a cell, lock it and book him at the cell door.',
+    bounty_book_in_cell       = 'Take the prisoner to a cell, lock it and book him at the cell door - the bounty is settled when you book him.',
 })

@@ -232,15 +232,12 @@ local function buildStation(key, st)
                 local hash = tonumber(c.door)
                 if not hash or not isPos(c.doorCoords) then
                     warn('%s.cells.list[%d]: door (Tuer-Hash) und doorCoords (vector3) fehlen - Zelle ist aus', key, i)
+                elseif not isPos(c.center) then
+                    -- ohne Mitte weiss das Script nicht, wo die Zelle ist (Einbuchen, Flucht, Teleport)
+                    warn('%s.cells.list[%d] (%s): center fehlt - Zelle ist aus. In der Zelle /lawcoords messen und eintragen',
+                        key, i, tostring(c.label or i))
                 else
                     local center = c.center
-                    local fallback = false
-                    if not isPos(center) then
-                        fallback = true
-                        warn('%s.cells.list[%d] (%s): center fehlt - Tuer-Position wird benutzt (ungenau). In der Zelle /lawcoords messen und eintragen',
-                            key, i, tostring(c.label or i))
-                        center = vector3(c.doorCoords.x, c.doorCoords.y, c.doorCoords.z + 1.0)
-                    end
                     order[#order + 1] = i
                     list[i] = {
                         label      = c.label or ('Zelle ' .. i),
@@ -250,7 +247,6 @@ local function buildStation(key, st)
                         radius     = (tonumber(c.radius) or defRadius) + 0.0,
                         heading    = (tonumber(c.heading) or 0.0) + 0.0,
                         capacity   = math.max(1, math.floor(tonumber(c.capacity) or defCap)),   -- Plaetze
-                        fallback   = fallback or nil,   -- Mitte nicht gemessen -> nie hineinteleportieren
                     }
                 end
             end

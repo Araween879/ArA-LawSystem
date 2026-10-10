@@ -555,8 +555,18 @@ Law.Cb.Register('bounty:claim', { rate = 3000, notCuffed = true, notJailed = tru
                     lastErr = 'target_not_yours'
                 else
                     local rows, err = eligible(ctx, tctx, dead, isLaw)
+                    -- Station mit Zellen (Tueren): Gesetz (Recht 'jail', Dienst, darf an dieser
+                    -- Station) sperrt den lebenden Gefangenen SELBST ein. Hier wird NICHTS
+                    -- eingeloest - das Kopfgeld erledigt sich beim Einbuchen an der Zellentuer
+                    -- (Law.Jail.Sentence schliesst es und bucht Treuhandgeld zurueck).
+                    local cellLoc = Config.Jail.Locations[stationKey]
+                    local hasCells = cellLoc ~= nil and cellLoc.mode == 'cells'
+                    local lawBooksSelf = hasCells and not dead and isLaw
+                        and Law.HasPerm(ctx, 'jail', true) and Law.Stations.AllowsDept(stationKey, ctx.dept)
                     if #rows == 0 then
                         lastErr = err
+                    elseif lawBooksSelf then
+                        return Law.Result(true, { bookInCell = true }, L('bounty_book_in_cell'))
                     else
                         -- Atomar einloesen - erst danach Geld
                         local now, total, claimed, claimedRows = Law.Now(), 0, {}, {}
@@ -609,18 +619,9 @@ Law.Cb.Register('bounty:claim', { rate = 3000, notCuffed = true, notJailed = tru
                             dead = dead, station = stationKey, law = isLaw,
                         })
 
-                        -- Ziel in Haft (tot: vorher wiederbeleben)
-                        -- Station mit Zellen (Tueren): Gesetz (Recht 'jail', Dienst, darf an
-                        -- dieser Station) sperrt den lebenden Gefangenen SELBST ein
-                        -- (Zellentuer, realistisch). Alle anderen koennen das nicht -> der
-                        -- Gefangene kommt per Teleport in eine freie Zelle.
-                        local cellLoc = Config.Jail.Locations[stationKey]
-                        local hasCells = cellLoc ~= nil and cellLoc.mode == 'cells'
-                        local lawBooksSelf = hasCells and not dead and isLaw
-                            and Law.HasPerm(ctx, 'jail', true) and Law.Stations.AllowsDept(stationKey, ctx.dept)
-                        if lawBooksSelf then
-                            Law.Notify(src, L('bounty_book_in_cell'), 'objective', 10000)
-                        elseif not dead or cfg.DeadGoesToJail then
+                        -- Ziel in Haft (tot: vorher wiederbeleben). Station mit Zellen:
+                        -- Kopfgeldjaeger koennen nicht einsperren -> Teleport in eine freie Zelle.
+                        if not dead or cfg.DeadGoesToJail then
                             local w = MySQL.scalar.await("SELECT MAX(jail_minutes) FROM ara_law_warrants WHERE charid = ? AND status = 'active'", { tctx.charId })
                             local minutes = math.max(tonumber(w) or 0, 0)
                             if minutes <= 0 then minutes = cfg.DefaultJailMinutes or 15 end

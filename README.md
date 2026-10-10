@@ -163,12 +163,14 @@ Position aus den Spieldaten sind schon eingetragen). So läuft eine Festnahme:
   (Glitch, Radius zu klein), wird er zurück in die Zelle gesetzt – Flucht gibt es nur durch eine offene Tür.
 - **Kopfgeld-Abgabe:** Gibt ein **Kopfgeldjäger** (oder Gesetz außer Dienst) an der Abgabestelle
   einer Station mit Zellen jemanden ab, wird der Gefangene **in eine freie Zelle teleportiert** und die
-  Tür abgeschlossen. **Gesetz im Dienst** bekommt nur das Kopfgeld und sperrt den Gefangenen
-  **selbst** ein (Tür auf, rein, zu, an der Tür einbuchen). Sind alle Zellen voll → Sisika.
+  Tür abgeschlossen. **Gesetz im Dienst** löst an der Abgabestelle nichts ein, sondern sperrt den
+  Gefangenen **selbst** ein (Tür auf, rein, zu, an der Tür einbuchen) – das Kopfgeld wird beim
+  Einbuchen erledigt (Treuhandgeld zurück in die Kasse). Sind alle Zellen voll → Sisika.
 - **Einrichten:** In jeder Zelle in die Mitte stellen, `/lawcoords`, Wert bei `center` eintragen.
   Als Admin zeigt **`/lawcells`** alle Türen (grün = zu, rot = offen) und Zellen (blau) im Spiel;
   neben einer Tür erscheint ihr Name.
-- Ohne `center` nimmt das Script die Tür-Position (ungenau) und warnt in der Konsole.
+- Ohne `center` ist die Zelle **aus** (Warnung in der Konsole) – erst messen, dann eintragen.
+- Wer bei einer Freilassung offline war und in einer abgeschlossenen Zelle wieder einloggt, wird nach `release` gesetzt.
 - Diese Türen **nicht zusätzlich in `vorp_doorlocks`** eintragen. Stehen sie dort, warnt das Script beim Start.
 - Einstellungen für alle Zellen (Dietrich, Reichweite, Türen nach Neustart zu): `config/justice.lua` → `Config.Jail.Cells`.
 - **Sisika** bleibt ein Gefängnis mit Transport (Teleport) – Einbuchen dafür am Pult (`jail`-Punkt).

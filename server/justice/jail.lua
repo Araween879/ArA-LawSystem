@@ -471,8 +471,8 @@ end
 
 --- Kopfgeld-Abgabe durch einen Kopfgeldjaeger: freie Zelle der Station waehlen,
 --- Tuer abschliessen und den Gefangenen HINEIN teleportieren (Gesetz sperrt
---- dagegen selbst an der Zellentuer ein). Nur Zellen mit gemessener Mitte und
---- freiem Platz (capacity), die leerste zuerst.
+--- dagegen selbst an der Zellentuer ein). Nur Zellen mit freiem Platz
+--- (capacity), die leerste zuerst.
 --- -> ok, err   (false, 'no_cell' = keine passende Zelle -> Aufrufer nimmt das Gefaengnis)
 function Law.Jail.SentenceToCell(targetSrc, stationKey, minutes, reason, officerCtx, opts)
     local loc = locationCfg(stationKey)
@@ -480,10 +480,8 @@ function Law.Jail.SentenceToCell(targetSrc, stationKey, minutes, reason, officer
     local best, bestN
     for _, idx in ipairs(loc.cellOrder or {}) do
         local c = loc.cells[idx]
-        if not c.fallback then
-            local n = #Law.Justice.InmatesInCell(stationKey, idx)
-            if n < (c.capacity or 1) and (not bestN or n < bestN) then best, bestN = idx, n end
-        end
+        local n = #Law.Justice.InmatesInCell(stationKey, idx)
+        if n < (c.capacity or 1) and (not bestN or n < bestN) then best, bestN = idx, n end
     end
     if not best then return false, 'no_cell' end
     local o = Law.Copy(type(opts) == 'table' and opts or {})
@@ -923,20 +921,34 @@ local function handleLogin(src, ctx)
     local row = MySQL.single.await('SELECT * FROM ara_law_jail WHERE charid = ?', { ctx.charId })
     if not row then
         if inmates[src] then clearOnline(inmates[src].charId, false, false) end
-        -- Waehrend der Abwesenheit freigelassen, aber noch im Gefaengnis ausgeloggt?
+        -- Waehrend der Abwesenheit freigelassen, aber noch im Gefaengnis / in der
+        -- abgeschlossenen Zelle ausgeloggt? -> nach draussen (sonst kaeme er nie raus)
         SetTimeout(6000, function()
             if GetPlayerPing(src) <= 0 or inmates[src] then return end
             local c = Law.GetCoords(src)
             local now = Law.Ctx(src)
-            if not c or not now or now.dept then return end  -- Waerter/Gesetz nie wegteleportieren
+            if not c or not now then return end
             for _, loc in pairs(Config.Jail.Locations) do
-                if loc.enabled ~= false and dist2D(c, loc.center) <= loc.radius then
-                    local recent = MySQL.scalar.await("SELECT COUNT(*) FROM ara_law_records WHERE charid = ? AND type = 'release' AND created_at >= ?",
-                        { ctx.charId, Law.Now() - 7 * 86400 })
-                    if (tonumber(recent) or 0) > 0 then
-                        TriggerClientEvent('ara_law:cl:jail:leave', src, { release = v4(loc.release) })
+                if loc.enabled ~= false then
+                    local inside, days = false, 7
+                    if loc.mode == 'cells' then
+                        -- Zelle: nur wer hinter einer ABGESCHLOSSENEN Tuer steht (auch Gesetz)
+                        for _, idx in ipairs(loc.cellOrder or {}) do
+                            local cell = loc.cells[idx]
+                            if Law.Cells.Inside(cell, c) and Law.Doors.IsLocked(cell.door) then inside = true break end
+                        end
+                        days = 30
+                    elseif not now.dept then  -- Waerter/Gesetz im Gefaengnis nie wegteleportieren
+                        inside = dist2D(c, loc.center) <= loc.radius
                     end
-                    return
+                    if inside then
+                        local recent = MySQL.scalar.await("SELECT COUNT(*) FROM ara_law_records WHERE charid = ? AND type = 'release' AND created_at >= ?",
+                            { ctx.charId, Law.Now() - days * 86400 })
+                        if (tonumber(recent) or 0) > 0 then
+                            TriggerClientEvent('ara_law:cl:jail:leave', src, { release = v4(loc.release) })
+                        end
+                        return
+                    end
                 end
             end
         end)

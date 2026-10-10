@@ -449,10 +449,10 @@ Eine Datei je Station: `config/stations/<key>.lua` (Vorlage mit allen Feldern: `
 Stationen/Punkte mit `enabled = false` werden entfernt (der restliche Code sieht sie nie),
 `cells` → `Config.Jail.Locations[key]`, `jailTo` → `Config.Jail.StationLocation[key]`,
 `prison` → `Config.Jail.Locations[key]` (`mode = 'prison'`, Teleport, z.B. Sisika; alte Form `cells` mit center ohne `list` gilt auch),
-`cells = { release, list = { { label, door, doorCoords, center, radius } } }` → `Config.Jail.Locations[key]` (`mode = 'cells'`, `cells = {...}`),
+`cells = { release, list = { { label, door, doorCoords, center, radius, capacity, heading, enabled } } }` → `Config.Jail.Locations[key]` (`mode = 'cells'`, `cells = { [Nummer in list] = {...} }`, `cellOrder`), ohne `center` ist die Zelle aus,
 jede Tuer → `Config.Jail.Doors[hash]` und Punkte `celldoor` (auf/zu, Recht jail), `cellbook` (`jail:sentenceCell`), `cellpick` (Dietrich),
 `doors` → weitere Tueren. Tuer-Zustand: Server `server/justice/doors.lua` (GlobalState `ara_law_doors`), Client setzt DoorSystem.
-Zellen-Haft: kein Teleport hinein, Flucht = Zelle (center/radius, Hoehe 3 m) verlassen, Ende = Teleport nach `release`; DB-Spalte `ara_law_jail.cell`.
+Zellen-Haft: Einbuchen durch Gesetz ohne Teleport (Person muss hinter dem Gitter stehen, `Law.Cells.Inside`), Kopfgeldjaeger-Abgabe teleportiert in eine freie Zelle; Flucht = Zelle verlassen (Kreis + Gitterseite, Hoehe 3 m), Ende = Teleport nach `release`; DB-Spalte `ara_law_jail.cell` = Nummer in `cells.list`.
 `shotsZone` → Eintrag in `Config.Dispatch.ShotsFired.Zones`. `spawn` als vector3 wird zu vector4 (Richtung 0.0).
 Stations-`jobs` landet als `st.depts` (wie bisher von `Law.Stations.AllowsDept` und dem Client geprueft).
 `jobs` am Punkt: Client zeigt den Prompt nur diesen Jobs, `Law.Stations.NearPoint` (Server) ignoriert den Punkt fuer alle anderen.
