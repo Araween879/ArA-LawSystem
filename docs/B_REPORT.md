@@ -131,7 +131,7 @@ Freigabe/Ablehnung im Dienstbuch (`escort:insuranceDecide`), Verfall nach `Expir
 | `escort:openLoot` | – | Beutefach erneut öffnen (nur Räuber) |
 
 ## 4. Net-Events Client → Server (`Law.Net.On`)
-`evidence:shot(weaponHash)`, `evidence:bleed(isMelee)`, `evidence:openLocker`, `weapons:fileFinish(cancelled)`,
+`evidence:shot(weaponHash)`, `evidence:wound(kind)`, `evidence:openLocker`, `weapons:fileFinish(cancelled)`,
 `k9:spawned(netId)`, `k9:dismiss(silent)`, `k9:died`, `scent:stop(sessionId)`, `escort:wagonSpawned(id, netId)`, `escort:robAbort(netId)`.
 
 ## 5. Events Server → Client (`ara_law:cl:*`)
@@ -160,7 +160,7 @@ NUI-Aktion (Client-Handler): `counter:transferWeapon` **(neu)** → Rückgabe = 
 - Alle `.await`-Schreibzugriffe nach einem Abzug (Buchung, Sichern, Registrierung, Geruchsprobe, Überfall, Versicherung) laufen über `Law.DB.Try` mit vollständiger Rückabwicklung.
 
 ## 8. Config-Schlüssel
-- `Config.Evidence`: `Enabled, Lifetime{casing,blood,cloth}, ScanRadius, ScanCooldown, DrawDistance, CollectDistance, PromptDistance, MaxWorld, MaxPerOwner (neu, 40), ShotRateMs, CasingMerge, CasingScatter, BleedRateMs, BleedMinDamage, MeleeClothChance, AnalysisSeconds, RevealCurrentHolder, Gsr{Minutes,Distance}, CasingHasScent, LockerLimit, Colors`
+- `Config.Evidence`: `Enabled, Lifetime{casing,blood,cloth}, ScanRadius, ScanCooldown, DrawDistance, CollectDistance, PromptDistance, MaxWorld, MaxPerOwner (neu, 40), ShotRateMs, CasingMerge, CasingScatter, BleedRateMs, ClothRateMs, Wounds, SharpWeapons, CollectWith, AnalysisSeconds, RevealCurrentHolder, Gsr{Minutes,Distance}, CasingHasScent, LockerLimit, Colors`
 - `Config.Weapons`: `RegisterFee, FeeDepartment, PermitItem, FiledSerial, File{Seconds,Chance,BreakChance}, InspectRequiresCuffs, InspectDistance, Labels`
 - `Config.Scent`: `RecordInterval, MinStep, JumpReset (neu, 150), MaxAge, SniffRadius, Chunk, Tolerance, FoundDistance, Cooldown, UsesPerItem, MaxDogSpeed, SampleDistance, SampleCooldown, SourceItems, Strength{fresh,medium}, FollowLive, SessionTimeout`
 - `Config.K9`: `Model, HandlerMaxDistance, SummonDistance, FromKennel, FromWhistle, DeathCooldown, Search{Radius,Cooldown}, AllowAttack, Invincible, Blip, PointReach, Speed{walk,run}`

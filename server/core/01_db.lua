@@ -93,6 +93,7 @@ local SCHEMA = {
             { 'has_sample', 'TINYINT NOT NULL DEFAULT 0' },
             { 'dangerous',  'TINYINT NOT NULL DEFAULT 0' },
             { 'notes',      'TEXT NULL' },
+            { 'scent_reset_at', TN },   -- letzte Haft: aeltere Geruchstraeger taugen nicht mehr
             { 'updated_at', T },
         },
     },

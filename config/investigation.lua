@@ -12,7 +12,7 @@ Config = Config or {}
 --------------------------------------------------------------------------
 Config.Evidence = {
     Enabled             = true,
-    Lifetime            = { casing = 2700, blood = 1800, cloth = 2700 },  -- wie lange eine Spur in der Welt liegt
+    Lifetime            = { casing = 2700, blood = 3600, cloth = 7200 },  -- wie lange eine Spur in der Welt liegt
     ScanRadius          = 30.0,    -- Spurensuche: Spuren in diesem Umkreis um den Officer
     ScanCooldown        = 3,       -- Sekunden zwischen zwei Suchen
     DrawDistance        = 30.0,    -- ab hier zeichnet der Client die Marker
@@ -23,9 +23,35 @@ Config.Evidence = {
     ShotRateMs          = 1500,    -- hoechstens eine Schussmeldung je Spieler in diesem Abstand
     CasingMerge         = 3.0,     -- gleiche Waffe im Umkreis -> eine Spur mit Zaehler
     CasingScatter       = 1.2,     -- zufaelliger Versatz der Huelse
-    BleedRateMs         = 10000,   -- hoechstens eine Blutspur je Spieler in diesem Abstand
-    BleedMinDamage      = 10,      -- so viel Lebenspunkte muessen auf einmal fehlen
-    MeleeClothChance    = 20,      -- % Stofffetzen bei Verletzung im Nahkampf
+    BleedRateMs         = 5000,    -- hoechstens eine Blutspur je Spieler in diesem Abstand
+    ClothRateMs         = 60000,   -- hoechstens ein Kleidungsfetzen je Spieler in diesem Abstand
+    -- Verletzungen: Wer getroffen wird, hinterlaesst Spuren an SEINER Position.
+    -- Blood / Cloth = Chance in % je Treffer (0 = nie, 100 = immer)
+    Wounds = {
+        Fist   = { Blood = 35 },              -- Schlaegerei (Faeuste, Laterne, Fackel ...): Blut KANN fallen
+        Shot   = { Blood = 100 },             -- angeschossen (Revolver, Gewehr, Schrot, Bogen)
+        Sharp  = { Blood = 100, Cloth = 100 },-- Messer, Axt, Machete ... (Liste SharpWeapons): Blut + Kleidungsfetzen
+        Animal = { Blood = 100 },             -- Tierbiss (Wolf, Baer ...)
+        Other  = { Blood = 0 },               -- Sturz, Feuer, Explosion, Ertrinken ...
+    },
+    -- Waffen, die Kleidung zerschneiden (Messer, Aexte & Co)
+    SharpWeapons = {
+        'WEAPON_MELEE_KNIFE', 'WEAPON_MELEE_KNIFE_JAWBONE', 'WEAPON_MELEE_KNIFE_TRADER', 'WEAPON_MELEE_KNIFE_HORROR',
+        'WEAPON_MELEE_KNIFE_RUSTIC', 'WEAPON_MELEE_KNIFE_MINER', 'WEAPON_MELEE_KNIFE_VAMPIRE', 'WEAPON_MELEE_KNIFE_CIVIL_WAR',
+        'WEAPON_MELEE_KNIFE_BEAR',
+        'WEAPON_MELEE_MACHETE', 'WEAPON_MELEE_MACHETE_HORROR', 'WEAPON_MELEE_MACHETE_COLLECTOR',
+        'WEAPON_MELEE_CLEAVER', 'WEAPON_MELEE_BROKEN_SWORD',
+        'WEAPON_MELEE_HATCHET', 'WEAPON_MELEE_HATCHET_HUNTER', 'WEAPON_MELEE_HATCHET_DOUBLE_BIT', 'WEAPON_MELEE_HATCHET_HEWING',
+        'WEAPON_MELEE_HATCHET_VIKING', 'WEAPON_MELEE_ANCIENT_HATCHET', 'WEAPON_MELEE_HATCHET_HUNTER_RUSTED',
+        'WEAPON_MELEE_HATCHET_DOUBLE_BIT_RUSTED',
+        'WEAPON_THROWN_THROWING_KNIVES', 'WEAPON_THROWN_TOMAHAWK', 'WEAPON_THROWN_TOMAHAWK_ANCIENT',
+    },
+    -- Womit wird eine Spur gesichert? (Item wird verbraucht)
+    CollectWith = {
+        casing = 'law_evidence_bag',
+        blood  = 'law_sterilecloth',   -- Blut nimmt man mit einem sterilen Tuch auf
+        cloth  = 'law_evidence_bag',
+    },
     AnalysisSeconds     = 60,      -- Laborzeit
     RevealCurrentHolder = true,    -- Labor/Register zeigen den aktuellen Besitzer laut vorp-Inventar
     Gsr                 = { Minutes = 15, Distance = 2.5 },  -- Schmauchspurentest
@@ -90,13 +116,24 @@ Config.Scent = {
     RecordInterval = 5,        -- Sekunden zwischen zwei Aufzeichnungen
     MinStep        = 3.0,      -- neuer Punkt erst ab dieser Bewegung
     JumpReset      = 150.0,    -- Sprung groesser als das in einem Intervall (Teleport, Knast) -> neue Spur
-    MaxAge         = 1800,     -- Punkte aelter als das verfliegen (30 Min.)
+    MaxAge         = 3600,     -- Punkte aelter als das verfliegen (60 Min.)
     SniffRadius    = 200.0,    -- Hund findet den neuesten Punkt in diesem Umkreis
     Chunk          = 15,       -- Punkte je Teilstueck
     Tolerance      = 15.0,     -- Hund muss so nah am letzten Punkt sein, bevor es weitergeht
     FoundDistance  = 5.0,      -- "Gefunden", wenn der Hund so nah an der Person steht
     Cooldown       = 60,       -- Sekunden zwischen zwei Witterungen je Hundefuehrer
     UsesPerItem    = 3,        -- so oft taugt ein Geruchstraeger
+    Uses           = {         -- abweichend je Item (0 = unbegrenzt)
+        law_clothscrap = 0,    -- Kleidung: der Hund findet den Traeger damit immer wieder
+    },
+    -- Wie lange nach der Tat taugt ein Geruchstraeger fuer den Hund? (Minuten, 0/fehlt = immer)
+    -- Blut: 60 Min. ab dem Moment, in dem es auf den Boden gefallen ist.
+    ItemMinutes    = {
+        law_bloodsample = 60,
+    },
+    -- Nach einer Haftstrafe ist der Geruch weg: alles, was VOR dem Einbuchen
+    -- gesichert wurde (Kleidung, Blut, Huelsen, Geruchsproben), taugt nicht mehr fuer den Hund.
+    ResetOnJail    = true,
     MaxDogSpeed    = 10.0,     -- m/s - schneller kann kein Hund sein (Schutz gegen Teleport)
     SampleDistance = 3.0,      -- Geruchsprobe nehmen
     SampleCooldown = 30,

@@ -431,6 +431,16 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
 
     -- 4. Probe in die Akte, Haftbefehle erledigt, Kopfgelder geschlossen (mit Erstattung)
     Law.Citizens.SetSample(tctx.charId, true)
+    -- Wer gesessen hat, dessen Geruch ist weg: alte Geruchstraeger (Kleidung, Blut ...)
+    -- taugen nicht mehr fuer den Bluthund, die Spur im Speicher verfliegt.
+    -- Ein Fehler hier (z.B. DB) darf die schon gebuchte Haft nicht abbrechen.
+    if not (Config.Scent and Config.Scent.ResetOnJail == false) then
+        local okS, errS = pcall(function()
+            Law.Scent.Clear(tctx.charId)
+            Law.Citizens.SetScentReset(tctx.charId, Law.Now())
+        end)
+        if not okS then Law.Warn('Geruch zuruecksetzen fehlgeschlagen fuer #%s: %s', tostring(tctx.charId), tostring(errS)) end
+    end
     if gone() then return true end
     local served = Law.Justice.ServeWarrants(tctx.charId)
     if gone() then return true end

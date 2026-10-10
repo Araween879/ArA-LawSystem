@@ -82,6 +82,46 @@ function Law.Scent.Strength(t)
     return 'weak'
 end
 
+--- Haft: Spur im Speicher loeschen (Geruch weg). Laufende Verfolgungen enden.
+function Law.Scent.Clear(charId)
+    trails[tonumber(charId)] = nil
+end
+
+--------------------------------------------------------------------------
+-- Geruchstraeger: wie oft, wie lange, nach Haft?
+--------------------------------------------------------------------------
+--- Wie oft taugt dieses Item? 0 = unbegrenzt
+function Law.Scent.MaxUses(itemName)
+    local v = (SCfg.Uses or {})[itemName]
+    if v ~= nil then return math.max(0, math.floor(tonumber(v) or 0)) end
+    return SCfg.UsesPerItem or 3
+end
+
+--- Text "(Witterung noch 3x)" bzw. "(Witterung unbegrenzt)" - uses nil = unbegrenzt
+function Law.Scent.UsesSuffix(uses)
+    if uses == nil then return L('scent_uses_unlimited') end
+    return L('scent_uses_suffix', uses)
+end
+
+--- Minuten ab Spur-Entstehung, die das Item fuer den Hund taugt (0 = immer)
+function Law.Scent.ItemMinutes(itemName)
+    return math.max(0, tonumber((SCfg.ItemMinutes or {})[itemName]) or 0)
+end
+
+--- Taugt der Geruchstraeger noch? row = ara_law_evidence (owner_charid, created_at)
+--- -> true | false, 'scent_faded'
+function Law.Scent.SourceUsable(itemName, row)
+    local created = tonumber(row and row.created_at) or 0
+    local minutes = Law.Scent.ItemMinutes(itemName)
+    if minutes > 0 and Law.Now() - created > minutes * 60 then return false, 'scent_faded' end
+    if SCfg.ResetOnJail ~= false then
+        local c = Law.Citizens.Get(row and row.owner_charid)
+        -- gesichert/entstanden VOR der letzten Haft -> Geruch weg
+        if c and c.scentResetAt and created <= c.scentResetAt then return false, 'scent_faded' end
+    end
+    return true
+end
+
 --------------------------------------------------------------------------
 -- Geruchsprobe am gefesselten (oder bewusstlosen) Ziel
 --------------------------------------------------------------------------
@@ -106,9 +146,9 @@ Law.Cb.Register('scent:sample', { perm = 'scent_sample', rate = 2000, notCuffed 
         { target.charId, coords.x, coords.y, coords.z, zone, now, ctx.charId, ctx.name, now, ctx.dept or '' })
     if not okDb or not evId then return Law.Result(false, 'failed') end
 
-    local uses = SCfg.UsesPerItem or 3
+    local uses = Law.Scent.MaxUses(itemName)
     local base = L('scent_item_desc', evId, target.name)
-    local meta = { evidence_id = evId, description = base .. ' ' .. L('scent_uses_suffix', uses), uses = uses, base = base }
+    local meta = { evidence_id = evId, description = base .. ' ' .. Law.Scent.UsesSuffix(uses > 0 and uses or nil), uses = uses > 0 and uses or nil, base = base }
     if not Law.Items.Give(src, itemName, 1, meta) then
         Law.DB.Try(MySQL.update.await, 'DELETE FROM ara_law_evidence WHERE id = ?', { evId })
         return Law.Result(false, 'cant_carry')

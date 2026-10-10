@@ -426,10 +426,11 @@ if affected ~= 1 then return Law.Result(false, 'already_done') end
 | `bountylicns` (vorhanden) | Kopfgeldjäger-Lizenz | A | benutzbar: Lizenz vorzeigen (Dokument). Gültigkeit steht in DB |
 | `law_badge` | Dienstmarke | Kern | benutzbar: Marke zeigen |
 | `law_fineticket` | Bußgeldbescheid | A | benutzbar: Dokument anzeigen, metadata `{ fine_id, description }` |
-| `law_evidence_bag` | Beweismittelbeutel | B | Verbrauch beim Sichern |
+| `law_evidence_bag` | Beweismittelbeutel | B | Verbrauch beim Sichern (Hülsen, Kleidung) |
+| `law_sterilecloth` | Steriles Tuch | B | Verbrauch beim Sichern von Blut |
 | `law_casing` | Patronenhülse (Beweis) | B | metadata `{ evidence_id, description }` |
-| `law_bloodsample` | Blutprobe (Beweis) | B | metadata `{ evidence_id, description }` |
-| `law_clothscrap` | Stofffetzen (Beweis) | B | metadata `{ evidence_id, description }` |
+| `law_bloodsample` | Blutprobe (Beweis) | B | metadata `{ evidence_id, description }`; Geruchsträger 60 Min. ab Tat |
+| `law_clothscrap` | Kleidungsfetzen (Beweis) | B | metadata `{ evidence_id, description }`; Geruchsträger unbegrenzt bis zur nächsten Haft |
 | `law_scentcloth` | Geruchstuch | B | metadata `{ evidence_id, description, uses }` |
 | `law_whistle` | Hundepfeife | B | benutzbar: Bluthund rufen/heimschicken |
 | `law_gunfile` | Waffenfeile | B | benutzbar: Seriennummer abfeilen |

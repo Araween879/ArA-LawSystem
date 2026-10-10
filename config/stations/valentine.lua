@@ -49,7 +49,7 @@ Config.Stations.valentine = {
         -- Fuer Buerger
         counter  = { coords = vector3(-274.28, 802.21, 120.38) },   -- Schalter fuer ALLE Buerger (Bussgeld, Kaution, Lizenzen, Anzeige ...)
         board    = { coords = vector3(-269.56, 807.15, 120.74) },   -- Steckbriefbrett (Kopfgelder, Auftraege) - fuer alle
-        dropoff  = { coords = vector3(-270.10, 809.65, 119.25), radius = 8.0 },   -- Abgabe-Zone fuer Gefangene (Kopfgeld/Auftraege)
+        dropoff  = { coords = vector3(-268.51, 809.67, 119.19), radius = 4.0 },   -- Abgabe-Zone fuer Gefangene (Kopfgeld/Auftraege), radius = Groesse in Metern
 
         -- Draussen
         kennel   = { coords = vector3(-281.75, 811.92, 119.95),                     -- Zwinger: Bluthund holen/abgeben (Prompt)

@@ -169,6 +169,34 @@ Position aus den Spieldaten sind schon eingetragen). So läuft eine Festnahme:
 
 ---
 
+## Spuren am Körper: Blut & Kleidung
+
+Wer getroffen wird, hinterlässt an **seiner** Stelle Spuren (sichtbar nur für Gesetz im
+Spurensuche-Modus, F6 → Spurensuche):
+
+| Situation | Spur | Einstellung |
+|---|---|---|
+| Schlägerei (Fäuste, Laterne, Fackel …) | Blut **kann** fallen (35 % je Treffer) | `Wounds.Fist` |
+| Angeschossen (Revolver, Gewehr, Schrot, Bogen) | Blut | `Wounds.Shot` |
+| Messer, Axt, Machete, Tomahawk … | Blut **und** Kleidungsfetzen | `Wounds.Sharp`, Liste `SharpWeapons` |
+| Tierbiss | Blut | `Wounds.Animal` |
+| Sturz, Feuer, Explosion | nichts | `Wounds.Other` |
+
+- **Blut** nimmt man mit einem **sterilen Tuch** auf (`law_sterilecloth`, in der Waffenkammer).
+  Die Blutprobe taugt **60 Minuten ab der Tat** als Geruchsträger für den Bluthund –
+  der Hund findet den Spieler, wenn er an dessen Fährte angesetzt wird (bis 200 m von der Fährte).
+- **Kleidungsfetzen** sichert man mit einem Beweismittelbeutel. Damit findet der Hund den
+  Spieler **immer wieder** (keine Zeitgrenze, beliebig oft) – **bis der Spieler im Knast saß**.
+- **Knast = Geruch weg:** Beim Einbuchen werden alle älteren Geruchsträger (Kleidung, Blut,
+  Hülsen, Geruchsproben) für den Hund wertlos, die Fährte im Speicher verfliegt. Im Hunde-Menü
+  steht dann „verflogen“. Das Labor (Blutgruppe/Akte) funktioniert weiter.
+- Der Hund folgt immer der echten Fährte (die letzten 60 Minuten Weg des Spielers) –
+  er ist kein GPS: Ist der Spieler nie in der Nähe gewesen, nimmt er keine Witterung auf.
+- Alles einstellbar in `config/investigation.lua` (`Config.Evidence.Wounds`, `CollectWith`,
+  `Config.Scent.ItemMinutes`, `Uses`, `ResetOnJail`, `MaxAge`).
+
+---
+
 ## Dienstwagen-Menü
 
 Am Garagen-Punkt (`garage`) jeder Station öffnet sich ein Menü:

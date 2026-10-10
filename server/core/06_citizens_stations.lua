@@ -36,6 +36,7 @@ local function toRow(r)
         hasSample = tonumber(r.has_sample) == 1,
         dangerous = tonumber(r.dangerous) == 1,
         notes     = r.notes,
+        scentResetAt = tonumber(r.scent_reset_at),
     }
 end
 
@@ -72,6 +73,8 @@ end
 function Law.Citizens.SetSample(charId, flag)    return set(charId, 'has_sample', flag and 1 or 0) end
 function Law.Citizens.SetDangerous(charId, flag) return set(charId, 'dangerous', flag and 1 or 0) end
 function Law.Citizens.SetNotes(charId, text)     return set(charId, 'notes', text) end
+--- Haft: Geruch ist weg (Geruchstraeger von vorher taugen nicht mehr fuer den Hund)
+function Law.Citizens.SetScentReset(charId, at)  return set(charId, 'scent_reset_at', at) end
 
 --------------------------------------------------------------------------
 -- Stationen

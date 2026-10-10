@@ -130,10 +130,16 @@ local function removeTrace(id)
     end
 end
 
+--- aelter = frueher entstanden; gleiche Sekunde -> kleinere Nummer (sonst koennte eine
+--- gerade angelegte Spur eine andere aus derselben Sekunde verdraengen)
+local function older(t, id, oldestAt, oldestId)
+    return not oldestAt or t.createdAt < oldestAt or (t.createdAt == oldestAt and id < oldestId)
+end
+
 local function dropOldest()
     local oldestId, oldestAt
     for id, t in pairs(world) do
-        if not oldestAt or t.createdAt < oldestAt then oldestId, oldestAt = id, t.createdAt end
+        if older(t, id, oldestAt, oldestId) then oldestId, oldestAt = id, t.createdAt end
     end
     if not oldestId then return false end
     removeTrace(oldestId)
@@ -149,7 +155,7 @@ local function capOwner(ownerCharId)
     for id, t in pairs(world) do
         if t.ownerCharId == ownerCharId then
             count = count + 1
-            if not oldestAt or t.createdAt < oldestAt then oldestId, oldestAt = id, t.createdAt end
+            if older(t, id, oldestAt, oldestId) then oldestId, oldestAt = id, t.createdAt end
         end
     end
     if count >= limit and oldestId then removeTrace(oldestId) end
@@ -261,20 +267,43 @@ Law.Net.On('evidence:shot', { rate = Cfg.ShotRateMs or 1500 }, function(src, ctx
     Law.Dispatch.ShotsFired(src, coords, weaponLabel(name))
 end)
 
-Law.Net.On('evidence:bleed', { rate = Cfg.BleedRateMs or 10000 }, function(src, ctx, isMelee)
+--- Verletzung (Client meldet nur die Art des Treffers an SICH selbst):
+---   fist = Schlaegerei, shot = angeschossen, sharp = Messer/Axt, animal = Tierbiss, other
+--- Blut/Kleidung wuerfelt der Server (Config.Evidence.Wounds), Position = Server-Position.
+local WOUND_KEY = { fist = 'Fist', shot = 'Shot', sharp = 'Sharp', animal = 'Animal', other = 'Other' }
+local lastBleedAt, lastClothAt = {}, {}  -- [charId] = GetGameTimer()
+
+local function roll(chance)
+    chance = tonumber(chance) or 0
+    return chance > 0 and math.random(1, 100) <= chance
+end
+
+Law.Net.On('evidence:wound', { rate = 300 }, function(src, ctx, kind)
     if not Cfg.Enabled then return end
+    local w = (Cfg.Wounds or {})[WOUND_KEY[kind] or '']
+    if not w then return end
     local coords = Law.GetCoords(src)
     if not coords then return end
-    local citizen = Law.Citizens.Get(ctx.charId)
-    local near = findNear('blood', ctx.charId, coords, 2.0)
-    if near then
-        near.count = near.count + 1
-        near.createdAt = Law.Now()
-    else
-        addTrace('blood', coords, { ownerCharId = ctx.charId, bloodType = citizen and citizen.bloodType or nil })
+    local now = GetGameTimer()
+
+    if roll(w.Blood) and now - (lastBleedAt[ctx.charId] or -1e9) >= (Cfg.BleedRateMs or 5000) then
+        lastBleedAt[ctx.charId] = now
+        local near = findNear('blood', ctx.charId, coords, 2.0)
+        if near then
+            near.count = near.count + 1
+            near.createdAt = Law.Now()
+        else
+            local citizen = Law.Citizens.Get(ctx.charId)
+            addTrace('blood', coords, { ownerCharId = ctx.charId, bloodType = citizen and citizen.bloodType or nil })
+        end
     end
-    if Law.ToBool(isMelee) and math.random(1, 100) <= (Cfg.MeleeClothChance or 0) then
-        addTrace('cloth', coords, { ownerCharId = ctx.charId })
+
+    if roll(w.Cloth) and now - (lastClothAt[ctx.charId] or -1e9) >= (Cfg.ClothRateMs or 60000) then
+        lastClothAt[ctx.charId] = now
+        local ang = math.random() * math.pi * 2
+        local r = 0.3 + math.random() * 0.7
+        addTrace('cloth', vector3(coords.x + math.cos(ang) * r, coords.y + math.sin(ang) * r, coords.z),
+            { ownerCharId = ctx.charId })
     end
 end)
 
@@ -312,14 +341,17 @@ Law.Cb.Register('evidence:collect', { perm = 'evidence', rate = 1000, notCuffed 
     if not t then return Law.Result(false, 'evidence_gone') end
     if not Law.IsNearCoords(src, t.coords, Cfg.CollectDistance or 2.0) then return Law.Result(false, 'too_far') end
     local itemName = ITEM_BY_TYPE[t.kind]
-    if Law.Items.Count(src, Config.Items.EvidenceBag) < 1 then return Law.Result(false, 'evidence_no_bag') end
+    -- Womit wird gesichert? Blut: steriles Tuch, sonst Beweismittelbeutel
+    local tool = (Cfg.CollectWith or {})[t.kind] or Config.Items.EvidenceBag
+    local noTool = tool == Config.Items.SterileCloth and 'evidence_no_sterile' or 'evidence_no_bag'
+    if Law.Items.Count(src, tool) < 1 then return Law.Result(false, noTool) end
     if not Law.Inv:canCarryItem(src, itemName, 1) then return Law.Result(false, 'cant_carry') end
 
     -- Spur sofort aus der Welt nehmen: ein zweiter Officer kann sie nicht mehr sichern
     removeTrace(id)
-    if not Law.Items.Take(src, Config.Items.EvidenceBag, 1) then
+    if not Law.Items.Take(src, tool, 1) then
         putTrace(t)
-        return Law.Result(false, 'evidence_no_bag')
+        return Law.Result(false, noTool)
     end
 
     -- oxmysql-.await WIRFT bei SQL-Fehlern -> Law.DB.Try, sonst waere der Beutel weg
@@ -330,15 +362,19 @@ Law.Cb.Register('evidence:collect', { perm = 'evidence', rate = 1000, notCuffed 
         { t.kind, t.weapon, t.serial, t.ownerCharId, t.bloodType, t.coords.x, t.coords.y, t.coords.z, t.zone,
           t.createdAt, ctx.charId, ctx.name, now, ctx.dept or '' })
     if not okInsert or not evId then
-        Law.Items.Give(src, Config.Items.EvidenceBag, 1)
+        Law.Items.Give(src, tool, 1)
         putTrace(t)
         return Law.Result(false, 'failed')
     end
 
-    local meta = { evidence_id = evId, description = itemDescription(t.kind, evId, t.zone, t.createdAt, t.count) }
+    local desc = itemDescription(t.kind, evId, t.zone, t.createdAt, t.count)
+    -- Geruchstraeger mit Ablauf (z.B. Blut 60 Min.): bis wann taugt er fuer den Hund?
+    local minutes = Law.Scent.ItemMinutes and Law.Scent.ItemMinutes(itemName) or 0
+    if minutes > 0 then desc = desc .. ' ' .. L('evidence_item_scent_until', os.date('%H:%M', t.createdAt + minutes * 60)) end
+    local meta = { evidence_id = evId, description = desc }
     if not Law.Items.Give(src, itemName, 1, meta) then
         Law.DB.Try(MySQL.update.await, 'DELETE FROM ara_law_evidence WHERE id = ?', { evId })
-        Law.Items.Give(src, Config.Items.EvidenceBag, 1)
+        Law.Items.Give(src, tool, 1)
         putTrace(t)
         return Law.Result(false, 'cant_carry')
     end
@@ -688,6 +724,10 @@ Law.Every(30000, function()
     for charId, at in pairs(lastShotAt) do
         if at < gsrLimit then lastShotAt[charId] = nil end
     end
+    -- Drosseln fuer Verletzungen: alte Eintraege weg (GetGameTimer in ms)
+    local ms = GetGameTimer()
+    for charId, at in pairs(lastBleedAt) do if ms - at > 600000 then lastBleedAt[charId] = nil end end
+    for charId, at in pairs(lastClothAt) do if ms - at > 600000 then lastClothAt[charId] = nil end end
 end)
 
 Law.Modules.Register('evidence', {

@@ -77,6 +77,11 @@ Meldung „Items fehlen in der Tabelle items“.
 | 5.7 | B feilt mit Waffenfeile die Seriennummer ab | Seriennummer „ABGEFEILT“ |
 | 5.8 | A: Schmauchspurentest an B direkt nach Schuss | positiv; nach 15 Min. negativ |
 | 5.9 | B verkauft registrierte Waffe am Schalter an C („Verkaufen / umschreiben“) | C bekommt Rückfrage; nach Annahme Waffe + neuer Waffenschein bei C, Register zeigt C, alter Schein von B „UNGÜLTIG“ |
+| 5.10 | B und C prügeln sich mit Fäusten (ca. 10 Treffer) | Bei manchen Treffern Blut (rote Marker) an der Stelle des Getroffenen |
+| 5.11 | C schießt B an | Blutspur an B's Stelle |
+| 5.12 | A sichert das Blut **ohne** steriles Tuch / **mit** sterilem Tuch | „Du brauchst ein steriles Tuch…“ / Item „Blutprobe“ mit „Witterung für den Hund bis … Uhr“ |
+| 5.13 | C greift B mit Messer oder Axt an | Blut **und** Kleidungsfetzen (blauer Marker) bei B |
+| 5.14 | A sichert den Kleidungsfetzen (Beweisbeutel) | Item „Kleidungsfetzen“ |
 
 ## 5b. Zellen mit Türen (Valentine)
 | # | Schritt | Erwartet |
@@ -102,7 +107,11 @@ Meldung „Items fehlen in der Tabelle items“.
 | 6.3 | B läuft 300 m weg und versteckt sich; A: F12 → „Witterung aufnehmen“ | Hund läuft los und folgt **B's Weg**, HUD „frisch“ |
 | 6.4 | A bleibt > 60 m zurück | Hund wartet |
 | 6.5 | Hund erreicht B | „Gefunden“, Hund bellt bei B |
-| 6.6 | Probe von einer Person, die seit > 30 Min. nicht in 200 m war | „Keine Witterung“, Abklingzeit |
+| 6.6 | Probe von einer Person, die seit > 60 Min. nicht in 200 m war | „Keine Witterung“, Abklingzeit |
+| 6.7 | Blutprobe von B (5.12) dem Hund zeigen, B ist weggelaufen | Hund folgt B's Fährte |
+| 6.8 | Dieselbe Blutprobe > 60 Min. nach der Tat | Menü zeigt „verflogen“, Hund nimmt keine Witterung auf |
+| 6.9 | Kleidungsfetzen von B (5.14) mehrmals benutzen | Badge „unbegrenzt“, Hund folgt jedes Mal |
+| 6.10 | B wird eingebucht (Knast), danach Kleidungsfetzen/Blutprobe dem Hund zeigen | „verflogen“ – Geruch ist weg |
 
 ## 7. Eskorten
 | # | Schritt | Erwartet |

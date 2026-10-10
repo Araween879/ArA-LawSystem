@@ -288,9 +288,11 @@ local function chooseScent()
     if not res or not res.ok then return Law.Notify(res and res.msg or L('err_failed')) end
     local items = {}
     for _, it in ipairs(res.data or {}) do
+        local uses = tonumber(it.uses) or 0   -- -1 = unbegrenzt (Kleidung)
+        local badge = (it.faded and L('k9_scent_faded')) or (uses < 0 and L('k9_scent_unlimited')) or L('k9_scent_uses', uses)
         items[#items + 1] = {
             id = it.id, label = L('k9_scent_item', it.typeLabel, it.evidenceId), desc = it.description,
-            badge = L('k9_scent_uses', it.uses), disabled = (tonumber(it.uses) or 0) <= 0,
+            badge = badge, disabled = it.faded == true or uses == 0,
         }
     end
     if #items == 0 then return Law.Notify(L('k9_scent_none_items')) end
