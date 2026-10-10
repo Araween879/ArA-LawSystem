@@ -68,7 +68,10 @@ local function spawnDog(model, spawn)
     local hash = joaat(model)
     local me = PlayerPedId()
     local x, y, z, h
-    if spawn then
+    if spawn and spawn.exact then
+        -- eigener Spawn-Punkt am Zwinger (config/stations/<stadt>.lua -> kennel.spawn)
+        x, y, z, h = spawn.x, spawn.y, spawn.z, spawn.w or 0.0
+    elseif spawn then
         x, y, z, h = spawn.x + 1.5, spawn.y + 1.5, spawn.z, spawn.w or 0.0
     else
         -- Pfeife: hinter dem Hundefuehrer

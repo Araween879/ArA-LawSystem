@@ -277,7 +277,7 @@ Config.Garage = {
 --------------------------------------------------------------------------
 Config.Duty = {
     OnlyAtPoint = true,   -- Dienst nur am "duty"-Punkt einer Station umschalten
-    PointRadius = 2.0,
+    PointRadius = 2.8,    -- Reichweite des Dienst-Punkts in Metern (Prompt erscheint ab hier; andere Punkte: 1.8)
 }
 
 Config.Payroll = {

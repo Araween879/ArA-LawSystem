@@ -92,6 +92,11 @@ Law.Cb.Register('k9:request', { perm = 'k9', rate = 2000, notCuffed = true, aliv
     local blocked = summonBlocked(src, ctx)
     if blocked then return blocked end
     dogs[src] = { charId = ctx.charId, pendingAt = Law.Now() }
+    -- Eigener Spawn am Zwinger (points.kennel.spawn) -> genau dort, sonst neben dem Prompt
+    if point.spawn then
+        local s = point.spawn
+        return Law.Result(true, { model = KCfg.Model, spawn = { x = s.x, y = s.y, z = s.z, w = s.w or 0.0, exact = true } })
+    end
     local c = Law.Vec(point.coords)
     return Law.Result(true, { model = KCfg.Model, spawn = { x = c.x, y = c.y, z = c.z, w = point.heading or 0.0 } })
 end)

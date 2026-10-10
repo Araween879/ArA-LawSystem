@@ -52,7 +52,8 @@ Config.Stations.valentine = {
         dropoff  = { coords = vector3(-270.10, 809.65, 119.25), radius = 8.0 },   -- Abgabe-Zone fuer Gefangene (Kopfgeld/Auftraege)
 
         -- Draussen
-        kennel   = { coords = vector3(-281.75, 811.92, 119.95), heading = 281.92 },   -- Zwinger: Bluthund holen/abgeben
+        kennel   = { coords = vector3(-281.75, 811.92, 119.95),                     -- Zwinger: Bluthund holen/abgeben (Prompt)
+                     spawn  = vector4(-281.52, 810.94, 119.36, 8.06) },             -- hier erscheint der Hund (mit Blickrichtung)
         garage   = { coords = vector3(-272.59, 814.42, 121.26),
                      spawn  = vector4(-268.55, 821.92, 119.02, 201.61) },   -- Dienstwagen: hier erscheint der Wagen
         escort   = { coords = vector3(-272.59, 814.42, 121.26),

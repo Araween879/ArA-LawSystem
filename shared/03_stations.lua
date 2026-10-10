@@ -108,6 +108,15 @@ local function cleanPoint(key, pType, p)
             return nil
         end
         p.spawn = s
+    elseif p.spawn ~= nil then
+        -- optionaler Spawn (z.B. Hund am Zwinger): vector3/vector4, sonst ignorieren
+        local s = toVec4(p.spawn)
+        if s and isPos(s) then
+            p.spawn = s
+        else
+            warn('%s.points.%s.spawn ist kein vector4(x, y, z, richtung) - wird ignoriert', key, pType)
+            p.spawn = nil
+        end
     end
     p.jobs = cleanJobs(('%s.points.%s'):format(key, pType), p.jobs)
     return p

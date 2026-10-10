@@ -11,6 +11,7 @@
 --------------------------------------------------------------------------
 Law.Stations.RegisterPoint('duty', {
     law = true,
+    distance = Config.Duty.PointRadius or 1.8,   -- Reichweite des Prompts (config/main.lua)
     label = function() return Law.Me.onDuty and L('prompt_duty_off') or L('prompt_duty_on') end,
     onUse = function() Law.Net.Send('duty:toggle') end,
 })

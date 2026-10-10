@@ -92,6 +92,7 @@ Config.Stations.vorlage = {
         armory   = { coords = vector3(0.0, 0.0, 0.0) },  -- Waffenkammer (Ausruestung zahlt die Kasse)
         evidence = { coords = vector3(0.0, 0.0, 0.0) },  -- Asservatenkammer + Labor (Spuren auswerten)
         kennel   = { coords = vector3(0.0, 0.0, 0.0), heading = 0.0 },  -- Zwinger: Bluthund holen/abgeben, heading = Blickrichtung des Hundes
+                                                                         -- optional: spawn = vector4(x, y, z, richtung) = genaue Stelle, an der der Hund erscheint
 
         -- Fuer ALLE Spieler
         counter  = { coords = vector3(0.0, 0.0, 0.0) },  -- Schalter: Bussgeld, Kaution, Lizenzen, Kopfgeld, Waffen, Eskorte, Habseligkeiten, Anzeige
