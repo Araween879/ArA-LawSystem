@@ -83,7 +83,7 @@ Meldung „Items fehlen in der Tabelle items“.
 |---|---|---|
 | 6.1 | A (Recht k9): Hundepfeife | Bluthund erscheint und folgt |
 | 6.2 | A nimmt Geruchsprobe von gefesseltem B (oder nutzt Blut/Stoff-Beweis von B) | Item Geruchstuch |
-| 6.3 | B läuft 300 m weg und versteckt sich; A: Hund → „Witterung aufnehmen“ | Hund läuft los und folgt **B's Weg**, HUD „frisch“ |
+| 6.3 | B läuft 300 m weg und versteckt sich; A: F12 → „Witterung aufnehmen“ | Hund läuft los und folgt **B's Weg**, HUD „frisch“ |
 | 6.4 | A bleibt > 60 m zurück | Hund wartet |
 | 6.5 | Hund erreicht B | „Gefunden“, Hund bellt bei B |
 | 6.6 | Probe von einer Person, die seit > 30 Min. nicht in 200 m war | „Keine Witterung“, Abklingzeit |

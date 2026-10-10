@@ -47,5 +47,6 @@
 | `/sheriff <Text>` | alle | Notruf an die Leitstelle |
 | `/panik` | Behörde im Dienst | Panikknopf |
 | `/einsatz <Nr>` | Behörde im Dienst | Einsatz annehmen + Route |
+| `F12` / `/hund` | Hundeführer im Dienst | Bluthund-Menü (Taste in `config/main.lua` → `Config.Keys.K9Menu`) |
 | `/lawcoords` | Admin | Position als vector3/vector4 in F8 |
 | `/editlawinterface` | alle | eigene Anzeigen (Job, Hinweise, Haft …) verschieben/vergrößern, pro Spieler gespeichert |

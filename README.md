@@ -191,6 +191,7 @@ vorp-Meldungen an fester Position.
 |---|---|---|
 | `/dienstbuch` | Behörde | Dienstbuch (Akten, Haftbefehle, Kopfgelder, Einsätze, Behörde) |
 | `F6` / `/lawmenu` | alle | Interaktionsmenü |
+| `F12` / `/hund` | Hundeführer im Dienst | Bluthund-Menü: Bei Fuß, Bleib, Umgebung absuchen, Witterung aufnehmen, Verfolgung abbrechen, Nach Hause |
 | `/marke` | Behörde | Marke zeigen |
 | `/sheriff <Text>` | alle | Notruf |
 | `/panik` | Behörde im Dienst | Panikknopf |

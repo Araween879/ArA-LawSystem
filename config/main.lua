@@ -44,6 +44,10 @@ Config.General = {
 Config.Keys = {
     Prompt   = 0xCEFD9220,  -- E   (INPUT_CONTEXT_Y) - Prompts an Stationen
     Interact = 0x3C0A40F2,  -- F6  - Interaktionsmenue (Spieler in der Naehe / eigene Aktionen)
+    -- Hunde-Menue (Bluthund-Befehle). ACHTUNG: Windows-Tastencode, KEIN Spiel-Hash wie oben,
+    -- weil F12 in RedM keiner Spiel-Taste zugeordnet ist. F12 = 0x7B, F11 = 0x7A, F10 = 0x79,
+    -- F9 = 0x78 (Liste: learn.microsoft.com -> "Virtual-Key Codes"). nil = keine Taste, nur /hund.
+    K9Menu   = 0x7B,
 }
 
 Config.Interact = {
@@ -70,6 +74,7 @@ Config.Commands = {
     Accept    = 'einsatz',     -- /einsatz <Nr>  Einsatz annehmen
     Coords    = 'lawcoords',   -- Admin: eigene Position ausgeben
     EditUi    = 'editlawinterface', -- Jeder: eigene Anzeigen (Job, Hinweise, Haft ...) verschieben + speichern
+    K9        = 'hund',        -- Hunde-Menue (gleiche Funktion wie Taste F12)
 }
 
 --------------------------------------------------------------------------

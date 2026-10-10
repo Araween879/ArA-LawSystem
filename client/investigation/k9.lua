@@ -355,68 +355,116 @@ local function search()
 end
 
 --------------------------------------------------------------------------
--- Befehle (Interaktionsmenue)
+-- Hunde-Menue: eigene Taste (Config.Keys.K9Menu, Standard F12) oder /hund
+-- (nicht mehr im F6-Interaktionsmenue)
 --------------------------------------------------------------------------
 local function hasDog() return dogAlive() end
 
-Law.Interact.Register('k9_follow', {
-    label = L('k9_cmd_follow'), order = 60, target = false, perm = 'k9', duty = true,
-    canShow = function() return hasDog() and K9.session == nil end,
-    onSelect = function() follow() end,
-})
+-- Reihenfolge = Reihenfolge im Menue. show() entscheidet, ob der Eintrag erscheint.
+local DOG_COMMANDS = {
+    { id = 'follow', label = 'k9_cmd_follow',
+      show = function() return hasDog() and K9.session == nil end,
+      run = function() follow() end },
+    { id = 'stay', label = 'k9_cmd_stay',
+      show = function() return hasDog() and K9.session == nil end,
+      run = function() stay() end },
+    { id = 'search', label = 'k9_cmd_search', desc = 'k9_cmd_search_desc',
+      show = function() return hasDog() and K9.session == nil end,
+      run = function() search() end },
+    { id = 'scent', label = 'k9_cmd_scent', desc = 'k9_cmd_scent_desc',
+      show = function() return hasDog() and K9.session == nil end,
+      run = function() chooseScent() end },
+    { id = 'stop', label = 'k9_cmd_stop',
+      show = function() return hasDog() and K9.session ~= nil end,
+      run = function()
+          local s = K9.session
+          K9.session = nil
+          if s then Law.Net.Send('scent:stop', s.id) end
+          follow()
+      end },
+    { id = 'attack', label = 'k9_cmd_attack', target = true,
+      show = function(targetSrc) return KCfg.AllowAttack and hasDog() and targetSrc ~= nil end,
+      run = function(targetSrc)
+          local res = Law.Cb.Await('k9:attack', targetSrc)
+          if not res or not res.ok then return Law.Notify(res and res.msg or L('err_failed')) end
+          local player = GetPlayerFromServerId(targetSrc)
+          local targetPed = player ~= -1 and GetPlayerPed(player) or 0
+          if targetPed ~= 0 and dogAlive() then
+              ClearPedTasks(K9.ped)
+              TaskCombatPed(K9.ped, targetPed, 0, 16)
+              setHud('tracking', nil, L('k9_cmd_attack'))
+          end
+      end },
+    { id = 'home', label = 'k9_cmd_home',
+      show = function() return K9.ped ~= nil end,
+      run = function() Law.Net.Send('k9:dismiss') end },
+}
 
-Law.Interact.Register('k9_stay', {
-    label = L('k9_cmd_stay'), order = 61, target = false, perm = 'k9', duty = true,
-    canShow = function() return hasDog() and K9.session == nil end,
-    onSelect = function() stay() end,
-})
+local menuOpen = false
 
-Law.Interact.Register('k9_search', {
-    label = L('k9_cmd_search'), desc = L('k9_cmd_search_desc'), order = 62, target = false, perm = 'k9', duty = true,
-    canShow = function() return hasDog() and K9.session == nil end,
-    onSelect = function() search() end,
-})
+local function openDogMenu()
+    if menuOpen or not Law.Ready or Law.UI.IsOpen() or Law.State.cuffed then return end
+    if not Law.Me.onDuty or not Law.HasPerm('k9') then return end
+    if not K9.ped then return Law.Notify(L('err_k9_no_dog'), 'error') end
+    local targetSrc = Law.Util.GetClosestPlayer((Config.Interact and Config.Interact.TargetDistance) or 3.0)
 
-Law.Interact.Register('k9_scent', {
-    label = L('k9_cmd_scent'), desc = L('k9_cmd_scent_desc'), order = 63, target = false, perm = 'k9', duty = true,
-    canShow = function() return hasDog() and K9.session == nil end,
-    onSelect = function() chooseScent() end,
-})
+    local items = {}
+    for _, c in ipairs(DOG_COMMANDS) do
+        if c.show(targetSrc) then
+            items[#items + 1] = {
+                id = c.id, label = L(c.label), desc = c.desc and L(c.desc) or nil,
+                badge = c.target and Law.Util.PlayerName(targetSrc) or nil,
+            }
+        end
+    end
+    if #items == 0 then return end
 
-Law.Interact.Register('k9_stop', {
-    label = L('k9_cmd_stop'), order = 64, target = false, perm = 'k9', duty = true,
-    canShow = function() return hasDog() and K9.session ~= nil end,
-    onSelect = function()
-        local s = K9.session
-        K9.session = nil
-        if s then Law.Net.Send('scent:stop', s.id) end
-        follow()
-    end,
-})
-
-Law.Interact.Register('k9_home', {
-    label = L('k9_cmd_home'), order = 65, target = false, perm = 'k9', duty = true,
-    canShow = function() return K9.ped ~= nil end,
-    onSelect = function() Law.Net.Send('k9:dismiss') end,
-})
-
-if KCfg.AllowAttack then
-    Law.Interact.Register('k9_attack', {
-        label = L('k9_cmd_attack'), order = 66, target = true, perm = 'k9', duty = true,
-        canShow = function() return hasDog() end,
-        onSelect = function(targetSrc)
-            local res = Law.Cb.Await('k9:attack', targetSrc)
-            if not res or not res.ok then return Law.Notify(res and res.msg or L('err_failed')) end
-            local player = GetPlayerFromServerId(targetSrc)
-            local targetPed = player ~= -1 and GetPlayerPed(player) or 0
-            if targetPed ~= 0 and dogAlive() then
-                ClearPedTasks(K9.ped)
-                TaskCombatPed(K9.ped, targetPed, 0, 16)
-                setHud('tracking', nil, L('k9_cmd_attack'))
+    menuOpen = true
+    CreateThread(function()
+        local choice = Law.UI.Menu({
+            title = L('k9_menu_title'),
+            subtitle = L('k9_state_' .. tostring(K9.state or 'idle')),
+            items = items,
+        })
+        menuOpen = false
+        if not choice then return end
+        for _, c in ipairs(DOG_COMMANDS) do
+            if c.id == choice then
+                -- Zustand kann sich geaendert haben, waehrend das Menue offen war
+                local now = c.target and Law.Util.GetClosestPlayer((Config.Interact and Config.Interact.TargetDistance) or 3.0) or targetSrc
+                if c.target and now ~= targetSrc then return Law.Notify(L('interact_target_gone')) end
+                if not c.show(now) then return end
+                local ok, err = xpcall(c.run, debug.traceback, now)
+                if not ok then Law.Warn('Fehler im Hunde-Menue (%s): %s', tostring(choice), tostring(err)) end
+                return
             end
-        end,
-    })
+        end
+    end)
 end
+
+Law.K9 = Law.K9 or {}
+Law.K9.OpenMenu = openDogMenu
+
+RegisterCommand(Config.Commands.K9 or 'hund', function()
+    openDogMenu()
+end, false)
+
+-- Taste: Windows-Tastencode (F12 = 0x7B), abgefragt nur solange ein Hund da ist
+CreateThread(function()
+    local key = Config.Keys and Config.Keys.K9Menu
+    if not key then return end
+    while true do
+        if K9.ped then
+            Wait(0)
+            if IsRawKeyReleased(key) then
+                openDogMenu()
+                Wait(300)
+            end
+        else
+            Wait(500)
+        end
+    end
+end)
 
 -- Geruchsprobe am gefesselten oder bewusstlosen Ziel
 Law.Interact.Register('scent_sample', {
