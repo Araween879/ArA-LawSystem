@@ -63,7 +63,8 @@ Config.Stations.annesburg = {
     --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
     --   4. Haft vorbei -> Teleport nach draussen (release)
     -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
-    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern,
+    -- capacity = wie viele Haeftlinge in die Zelle passen.
     -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
     -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
     -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
@@ -73,9 +74,9 @@ Config.Stations.annesburg = {
         release = vector4(2916.59, 1317.09, 44.35, 60.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
         list = {
             { label = 'Zelle 1', door = 1502928852, doorCoords = vector3(2904.27, 1314.34, 43.94),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
             { label = 'Zelle 2', door = 1657401918, doorCoords = vector3(2902.96, 1310.87, 43.94),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
         },
     },
     doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }

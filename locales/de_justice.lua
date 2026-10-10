@@ -404,4 +404,6 @@ Law.LocaleAdd('de', {
     err_cell_door_open        = 'Erst die Zellentuer abschliessen.',
     err_cell_target_outside   = 'Die Person steht nicht in der Zelle.',
     err_disabled              = 'Das ist ausgeschaltet.',
+    err_cell_full             = 'Die Zelle ist voll.',
+    bounty_book_in_cell       = 'Kopfgeld eingeloest. Bring den Gefangenen in eine Zelle, schliess ab und buche ihn an der Zellentuer ein.',
 })

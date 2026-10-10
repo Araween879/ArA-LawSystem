@@ -152,6 +152,13 @@ Position aus den Spieldaten sind schon eingetragen). So läuft eine Festnahme:
 - **Ausbruch:** Wer mit einem Dietrich das Schloss knackt, öffnet die Tür (Alarm an die Leitstelle,
   Spur für den Bluthund). Verlässt der Häftling die Zelle, gilt das als **Flucht** (Haftbefehl, Kopfgeld).
 - **Aufschließen einer belegten Zelle** fragt vorher nach.
+- **Plätze:** `capacity` je Zelle (Valentine: 3). Ist die Zelle voll, lehnt das Einbuchen ab.
+- **Tür zu = kein Ausbruch:** Steht ein Häftling bei abgeschlossener Tür knapp außerhalb der Zelle
+  (Glitch, Radius zu klein), wird er zurück in die Zelle gesetzt – Flucht gibt es nur durch eine offene Tür.
+- **Kopfgeld-Abgabe:** Gibt ein **Kopfgeldjäger** (oder Gesetz außer Dienst) an der Abgabestelle
+  einer Station mit Zellen jemanden ab, wird der Gefangene **in eine freie Zelle teleportiert** und die
+  Tür abgeschlossen. **Gesetz im Dienst** bekommt nur das Kopfgeld und sperrt den Gefangenen
+  **selbst** ein (Tür auf, rein, zu, an der Tür einbuchen). Sind alle Zellen voll → Sisika.
 - **Einrichten:** In jeder Zelle in die Mitte stellen, `/lawcoords`, Wert bei `center` eintragen.
   Als Admin zeigt **`/lawcells`** alle Türen (grün = zu, rot = offen) und Zellen (blau) im Spiel;
   neben einer Tür erscheint ihr Name.

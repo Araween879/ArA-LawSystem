@@ -38,7 +38,7 @@ Config.Stations.valentine = {
     points = {
         -- Pult / Tresen
         duty     = { coords = vector3(-278.25, 802.64, 119.38) },   -- Dienst an/aus
-        boss     = { coords = vector3(-277.19, 804.38, 119.38) },   -- Chef: Personal, Kasse, Protokoll (Dienstbuch)
+        boss     = { coords = vector3(-276.95, 807.33, 118.17) },   -- Chef: Behoerde verwalten (Personal, Kasse, Protokoll)
         jail     = { coords = vector3(-277.73, 804.84, 119.38) },   -- Einbuchen: gefesselte Person steht daneben  (ANPASSEN: noch Startwert)
 
         -- Hinterzimmer
@@ -66,27 +66,31 @@ Config.Stations.valentine = {
     --   2. Haeftling geht SELBST in die Zelle, Tuer abschliessen
     --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
     --   4. Haft vorbei -> Teleport nach draussen (release)
+    -- Kopfgeldjaeger gibt jemanden an der Abgabestelle ab -> Gefangener kommt per
+    -- Teleport in eine freie Zelle (Tuer wird abgeschlossen). Gesetz sperrt selbst ein.
     -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
-    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern,
+    -- capacity = wie viele Haeftlinge in die Zelle passen.
     -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
     -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
     -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
     cells = {
         enabled = true,
         label   = 'Zellen Valentine',
-        release = vector4(-278.17, 814.88, 119.28, 180.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
+        release = vector4(-269.78, 809.68, 119.24, 276.62),   -- Entlassung: hier kommt der Haeftling raus
         list = {
-            { label = 'Zelle 1', door = 193903155, doorCoords = vector3(-272.05, 808.26, 118.37),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
-            { label = 'Zelle 2', door = 295355979, doorCoords = vector3(-273.46, 809.97, 118.37),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
-            { label = 'Zelle 3', door = 535323366, doorCoords = vector3(-275.02, 809.27, 118.37),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
-            { label = 'Zelle 4', door = 1508776842, doorCoords = vector3(-270.77, 810.03, 118.40),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            -- center = Mitte der Zelle (/lawcoords), capacity = Plaetze, radius = Groesse in Metern
+            { label = 'Zelle 1', door = 295355979, doorCoords = vector3(-273.46, 809.97, 118.37),
+              center = vector3(-273.13, 811.37, 119.37), heading = 12.58, capacity = 3, radius = 2.0 },
+            { label = 'Zelle 2', door = 193903155, doorCoords = vector3(-272.05, 808.26, 118.37),
+              center = vector3(-272.19, 807.28, 119.37), heading = 260.25, capacity = 3, radius = 2.0 },
         },
     },
-    doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }
+    -- weitere abschliessbare Gittertueren (Start: offen). Gesetz im Dienst schliesst sie per Prompt ab.
+    doors = {
+        { label = 'Gittertuer Zellengang', door = 1508776842, doorCoords = vector3(-270.77, 810.03, 118.40), locked = false },
+        { label = 'Gittertuer hinten',     door = 535323366,  doorCoords = vector3(-275.02, 809.27, 118.37), locked = false },
+    },
 
     -- Schuesse-Alarm: Schuesse in diesem Gebiet meldet ein NPC-Zeuge an die Leitstelle
     shotsZone = {

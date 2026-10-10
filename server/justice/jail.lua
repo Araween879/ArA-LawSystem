@@ -453,10 +453,32 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
     setupInmate(targetSrc, {
         charid = tctx.charId, name = tctx.name, location = key, cell = cell, department = dept,
         sentence_seconds = seconds, served_seconds = 0, reduced_seconds = 0,
-    }, cell == nil, false)
+    }, cell == nil or opts.teleportIn == true, false)
     Law.Notify(targetSrc, L('jail_sentenced_you', minutes, placeLabel), 'objective', 10000)
     if property then Law.Notify(targetSrc, L('jail_property_taken'), 'info', 8000) end
     return true
+end
+
+--- Kopfgeld-Abgabe durch einen Kopfgeldjaeger: freie Zelle der Station waehlen,
+--- Tuer abschliessen und den Gefangenen HINEIN teleportieren (Gesetz sperrt
+--- dagegen selbst an der Zellentuer ein). Nur Zellen mit gemessener Mitte und
+--- freiem Platz (capacity), die leerste zuerst.
+--- -> ok, err   (false, 'no_cell' = keine passende Zelle -> Aufrufer nimmt das Gefaengnis)
+function Law.Jail.SentenceToCell(targetSrc, stationKey, minutes, reason, officerCtx, opts)
+    local loc = locationCfg(stationKey)
+    if not loc or loc.mode ~= 'cells' then return false, 'no_location' end
+    local best, bestN
+    for idx, c in ipairs(loc.cells or {}) do
+        if not c.fallback then
+            local n = #Law.Justice.InmatesInCell(stationKey, idx)
+            if n < (c.capacity or 1) and (not bestN or n < bestN) then best, bestN = idx, n end
+        end
+    end
+    if not best then return false, 'no_cell' end
+    local o = Law.Copy(type(opts) == 'table' and opts or {})
+    o.location, o.cell, o.teleportIn = stationKey, best, true
+    Law.Doors.SetLocked(loc.cells[best].door, true, officerCtx, 'bounty')
+    return Law.Jail.Sentence(targetSrc, minutes, reason, officerCtx, o)
 end
 
 function Law.Jail.Sentence(targetSrc, minutes, reason, officerCtx, opts)
@@ -570,6 +592,9 @@ Law.Cb.Register('jail:sentenceCell', { perm = 'jail', rate = 2000, notCuffed = t
     local reach = ((Config.Jail.Cells and Config.Jail.Cells.DoorReach) or 2.0) + 1.5
     if not me or dist2D(me, door.coords) > reach or math.abs(me.z - door.coords.z) > 3.0 then return Law.Result(false, 'too_far') end
     if not Law.Doors.IsLocked(door.hash) then return Law.Result(false, 'cell_door_open') end
+    if #Law.Justice.InmatesInCell(door.station, door.cell) >= (cell.capacity or 1) then
+        return Law.Result(false, 'cell_full')
+    end
 
     targetSrc = Law.ToInt(targetSrc, 1)
     if not targetSrc or targetSrc == src then return Law.Result(false, 'invalid') end
@@ -852,8 +877,14 @@ local function checkEscapes()
                 -- Tod/Respawn ist keine Flucht -> zurueck. Aber hoechstens
                 -- MaxDeathReturns Mal in Folge (H1), sonst waere "kuerzlich tot"
                 -- ein Freifahrtschein zum Weglaufen.
+                local cell = cellOf(i)
                 if (recentlyDead or (ctx and ctx.isDead)) and (i.deathReturns or 0) < maxReturns then
                     i.deathReturns = (i.deathReturns or 0) + 1
+                    i.graceUntil = now + graceSeconds()
+                    teleportBack(src, i)
+                elseif cell and Law.Doors.IsLocked(cell.door) and dist2D(c, center) <= radius + 6.0 then
+                    -- Zellentuer ist zu: durch Gitter laeuft keiner -> Glitch (oder radius
+                    -- zu klein). Keine Flucht, zurueck in die Zelle.
                     i.graceUntil = now + graceSeconds()
                     teleportBack(src, i)
                 else

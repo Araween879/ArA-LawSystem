@@ -89,6 +89,10 @@ Meldung „Items fehlen in der Tabelle items“.
 | 5b.6 | B verlässt die offene Zelle | Flucht: Haftbefehl, Alarm |
 | 5b.7 | Haftzeit läuft ab (Zeit per Dienstbuch verkürzen) | B wird nach draußen teleportiert, Tür bleibt zu |
 | 5b.8 | `restart ArA-LawSystem` | Türen wieder abgeschlossen |
+| 5b.9 | Kopfgeldjäger C gibt gefesselten B (aktives Kopfgeld) an der Abgabestelle Valentine ab | B wird in eine freie Zelle teleportiert, Tür zu, Haft-HUD läuft |
+| 5b.10 | Deputy A (im Dienst) gibt B an der Abgabestelle ab | A bekommt Meldung „Bring den Gefangenen in eine Zelle…“, B bleibt gefesselt, **kein** Teleport |
+| 5b.11 | 4. Häftling in eine Zelle mit 3 Plätzen einbuchen | „Die Zelle ist voll.“ |
+| 5b.12 | Häftling stellt sich bei geschlossener Tür an die Gitterwand | keine Flucht; liegt er außerhalb des Radius, kommt er zurück in die Zellenmitte |
 
 ## 6. Bluthund
 | # | Schritt | Erwartet |

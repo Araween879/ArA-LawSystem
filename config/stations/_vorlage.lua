@@ -118,7 +118,8 @@ Config.Stations.vorlage = {
     --
     -- door       = Tuer-Hash aus rdr3_discoveries (doorHashes/doorhashes.lua)
     -- doorCoords = Position der Tuer (gleiche Datei)
-    -- center     = Mitte IN der Zelle (im Spiel hinstellen, /lawcoords), radius = Groesse
+    -- center     = Mitte IN der Zelle (im Spiel hinstellen, /lawcoords), radius = Groesse,
+    -- capacity   = wie viele Haeftlinge in die Zelle passen
     -- Als Admin zeigt /lawcells alle Tueren (gruen = zu, rot = offen) und Zellen (blau).
     -- WICHTIG: diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen.
     -- Einstellungen fuer alle Zellen (Dietrich, Reichweite ...): config/justice.lua -> Config.Jail.Cells
@@ -128,7 +129,7 @@ Config.Stations.vorlage = {
         label   = 'Zellen Neue Station',                -- Name im Dienstbuch / in der Akte
         release = vector4(0.0, 0.0, 0.0, 0.0),          -- hier kommt der Haeftling nach der Haft raus
         list = {
-            -- { label = 'Zelle 1', door = 123456789, doorCoords = vector3(0.0, 0.0, 0.0), center = vector3(0.0, 0.0, 0.0), radius = 1.6 },
+            -- { label = 'Zelle 1', door = 123456789, doorCoords = vector3(0.0, 0.0, 0.0), center = vector3(0.0, 0.0, 0.0), capacity = 2, radius = 1.6 },
         },
     },
     -- Weitere abschliessbare Tueren ohne Zelle (z.B. Zellentrakt):

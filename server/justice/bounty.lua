@@ -610,7 +610,17 @@ Law.Cb.Register('bounty:claim', { rate = 3000, notCuffed = true, notJailed = tru
                         })
 
                         -- Ziel in Haft (tot: vorher wiederbeleben)
-                        if not dead or cfg.DeadGoesToJail then
+                        -- Station mit Zellen (Tueren): Gesetz (Recht 'jail', Dienst, darf an
+                        -- dieser Station) sperrt den lebenden Gefangenen SELBST ein
+                        -- (Zellentuer, realistisch). Alle anderen koennen das nicht -> der
+                        -- Gefangene kommt per Teleport in eine freie Zelle.
+                        local cellLoc = Config.Jail.Locations[stationKey]
+                        local hasCells = cellLoc ~= nil and cellLoc.mode == 'cells'
+                        local lawBooksSelf = hasCells and not dead and isLaw
+                            and Law.HasPerm(ctx, 'jail', true) and Law.Stations.AllowsDept(stationKey, ctx.dept)
+                        if lawBooksSelf then
+                            Law.Notify(src, L('bounty_book_in_cell'), 'objective', 10000)
+                        elseif not dead or cfg.DeadGoesToJail then
                             local w = MySQL.scalar.await("SELECT MAX(jail_minutes) FROM ara_law_warrants WHERE charid = ? AND status = 'active'", { tctx.charId })
                             local minutes = math.max(tonumber(w) or 0, 0)
                             if minutes <= 0 then minutes = cfg.DefaultJailMinutes or 15 end
@@ -619,9 +629,16 @@ Law.Cb.Register('bounty:claim', { rate = 3000, notCuffed = true, notJailed = tru
                             for _, r in ipairs(rows) do
                                 if r.kind == 'official' and Law.GetDept(r.department) then jailDept = r.department break end
                             end
-                            local okJail, jailErr = Law.Jail.Sentence(t, minutes, L('jail_reason_bounty', ctx.name), ctx, {
-                                location = Config.Jail.StationLocation[stationKey], dept = jailDept,
-                            })
+                            local okJail, jailErr = false, 'no_cell'
+                            if hasCells then
+                                okJail, jailErr = Law.Jail.SentenceToCell(t, stationKey, minutes, L('jail_reason_bounty', ctx.name), ctx, { dept = jailDept })
+                            end
+                            if not okJail and jailErr == 'no_cell' then
+                                -- keine Zelle (oder keine gemessen) -> wie bisher ins Gefaengnis
+                                okJail, jailErr = Law.Jail.Sentence(t, minutes, L('jail_reason_bounty', ctx.name), ctx, {
+                                    location = Config.Jail.StationLocation[stationKey], dept = jailDept,
+                                })
+                            end
                             if not okJail then Law.Warn('Kopfgeld-Haft fehlgeschlagen fuer %s: %s', tostring(tctx.charId), tostring(jailErr)) end
                         end
 

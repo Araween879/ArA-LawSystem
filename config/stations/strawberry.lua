@@ -65,7 +65,8 @@ Config.Stations.strawberry = {
     --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
     --   4. Haft vorbei -> Teleport nach draussen (release)
     -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
-    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern,
+    -- capacity = wie viele Haeftlinge in die Zelle passen.
     -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
     -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
     -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
@@ -75,9 +76,9 @@ Config.Stations.strawberry = {
         release = vector4(-1805.13, -355.05, 164.14, 150.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
         list = {
             { label = 'Zelle 1', door = 902070893, doorCoords = vector3(-1814.40, -353.15, 160.44),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
             { label = 'Zelle 2', door = 1207903970, doorCoords = vector3(-1812.01, -351.92, 160.47),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
         },
     },
     doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }

@@ -175,6 +175,7 @@ Config.Jail = {
     -- Haft wird er nach draussen teleportiert (cells.release der Station).
     Cells = {
         Radius        = 1.6,    -- Groesse einer Zelle in Metern (wenn bei der Zelle kein radius steht)
+        Capacity      = 2,      -- so viele Haeftlinge passen in eine Zelle (wenn bei der Zelle kein capacity steht)
         DoorReach     = 2.0,    -- so nah muss man an der Zellentuer stehen (Prompt)
         LockedOnStart = true,   -- nach Server-Neustart sind alle Zellentueren abgeschlossen
         -- Ausbruch: Schloss einer Zellentuer mit einem Dietrich knacken (alle ausser Gesetz im Dienst)

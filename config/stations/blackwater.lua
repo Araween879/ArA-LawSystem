@@ -63,7 +63,8 @@ Config.Stations.blackwater = {
     --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
     --   4. Haft vorbei -> Teleport nach draussen (release)
     -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
-    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern,
+    -- capacity = wie viele Haeftlinge in die Zelle passen.
     -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
     -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
     -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
@@ -73,9 +74,9 @@ Config.Stations.blackwater = {
         release = vector4(-752.53, -1266.10, 43.43, 90.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
         list = {
             { label = 'Zelle 1', door = 2167775834, doorCoords = vector3(-763.53, -1262.46, 43.02),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
             { label = 'Zelle 2', door = 2514996158, doorCoords = vector3(-765.86, -1264.70, 43.02),
-              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+              center = nil, capacity = 2, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
         },
     },
     doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }

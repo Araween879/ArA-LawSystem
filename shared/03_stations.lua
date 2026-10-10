@@ -224,6 +224,7 @@ local function buildStation(key, st)
     if type(cells) == 'table' and cells.list and cells.enabled ~= false then
         local list = {}
         local defRadius = (Config.Jail.Cells and Config.Jail.Cells.Radius) or 1.6
+        local defCap = (Config.Jail.Cells and Config.Jail.Cells.Capacity) or 2
         for i, c in ipairs(cells.list) do
             if type(c) == 'table' and c.enabled ~= false then
                 local hash = tonumber(c.door)
@@ -231,7 +232,9 @@ local function buildStation(key, st)
                     warn('%s.cells.list[%d]: door (Tuer-Hash) und doorCoords (vector3) fehlen - Zelle ist aus', key, i)
                 else
                     local center = c.center
+                    local fallback = false
                     if not isPos(center) then
+                        fallback = true
                         warn('%s.cells.list[%d] (%s): center fehlt - Tuer-Position wird benutzt (ungenau). In der Zelle /lawcoords messen und eintragen',
                             key, i, tostring(c.label or i))
                         center = vector3(c.doorCoords.x, c.doorCoords.y, c.doorCoords.z + 1.0)
@@ -243,6 +246,8 @@ local function buildStation(key, st)
                         center     = vector3(center.x, center.y, center.z),
                         radius     = (tonumber(c.radius) or defRadius) + 0.0,
                         heading    = (tonumber(c.heading) or 0.0) + 0.0,
+                        capacity   = math.max(1, math.floor(tonumber(c.capacity) or defCap)),   -- Plaetze
+                        fallback   = fallback or nil,   -- Mitte nicht gemessen -> nie hineinteleportieren
                     }
                 end
             end
