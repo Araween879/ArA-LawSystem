@@ -1,7 +1,10 @@
 --[[
     ArA-LawSystem - Haupt-Config (Kern)
 
-    Besitzer: Head Dev. Module haben eigene Dateien:
+    Welche Datei fuer was?
+      config/main.lua           (DIESE: Allgemein, Tasten, Befehle, Items, Behoerden + Raenge,
+                                 Waffenkammer, Dienstwagen, Lohn, Kassen, Leitstelle)
+      config/stations/*.lua     (EINE Datei pro Stadt: alle Punkte der Station, Blip, Zellen)
       config/justice.lua        (Festnahme, Bussgeld, Knast, Akten, Haftbefehle, Kopfgeld, NPC)
       config/investigation.lua  (Spuren, Waffenregister, Geruch, Bluthund)
       config/escort.lua         (Personenschutz, Transporte, Werttransporte)
@@ -258,15 +261,9 @@ Config.Dispatch = {
         ZoneCooldown    = 60,     -- je Stadt hoechstens ein Alarm pro X Sekunden
         Delay           = { 5, 15 },  -- Sekunden bis der NPC-Zeuge meldet
         Fuzz            = 60,     -- Meter Ungenauigkeit der Meldung
+        -- Die Gebiete der Staedte stehen in config/stations/<stadt>.lua (shotsZone).
+        -- Hier nur Orte OHNE eigene Station:
         Zones = {  -- ANPASSEN nach Bedarf
-            { label = 'Valentine',     coords = vector3(-281.0, 790.0, 119.0),   radius = 180.0 },
-            { label = 'Saint Denis',   coords = vector3(2632.0, -1312.0, 52.0),  radius = 450.0 },
-            { label = 'Blackwater',    coords = vector3(-800.0, -1290.0, 43.0),  radius = 250.0 },
-            { label = 'Rhodes',        coords = vector3(1300.0, -1280.0, 76.0),  radius = 180.0 },
-            { label = 'Strawberry',    coords = vector3(-1780.0, -420.0, 156.0), radius = 150.0 },
-            { label = 'Annesburg',     coords = vector3(2930.0, 1330.0, 44.0),   radius = 170.0 },
-            { label = 'Armadillo',     coords = vector3(-3660.0, -2600.0, -13.0), radius = 180.0 },
-            { label = 'Tumbleweed',    coords = vector3(-5510.0, -2940.0, -2.0), radius = 150.0 },
             { label = 'Van Horn',      coords = vector3(2960.0, 530.0, 45.0),    radius = 120.0 },
             { label = 'Emerald Ranch', coords = vector3(1420.0, 290.0, 88.0),    radius = 100.0 },
         },
@@ -275,53 +272,8 @@ Config.Dispatch = {
 
 --------------------------------------------------------------------------
 -- Stationen
--- points.<typ> = { coords = vector3(...), heading = 0.0, radius = 2.0, spawn = vector4(...) }
--- Typen und Besitzer: docs/01_CONTRACT.md Abschnitt 9
--- depts = nil -> alle Behoerden duerfen die Behoerden-Punkte nutzen
+-- Jede Stadt hat ihre EIGENE Datei:  config/stations/<stadt>.lua
+-- Dort stehen alle Punkte, Blip, erlaubte Behoerden, eigene Zellen und das
+-- Schuesse-Alarm-Gebiet. Neue Station: config/stations/_vorlage.lua kopieren.
 --------------------------------------------------------------------------
-local function station(label, desk, storage, entrance, spawn, extra)
-    local s = {
-        label = label,
-        depts = nil,
-        blip  = { style = 'BLIP_STYLE_FRIENDLY_ON_RADAR', sprite = 'blip_ambient_sheriff', name = label },
-        points = {
-            duty     = { coords = desk },
-            boss     = { coords = desk },
-            counter  = { coords = desk },
-            jail     = { coords = desk },
-            storage  = { coords = storage },
-            armory   = { coords = storage },
-            evidence = { coords = storage },
-            board    = { coords = entrance },
-            kennel   = { coords = entrance },
-            dropoff  = { coords = entrance, radius = 8.0 },
-            garage   = { coords = entrance, spawn = spawn },
-            escort   = { coords = entrance, spawn = spawn, radius = 25.0 },
-        },
-    }
-    for k, v in pairs(extra or {}) do s[k] = v end
-    return s
-end
-
-Config.Stations = {
-    -- ANPASSEN: desk/storage/entrance aus vorp_police, spawn geschaetzt
-    valentine  = station('Valentine',   vector3(-277.73, 804.84, 119.38),  vector3(-276.97, 810.83, 119.38),  vector3(-278.17, 814.88, 119.28),  vector4(-283.50, 823.50, 119.30, 190.0)),
-    strawberry = station('Strawberry',  vector3(-1807.03, -348.47, 164.65), vector3(-1814.17, -354.75, 164.65), vector3(-1805.13, -355.05, 164.14), vector4(-1800.50, -360.50, 163.90, 150.0)),
-    blackwater = station('Blackwater',  vector3(-761.95, -1272.62, 44.05), vector3(-765.12, -1272.37, 44.04), vector3(-752.53, -1266.10, 43.43), vector4(-747.00, -1262.00, 43.40, 90.0)),
-    rhodes     = station('Rhodes',      vector3(1361.57, -1303.40, 77.77), vector3(1361.17, -1305.83, 77.76), vector3(1354.90, -1306.85, 76.94), vector4(1349.00, -1310.00, 76.70, 330.0)),
-    saintdenis = station('Saint Denis', vector3(2508.46, -1308.56, 48.95), vector3(2494.62, -1304.30, 48.95), vector3(2510.00, -1318.00, 48.53), vector4(2516.00, -1326.00, 48.40, 270.0)),
-    tumbleweed = station('Tumbleweed',  vector3(-5529.55, -2929.25, -1.36), vector3(-5526.59, -2928.51, -1.36), vector3(-5531.39, -2935.31, -1.91), vector4(-5536.00, -2941.00, -2.00, 200.0)),
-    annesburg  = station('Annesburg',   vector3(2907.11, 1313.93, 44.94),  vector3(2904.03, 1309.86, 44.94),  vector3(2916.59, 1317.09, 44.35),  vector4(2922.00, 1321.00, 44.20, 60.0)),
-    armadillo  = station('Armadillo',   vector3(-3624.70, -2601.96, -13.34), vector3(-3622.69, -2600.00, -13.34), vector3(-3610.40, -2599.16, -13.88), vector4(-3604.00, -2596.00, -13.90, 270.0)),
-    sisika = {
-        label = 'Sisika-Gefaengnis',
-        depts = nil,
-        blip  = { style = 'BLIP_STYLE_FRIENDLY_ON_RADAR', sprite = 'blip_ambient_sheriff', name = 'Sisika' },
-        points = {  -- ANPASSEN
-            duty    = { coords = vector3(3339.07, -669.41, 45.83) },
-            storage = { coords = vector3(3339.07, -669.41, 45.83) },
-            jail    = { coords = vector3(3339.07, -669.41, 45.83) },
-            counter = { coords = vector3(3339.07, -669.41, 45.83) },
-        },
-    },
-}
+Config.Stations = Config.Stations or {}

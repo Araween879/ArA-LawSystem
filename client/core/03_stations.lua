@@ -82,8 +82,9 @@ end
 local function createBlips()
     for key, st in pairs(Config.Stations) do
         if st.blip then
+            -- Position: blip.coords, sonst Schalter, sonst Dienst-Punkt
             local p = st.points and (st.points.counter or st.points.duty)
-            local c = p and Law.Vec(p.coords or (p[1] and p[1].coords))
+            local c = Law.Vec(st.blip.coords) or (p and Law.Vec(p.coords or (p[1] and p[1].coords)))
             if c then
                 blips[key] = Law.Util.AddBlip(c, st.blip.sprite, st.blip.name or st.label, st.blip.color, st.blip.style)
             end

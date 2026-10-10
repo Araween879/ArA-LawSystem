@@ -161,44 +161,13 @@ Config.Jail = {
     EscapeBounty       = 150,    -- 0 = kein Kopfgeld bei Flucht
     DiedRecentlySeconds = 90,    -- kuerzlich tot -> zurueck statt Fluchtalarm
     MaxDeathReturns    = 3,      -- hoechstens X Mal hintereinander "tot -> zurueck", danach gilt es als Flucht
-    Locations = {
-        sisika = {
-            label   = 'Sisika-Gefaengnis',
-            enabled = true,
-            center  = vector3(3339.23, -670.12, 45.83),
-            radius  = 100.0,
-            spawn   = vector4(3339.07, -669.41, 45.83, 194.42),
-            release = vector4(2518.42, -1308.34, 49.01, 275.49),  -- Saint Denis (aus vorp_police)
-            work = {  -- ANPASSEN: Arbeitspunkte auf der Insel
-                { coords = vector3(3346.50, -680.20, 45.50), label = 'Steine klopfen',  scenario = 'WORLD_HUMAN_FARMER_HOE' },
-                { coords = vector3(3330.80, -660.40, 45.80), label = 'Hof fegen',       scenario = 'WORLD_HUMAN_BROOM_WORKING' },
-                { coords = vector3(3352.10, -662.90, 45.60), label = 'Unkraut jaeten',  scenario = 'WORLD_HUMAN_CROUCH_INSPECT' },
-                { coords = vector3(3326.40, -676.70, 45.70), label = 'Holz aufschichten', scenario = 'WORLD_HUMAN_FARMER_RAKE' },
-            },
-        },
-        -- Beispiel fuer eine lokale Zelle - erst nach Pruefung der Koordinaten aktivieren. ANPASSEN
-        valentine_cells = {
-            label   = 'Zelle Valentine',
-            enabled = false,
-            center  = vector3(-273.20, 810.90, 119.38),
-            radius  = 8.0,
-            spawn   = vector4(-273.20, 810.90, 119.38, 90.0),
-            release = vector4(-278.17, 814.88, 119.28, 180.0),
-            work    = {},
-        },
-    },
-    -- Einbuchungspunkt der Station -> Knast-Ort (Standard: DefaultLocation)
-    StationLocation = {
-        valentine  = 'sisika',
-        strawberry = 'sisika',
-        blackwater = 'sisika',
-        rhodes     = 'sisika',
-        saintdenis = 'sisika',
-        tumbleweed = 'sisika',
-        annesburg  = 'sisika',
-        armadillo  = 'sisika',
-        sisika     = 'sisika',
-    },
+    -- Knast-Orte: Sisika und die eigenen Zellen der Staedte stehen jetzt in
+    -- config/stations/<stadt>.lua (Feld "cells"), die Vorauswahl je Station im
+    -- Feld "jailTo". Hier nur zusaetzliche Knast-Orte OHNE eigene Station eintragen:
+    --   meinknast = { label = '...', enabled = true, center = vector3(...), radius = 50.0,
+    --                 spawn = vector4(...), release = vector4(...), work = {} },
+    Locations = {},
+    StationLocation = {},  -- wird aus config/stations/*.lua (jailTo) gefuellt
     Work = {
         Seconds          = 10,   -- Dauer einer Arbeit
         ReduceSeconds    = 30,   -- Haftzeit-Verkuerzung je Arbeit
