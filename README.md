@@ -70,10 +70,11 @@ Station gehört:
 | `enabled` | `true` = Station an, `false` = komplett aus |
 | `label` | Name der Station im Spiel |
 | `jobs` | Welche Jobs an der ganzen Station arbeiten dürfen (`nil` = alle Behörden, z. B. `{ 'sheriff' }`) |
-| `jailTo` | Wohin hier eingebucht wird (`'sisika'` oder eigene Zellen) |
+| `jailTo` | Gefängnis beim Einbuchen am Pult (`'sisika'` = Transport) |
 | `blip` | Kartensymbol (an/aus, Name, Symbol, Farbe, Position – ohne Angabe am Schalter bzw. Dienst-Punkt) |
 | `points` | Alle Punkte der Station (siehe unten) |
-| `cells` | Eigene Zellen in der Station (Standard: aus, alle kommen nach Sisika) |
+| `cells` | Zellen mit Türen: aufschließen, Häftling geht rein, abschließen, an der Tür einbuchen |
+| `doors` | Weitere abschließbare Türen (z. B. Zellentrakt) |
 | `shotsZone` | Gebiet für den Schüsse-Alarm der Stadt |
 
 ### Die Punkte
@@ -136,13 +137,28 @@ werden dort gelb gemeldet – der betroffene Punkt ist dann aus.
 > Gleiches beim **Abschalten** einer benutzten Station (oder ihres `escort`-Punkts): offene
 > Eskort-Aufträge und abholbereite Ware dort sind erst wieder erreichbar, wenn sie wieder an ist.
 
-### Eigene Zellen statt Sisika
+### Zellen mit Türen (realistisch)
 
-In der Stadt-Datei:
-1. bei `cells` → `enabled = true`, `center`, `spawn` und `release` im Spiel prüfen
-2. oben `jailTo = '<name der stadt>'` setzen (z. B. `jailTo = 'valentine'`)
+Jede Stadt-Datei hat einen Block `cells` mit den echten Zellentüren der Station (Tür-Hash und
+Position aus den Spieldaten sind schon eingetragen). So läuft eine Festnahme:
 
-Die Positionen der Zellentüren aus den Spieldaten stehen als Hilfe schon in jeder Stadt-Datei.
+1. **Zellentür aufschließen**: Prompt an der Tür (Recht `jail`, im Dienst)
+2. Der Gefesselte **geht selbst in die Zelle** – es wird **nicht** hineinteleportiert
+3. **Tür abschließen**
+4. An der Tür **„Häftling einbuchen“**: Strafkatalog, Zusatzminuten, Kaution, Notiz.
+   Geht nur, wenn die Tür abgeschlossen ist und die Person wirklich in der Zelle steht.
+5. **Haft vorbei** → der Häftling wird nach `release` (draußen) teleportiert, die Tür bleibt zu.
+
+- **Ausbruch:** Wer mit einem Dietrich das Schloss knackt, öffnet die Tür (Alarm an die Leitstelle,
+  Spur für den Bluthund). Verlässt der Häftling die Zelle, gilt das als **Flucht** (Haftbefehl, Kopfgeld).
+- **Aufschließen einer belegten Zelle** fragt vorher nach.
+- **Einrichten:** In jeder Zelle in die Mitte stellen, `/lawcoords`, Wert bei `center` eintragen.
+  Als Admin zeigt **`/lawcells`** alle Türen (grün = zu, rot = offen) und Zellen (blau) im Spiel;
+  neben einer Tür erscheint ihr Name.
+- Ohne `center` nimmt das Script die Tür-Position (ungenau) und warnt in der Konsole.
+- Diese Türen **nicht zusätzlich in `vorp_doorlocks`** eintragen. Stehen sie dort, warnt das Script beim Start.
+- Einstellungen für alle Zellen (Dietrich, Reichweite, Türen nach Neustart zu): `config/justice.lua` → `Config.Jail.Cells`.
+- **Sisika** bleibt ein Gefängnis mit Transport (Teleport) – Einbuchen dafür am Pult (`jail`-Punkt).
 
 ---
 
@@ -197,6 +213,7 @@ vorp-Meldungen an fester Position.
 | `/panik` | Behörde im Dienst | Panikknopf |
 | `/einsatz <Nr>` | Behörde im Dienst | Einsatz annehmen |
 | `/lawcoords` | Admin | eigene Position in F8 ausgeben |
+| `/lawcells` | Admin | Zellentüren und Zellen im Spiel anzeigen (zum Einrichten) |
 | `/editlawinterface` | alle | eigene Anzeigen verschieben und vergrößern (siehe unten) |
 
 Die Namen der Befehle lassen sich in `config/main.lua` → `Config.Commands` ändern.

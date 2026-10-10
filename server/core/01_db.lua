@@ -206,6 +206,7 @@ local SCHEMA = {
             { 'charid',           'INT NOT NULL' },
             { 'name',             NAME },
             { 'location',         "VARCHAR(32) NOT NULL DEFAULT ''" },
+            { 'cell',             'TINYINT NULL DEFAULT NULL' },  -- Zelle (Zellen mit Tueren), sonst NULL
             { 'sentence_seconds', 'INT NOT NULL DEFAULT 0' },
             { 'served_seconds',   'INT NOT NULL DEFAULT 0' },
             { 'reduced_seconds',  'INT NOT NULL DEFAULT 0' },

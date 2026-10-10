@@ -31,10 +31,14 @@ local function locationCfg(key)
     return nil
 end
 
+local function isPrison(l) return l ~= nil and l.mode ~= 'cells' end
+
+--- Standard-Haftort (Gefaengnis mit Teleport). Zellen mit Tueren nie: dort
+--- wird nur an der Zellentuer eingebucht (jail:sentenceCell).
 local function defaultLocationKey()
-    if locationCfg(Config.Jail.DefaultLocation) then return Config.Jail.DefaultLocation end
+    if isPrison(locationCfg(Config.Jail.DefaultLocation)) then return Config.Jail.DefaultLocation end
     for k, l in pairs(Config.Jail.Locations) do
-        if l.enabled ~= false then return k end
+        if l.enabled ~= false and isPrison(l) then return k end
     end
     return nil
 end
@@ -46,6 +50,23 @@ end
 
 local function v4(v)
     return { x = v.x, y = v.y, z = v.z, w = v.w or 0.0 }
+end
+
+--- Zelle eines Haeftlings (nur Zellen-Modus) -> cell | nil
+local function cellOf(i)
+    local loc = i and locationCfg(i.location)
+    return loc and loc.mode == 'cells' and i.cell and (loc.cells or {})[i.cell] or nil
+end
+
+--- Bereich, in dem der Haeftling bleiben muss -> center, radius, spawn (vector4), maxDz|nil
+local function zoneOf(i)
+    local cell = cellOf(i)
+    if cell then
+        return cell.center, cell.radius, vector4(cell.center.x, cell.center.y, cell.center.z, cell.heading or 0.0), 3.0
+    end
+    local loc = locationCfg(i and i.location)
+    if not loc then return nil end
+    return loc.center, loc.radius, loc.spawn, nil
 end
 
 local function dist2D(a, b)
@@ -91,9 +112,12 @@ local function enterPayload(i, teleport)
     for idx, w in ipairs(loc.work or {}) do
         work[#work + 1] = { index = idx, coords = Law.VecToTable(w.coords), label = w.label, scenario = w.scenario }
     end
+    local center, radius, spawn = zoneOf(i)
+    local cell = cellOf(i)
     return {
-        location = i.location, label = loc.label, center = Law.VecToTable(loc.center), radius = loc.radius,
-        spawn = v4(loc.spawn), work = work, workSeconds = Config.Jail.Work.Seconds, workDistance = Config.Jail.Work.Distance,
+        location = i.location, label = cell and (cell.label .. ' - ' .. loc.label) or loc.label,
+        center = Law.VecToTable(center), radius = radius,
+        spawn = v4(spawn), work = work, workSeconds = Config.Jail.Work.Seconds, workDistance = Config.Jail.Work.Distance,
         hud = hudData(i), teleport = teleport == true,
     }
 end
@@ -107,7 +131,15 @@ end
 local function setupInmate(src, row, teleport, silent)
     if not src or GetPlayerPing(src) <= 0 then return nil end
     local key = locationCfg(row.location) and row.location or defaultLocationKey()
+    local loc = locationCfg(key)
+    local cell = tonumber(row.cell)
+    if not (loc and loc.mode == 'cells' and cell and (loc.cells or {})[cell]) then
+        cell = nil
+        -- Zellen-Ort ohne gueltige Zelle (Config geaendert) -> Standard-Gefaengnis
+        if loc and loc.mode == 'cells' then key = defaultLocationKey() end
+    end
     local i = {
+        cell       = cell,
         charId     = tonumber(row.charid),
         name       = row.name,
         location   = key,
@@ -314,6 +346,15 @@ local function inmatePublic(row, i)
     }
 end
 
+--- Namen der Haeftlinge, die (online) in dieser Zelle sitzen
+function Law.Justice.InmatesInCell(locationKey, cellIdx)
+    local out = {}
+    for src, i in pairs(inmates) do
+        if i.location == locationKey and i.cell == cellIdx and GetPlayerPing(src) > 0 then out[#out + 1] = i.name or '?' end
+    end
+    return out
+end
+
 function Law.Justice.InmateByCharId(charId)
     local row = MySQL.single.await('SELECT * FROM ara_law_jail WHERE charid = ?', { charId })
     if not row then return nil end
@@ -347,6 +388,17 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
 
     local key = (opts.location and locationCfg(opts.location)) and opts.location or defaultLocationKey()
     local loc = locationCfg(key)
+    -- Zellen mit Tueren nur mit einer gueltigen Zelle (Einbuchen an der Zellentuer).
+    -- Sonst (z.B. Kopfgeld-Abgabe an dieser Station) -> Standard-Gefaengnis.
+    local cell = nil
+    if loc and loc.mode == 'cells' then
+        cell = tonumber(opts.cell)
+        if not (cell and (loc.cells or {})[cell]) then
+            cell = nil
+            key = defaultLocationKey()
+            loc = locationCfg(key)
+        end
+    end
     if not loc then return false, 'no_location' end
     local oc = type(officerCtx) == 'table' and officerCtx or nil
     local dept = (oc and oc.dept) or ((opts.dept and Law.GetDept(opts.dept)) and opts.dept or nil)
@@ -358,8 +410,8 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
 
     -- 1. DB-Zeile zuerst (has_property = 2 = Nacharbeiten ausstehend)
     local okI, affected = Law.DB.Try(MySQL.update.await,
-        'INSERT INTO ara_law_jail (charid, name, location, sentence_seconds, served_seconds, reduced_seconds, reason, officer_charid, officer_name, bail, department, has_property, jailed_at, updated_at) VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, 2, ?, ?)',
-        { tctx.charId, tctx.name, key, seconds, reason, oc and oc.charId or nil, oc and oc.name or nil, bail, dept, now, now })
+        'INSERT INTO ara_law_jail (charid, name, location, cell, sentence_seconds, served_seconds, reduced_seconds, reason, officer_charid, officer_name, bail, department, has_property, jailed_at, updated_at) VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, 2, ?, ?)',
+        { tctx.charId, tctx.name, key, cell, seconds, reason, oc and oc.charId or nil, oc and oc.name or nil, bail, dept, now, now })
     if not okI or (affected or 0) < 1 then return false, 'failed' end
     if gone() then return true end
 
@@ -390,18 +442,19 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
         { (property or hasProperty(tctx.charId)) and 1 or 0, tctx.charId })
     local details = reason
     if bail then details = details .. '\n' .. L('record_jail_bail', bail) end
-    Law.Records.Add(tctx.charId, 'jail', L('record_jail', minutes, loc.label), details, oc)
+    local placeLabel = cell and (loc.cells[cell].label .. ' - ' .. loc.label) or loc.label
+    Law.Records.Add(tctx.charId, 'jail', L('record_jail', minutes, placeLabel), details, oc)
     Law.Audit(oc, 'jail.sentence', tctx.charId, {
-        minutes = minutes, location = key, bail = bail, warrants = #served, bounties = closed, property = property,
+        minutes = minutes, location = key, cell = cell, bail = bail, warrants = #served, bounties = closed, property = property,
     })
     if gone() then return true end
 
-    -- 6. Zustand + Teleport (nur online)
+    -- 6. Zustand (online). Zelle: KEIN Teleport - der Haeftling steht schon drin.
     setupInmate(targetSrc, {
-        charid = tctx.charId, name = tctx.name, location = key, department = dept,
+        charid = tctx.charId, name = tctx.name, location = key, cell = cell, department = dept,
         sentence_seconds = seconds, served_seconds = 0, reduced_seconds = 0,
-    }, true, false)
-    Law.Notify(targetSrc, L('jail_sentenced_you', minutes, loc.label), 'objective', 10000)
+    }, cell == nil, false)
+    Law.Notify(targetSrc, L('jail_sentenced_you', minutes, placeLabel), 'objective', 10000)
     if property then Law.Notify(targetSrc, L('jail_property_taken'), 'info', 8000) end
     return true
 end
@@ -456,6 +509,27 @@ end
 --------------------------------------------------------------------------
 -- Einbuchen am jail-Punkt
 --------------------------------------------------------------------------
+--- Formular auswerten (Pult und Zellentuer gleich) -> minutes, bail, reason, calc | nil, err
+local function parseSentence(codes, extraMinutes, bail, note)
+    local calc = Law.Justice.ComputeCodes(codes)
+    if not calc then return nil, 'invalid_codes' end
+    local extra = 0
+    if extraMinutes ~= nil and extraMinutes ~= '' then
+        extra = Law.ToInt(extraMinutes, 0, Config.Jail.MaxExtraMinutes)
+        if not extra then return nil, 'invalid_minutes' end
+    end
+    local minutes = math.min(calc.jail + extra, Config.Jail.MaxMinutes)
+    if minutes < 1 then return nil, 'minutes_zero' end
+    local bailAmount
+    if bail ~= nil and bail ~= '' then
+        bailAmount = Law.ToMoney(bail, 0, Config.Jail.Bail.MaxAmount)
+        if not bailAmount then return nil, 'invalid_amount' end
+    end
+    note = Law.ToStr(note, 120, true) or ''
+    local reason = note ~= '' and (calc.text .. ' - ' .. note) or calc.text
+    return { minutes = minutes, bail = bailAmount, reason = reason, calc = calc }
+end
+
 Law.Cb.Register('jail:sentence', { perm = 'jail', rate = 2000, notCuffed = true, alive = true }, function(src, ctx, targetSrc, codes, extraMinutes, bail, note, location)
     local stationKey = Law.Stations.NearPoint(src, 'jail', 3.0)
     if not stationKey or not Law.Stations.AllowsDept(stationKey, ctx.dept) then return Law.Result(false, 'not_at_point') end
@@ -466,32 +540,54 @@ Law.Cb.Register('jail:sentence', { perm = 'jail', rate = 2000, notCuffed = true,
     if not Law.State.cuffed[targetSrc] then return Law.Result(false, 'target_not_cuffed') end
     if not Law.IsNear(src, targetSrc, Config.Jail.SentenceDistance or 5.0) then return Law.Result(false, 'too_far') end
 
-    local calc = Law.Justice.ComputeCodes(codes)
-    if not calc then return Law.Result(false, 'invalid_codes') end
-    local extra = 0
-    if extraMinutes ~= nil and extraMinutes ~= '' then
-        extra = Law.ToInt(extraMinutes, 0, Config.Jail.MaxExtraMinutes)
-        if not extra then return Law.Result(false, 'invalid_minutes') end
-    end
-    local minutes = math.min(calc.jail + extra, Config.Jail.MaxMinutes)
-    if minutes < 1 then return Law.Result(false, 'minutes_zero') end
+    local f, ferr = parseSentence(codes, extraMinutes, bail, note)
+    if not f then return Law.Result(false, ferr) end
 
-    local bailAmount
-    if bail ~= nil and bail ~= '' then
-        bailAmount = Law.ToMoney(bail, 0, Config.Jail.Bail.MaxAmount)
-        if not bailAmount then return Law.Result(false, 'invalid_amount') end
-    end
-
+    -- Am Pult nur Gefaengnisse mit Transport (Zellen werden an der Zellentuer eingebucht)
     local loc = Law.ToStr(location, 32, true)
-    if not loc or not locationCfg(loc) then
+    if not loc or not isPrison(locationCfg(loc)) then
         loc = Config.Jail.StationLocation[stationKey] or Config.Jail.DefaultLocation
     end
-    note = Law.ToStr(note, 120, true) or ''
-    local reason = note ~= '' and (calc.text .. ' - ' .. note) or calc.text
 
-    local ok, err = Law.Jail.Sentence(targetSrc, minutes, reason, ctx, { location = loc, bail = bailAmount, codes = calc.list })
+    local ok, err = Law.Jail.Sentence(targetSrc, f.minutes, f.reason, ctx, { location = loc, bail = f.bail, codes = f.calc.list })
     if not ok then return Law.Result(false, err or 'failed') end
-    return Law.Result(true, { minutes = minutes, location = loc }, L('jail_sentenced', tctx.name, minutes))
+    return Law.Result(true, { minutes = f.minutes, location = loc }, L('jail_sentenced', tctx.name, f.minutes))
+end)
+
+--------------------------------------------------------------------------
+-- Einbuchen an der Zellentuer (Zellen-Modus, kein Teleport hinein)
+-- Bedingungen: Tuer abgeschlossen, Person steht IN der Zelle, Officer an der Tuer.
+--------------------------------------------------------------------------
+Law.Cb.Register('jail:sentenceCell', { perm = 'jail', rate = 2000, notCuffed = true, notJailed = true, alive = true }, function(src, ctx, doorHash, targetSrc, codes, extraMinutes, bail, note)
+    local door = Law.Doors.Get(Law.ToInt(doorHash, 0) or 0)
+    if not door or not door.cell then return Law.Result(false, 'door_unknown') end
+    if not Law.Stations.AllowsDept(door.station, ctx.dept) then return Law.Result(false, 'no_permission') end
+    local loc = locationCfg(door.station)
+    local cell = loc and loc.mode == 'cells' and (loc.cells or {})[door.cell]
+    if not cell then return Law.Result(false, 'no_location') end
+
+    local me = Law.GetCoords(src)
+    local reach = ((Config.Jail.Cells and Config.Jail.Cells.DoorReach) or 2.0) + 1.5
+    if not me or dist2D(me, door.coords) > reach or math.abs(me.z - door.coords.z) > 3.0 then return Law.Result(false, 'too_far') end
+    if not Law.Doors.IsLocked(door.hash) then return Law.Result(false, 'cell_door_open') end
+
+    targetSrc = Law.ToInt(targetSrc, 1)
+    if not targetSrc or targetSrc == src then return Law.Result(false, 'invalid') end
+    local tctx = Law.Ctx(targetSrc)
+    if not tctx then return Law.Result(false, 'no_target') end
+    local tc = Law.GetCoords(targetSrc)
+    if not tc or dist2D(tc, cell.center) > cell.radius + 0.3 or math.abs(tc.z - cell.center.z) > 3.0 then
+        return Law.Result(false, 'cell_target_outside')
+    end
+
+    local f, ferr = parseSentence(codes, extraMinutes, bail, note)
+    if not f then return Law.Result(false, ferr) end
+
+    local ok, err = Law.Jail.Sentence(targetSrc, f.minutes, f.reason, ctx,
+        { location = door.station, cell = door.cell, bail = f.bail, codes = f.calc.list })
+    if not ok then return Law.Result(false, err or 'failed') end
+    return Law.Result(true, { minutes = f.minutes, location = door.station, cell = door.cell },
+        L('jail_sentenced_cell', tctx.name, f.minutes, cell.label))
 end)
 
 --------------------------------------------------------------------------
@@ -731,8 +827,9 @@ end
 --- Zurueck in die Zelle: serverseitig (OneSync) UND per Client-Event
 --- (Fade/Kollision). Der Server-Teleport greift auch, wenn der Client das
 --- Event ignoriert.
-local function teleportBack(src, loc)
-    local s = loc.spawn
+local function teleportBack(src, i)
+    local _, _, s = zoneOf(i)
+    if not s then return end
     local ped = GetPlayerPed(src)
     if ped and ped ~= 0 and DoesEntityExist(ped) then
         SetEntityCoords(ped, s.x + 0.0, s.y + 0.0, s.z + 0.0, false, false, false, false)
@@ -746,10 +843,11 @@ local function checkEscapes()
     for _, e in ipairs(snapshot()) do
         local src, i = e.src, e.i
         if inmates[src] == i and GetPlayerPing(src) > 0 and now >= (i.graceUntil or 0) then
-            local loc = locationCfg(i.location)
+            local center, radius, _, maxDz = zoneOf(i)
             local c = Law.GetCoords(src)
             local recentlyDead = Law.DiedRecently(src, Config.Jail.DiedRecentlySeconds or 90)
-            if loc and c and dist2D(c, loc.center) > loc.radius then
+            local outside = center and c and (dist2D(c, center) > radius or (maxDz and math.abs(c.z - center.z) > maxDz))
+            if outside then
                 local ctx = Law.Ctx(src)
                 -- Tod/Respawn ist keine Flucht -> zurueck. Aber hoechstens
                 -- MaxDeathReturns Mal in Folge (H1), sonst waere "kuerzlich tot"
@@ -757,11 +855,11 @@ local function checkEscapes()
                 if (recentlyDead or (ctx and ctx.isDead)) and (i.deathReturns or 0) < maxReturns then
                     i.deathReturns = (i.deathReturns or 0) + 1
                     i.graceUntil = now + graceSeconds()
-                    teleportBack(src, loc)
+                    teleportBack(src, i)
                 else
                     escape(src, i, c)
                 end
-            elseif loc and c and not recentlyDead then
+            elseif center and c and not recentlyDead then
                 -- sicher in der Zone und nicht frisch gestorben -> Zaehler zuruecksetzen
                 i.deathReturns = 0
             end
@@ -825,9 +923,9 @@ local function handleLogin(src, ctx)
             if inmates[src] ~= i or GetPlayerPing(src) <= 0 then return end
             Law.Notify(src, L('jail_offline_you', math.ceil(remaining(i) / 60)), 'objective', 10000)
         end
-        local loc = locationCfg(i.location)
+        local center, radius = zoneOf(i)
         local c = Law.GetCoords(src)
-        local inside = loc and c and dist2D(c, loc.center) <= loc.radius
+        local inside = center and c and dist2D(c, center) <= radius
         i.graceUntil = Law.Now() + graceSeconds()
         local payload = enterPayload(i, not inside)
         if payload then TriggerClientEvent('ara_law:cl:jail:enter', src, payload) end
@@ -846,12 +944,11 @@ Law.Modules.Register('jail', {
         local i = inmates[src]
         if not i then return end
         i.graceUntil = Law.Now() + graceSeconds()
-        local loc = locationCfg(i.location)
-        if not loc then return end
+        if not zoneOf(i) then return end
         -- vorp teleportiert beim Respawn selbst -> danach zurueck in die Zelle
         SetTimeout(3000, function()
             if inmates[src] == i and GetPlayerPing(src) > 0 then
-                teleportBack(src, loc)
+                teleportBack(src, i)
             end
         end)
     end,

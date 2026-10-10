@@ -75,6 +75,7 @@ Config.Commands = {
     Coords    = 'lawcoords',   -- Admin: eigene Position ausgeben
     EditUi    = 'editlawinterface', -- Jeder: eigene Anzeigen (Job, Hinweise, Haft ...) verschieben + speichern
     K9        = 'hund',        -- Hunde-Menue (gleiche Funktion wie Taste F12)
+    Cells     = 'lawcells',    -- Admin: Zellentueren + Zellen im Spiel anzeigen (zum Einrichten)
 }
 
 --------------------------------------------------------------------------

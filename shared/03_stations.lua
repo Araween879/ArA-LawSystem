@@ -6,10 +6,14 @@
     dann shared/) und macht daraus die Tabellen, die der restliche Code liest:
 
       1. Stationen / Punkte mit enabled = false fliegen raus
-      2. Feld `cells`     -> Config.Jail.Locations[<stadt>]     (Knast-Ort)
-      3. Feld `jailTo`    -> Config.Jail.StationLocation[<stadt>] (Vorauswahl beim Einbuchen)
-      4. Feld `shotsZone` -> Config.Dispatch.ShotsFired.Zones   (Schuesse-Alarm)
-      5. Tippfehler werden beim Start in der Konsole gemeldet
+      2. Feld `prison`    -> Config.Jail.Locations[<stadt>]     (Gefaengnis mit Teleport, z.B. Sisika)
+      3. Feld `cells`     -> Config.Jail.Locations[<stadt>]     (Zellen MIT Tueren, kein Teleport hinein)
+                          -> Config.Jail.Doors[<tuer-hash>]      (abschliessbare Tueren)
+                          -> Punkte celldoor / cellbook / cellpick an jeder Tuer (Prompts)
+         Feld `doors`     -> weitere abschliessbare Tueren (z.B. Zellentrakt)
+      4. Feld `jailTo`    -> Config.Jail.StationLocation[<stadt>] (Vorauswahl beim Einbuchen am Pult)
+      5. Feld `shotsZone` -> Config.Dispatch.ShotsFired.Zones   (Schuesse-Alarm)
+      6. Tippfehler werden beim Start in der Konsole gemeldet
 
     Hier muss man normalerweise NICHTS aendern - eingestellt wird in
     config/stations/*.lua.
@@ -20,6 +24,7 @@ Config.Stations = Config.Stations or {}
 Config.Jail = Config.Jail or {}
 Config.Jail.Locations = Config.Jail.Locations or {}
 Config.Jail.StationLocation = Config.Jail.StationLocation or {}
+Config.Jail.Doors = {}   -- [tuer-hash] = { hash, station, label, coords, cell = index|nil, locked }
 Config.Dispatch = Config.Dispatch or {}
 Config.Dispatch.ShotsFired = Config.Dispatch.ShotsFired or {}
 Config.Dispatch.ShotsFired.Zones = Config.Dispatch.ShotsFired.Zones or {}
@@ -29,6 +34,8 @@ local POINT_TYPES = {
     duty = true, boss = true, counter = true, jail = true,
     storage = true, armory = true, evidence = true,
     board = true, kennel = true, dropoff = true, garage = true, escort = true,
+    -- automatisch aus cells/doors erzeugt (nicht selbst eintragen):
+    celldoor = true, cellbook = true, cellpick = true,
 }
 local NEEDS_SPAWN = { garage = true, escort = true }
 
@@ -122,6 +129,29 @@ local function cleanPoint(key, pType, p)
     return p
 end
 
+--- Abschliessbare Tuer anmelden + Prompts an der Tuer (celldoor / cellbook / cellpick)
+local function addDoor(st, key, hash, coords, label, cellIdx, locked)
+    if Config.Jail.Doors[hash] then
+        warn('Tuer %s steht doppelt (%s und %s) - der zweite Eintrag wird ignoriert', tostring(hash), Config.Jail.Doors[hash].station, key)
+        return
+    end
+    local onStart = (Config.Jail.Cells and Config.Jail.Cells.LockedOnStart) ~= false
+    Config.Jail.Doors[hash] = {
+        hash = hash, station = key, label = label, coords = coords, cell = cellIdx,
+        locked = (locked == nil) and onStart or (locked == true),
+    }
+    local function push(pType, p)
+        local cur = st.points[pType]
+        if cur == nil then st.points[pType] = { p }
+        elseif cur.coords then st.points[pType] = { cur, p }
+        else cur[#cur + 1] = p end
+    end
+    push('celldoor', { coords = coords, door = hash, label = label })
+    if cellIdx then push('cellbook', { coords = coords, door = hash, cell = cellIdx, label = label }) end
+    local lp = Config.Jail.Cells and Config.Jail.Cells.Lockpick
+    if lp and lp.Enabled ~= false then push('cellpick', { coords = coords, door = hash, label = label }) end
+end
+
 local function buildStation(key, st)
     -- Jobs der ganzen Station (jobs, alter Name: depts)
     st.depts = cleanJobs(key, st.jobs ~= nil and st.jobs or st.depts)
@@ -162,28 +192,99 @@ local function buildStation(key, st)
         end
     end
 
-    -- Eigene Zellen -> Knast-Ort mit dem Schluessel der Station
-    local cells = st.cells
-    if type(cells) == 'table' then
-        local complete = isPos(cells.center) and isPos(cells.spawn) and isPos(cells.release)
+    -- Gefaengnis mit Teleport (Sisika). Alte Form: cells mit center/spawn (ohne list).
+    local prison = st.prison
+    if prison == nil and type(st.cells) == 'table' and st.cells.list == nil then prison = st.cells end
+    if type(prison) == 'table' then
+        local complete = isPos(prison.center) and isPos(prison.spawn) and isPos(prison.release)
         if not complete then
-            -- ausgeschaltete, unfertige Zellen (Vorlage) still ueberspringen
-            if cells.enabled ~= false then
-                warn('%s.cells braucht center (vector3), spawn und release (vector4), nicht 0/0/0 - Zellen sind aus', key)
+            -- ausgeschaltete, unfertige Eintraege (Vorlage) still ueberspringen
+            if prison.enabled ~= false then
+                warn('%s.prison braucht center (vector3), spawn und release (vector4), nicht 0/0/0 - Gefaengnis ist aus', key)
             end
         else
             if Config.Jail.Locations[key] then
                 warn('Knast-Ort "%s" steht doppelt (config/justice.lua und Station) - die Station gilt', key)
             end
             Config.Jail.Locations[key] = {
-                label   = cells.label or st.label or key,
-                enabled = cells.enabled ~= false,
-                center  = vector3(cells.center.x, cells.center.y, cells.center.z),
-                radius  = (tonumber(cells.radius) or 8.0) + 0.0,
-                spawn   = toVec4(cells.spawn),
-                release = toVec4(cells.release),
-                work    = cells.work or {},
+                mode    = 'prison',
+                label   = prison.label or st.label or key,
+                enabled = prison.enabled ~= false,
+                center  = vector3(prison.center.x, prison.center.y, prison.center.z),
+                radius  = (tonumber(prison.radius) or 8.0) + 0.0,
+                spawn   = toVec4(prison.spawn),
+                release = toVec4(prison.release),
+                work    = prison.work or {},
             }
+        end
+    end
+
+    -- Zellen mit Tueren (kein Teleport hinein)
+    local cells = st.cells
+    if type(cells) == 'table' and cells.list and cells.enabled ~= false then
+        local list = {}
+        local defRadius = (Config.Jail.Cells and Config.Jail.Cells.Radius) or 1.6
+        for i, c in ipairs(cells.list) do
+            if type(c) == 'table' and c.enabled ~= false then
+                local hash = tonumber(c.door)
+                if not hash or not isPos(c.doorCoords) then
+                    warn('%s.cells.list[%d]: door (Tuer-Hash) und doorCoords (vector3) fehlen - Zelle ist aus', key, i)
+                else
+                    local center = c.center
+                    if not isPos(center) then
+                        warn('%s.cells.list[%d] (%s): center fehlt - Tuer-Position wird benutzt (ungenau). In der Zelle /lawcoords messen und eintragen',
+                            key, i, tostring(c.label or i))
+                        center = vector3(c.doorCoords.x, c.doorCoords.y, c.doorCoords.z + 1.0)
+                    end
+                    list[#list + 1] = {
+                        label      = c.label or ('Zelle ' .. i),
+                        door       = hash,
+                        doorCoords = vector3(c.doorCoords.x, c.doorCoords.y, c.doorCoords.z),
+                        center     = vector3(center.x, center.y, center.z),
+                        radius     = (tonumber(c.radius) or defRadius) + 0.0,
+                        heading    = (tonumber(c.heading) or 0.0) + 0.0,
+                    }
+                end
+            end
+        end
+        if #list == 0 then
+            warn('%s.cells: keine gueltige Zelle - Zellen sind aus', key)
+        elseif not isPos(cells.release) then
+            warn('%s.cells.release (vector4) fehlt - hier kommt der Haeftling nach der Haft raus. Zellen sind aus', key)
+        else
+            if Config.Jail.Locations[key] then
+                warn('%s hat prison UND cells - es gelten die Zellen (Sisika-artiges Gefaengnis bitte als eigene Station)', key)
+            end
+            -- Mittelpunkt/Umkreis aller Zellen (nur fuer "nach Freilassung noch drin?")
+            local cx, cy, cz = 0.0, 0.0, 0.0
+            for _, c in ipairs(list) do cx, cy, cz = cx + c.center.x, cy + c.center.y, cz + c.center.z end
+            local mid = vector3(cx / #list, cy / #list, cz / #list)
+            local r = 0.0
+            for _, c in ipairs(list) do r = math.max(r, #(vector3(c.center.x, c.center.y, mid.z) - mid) + c.radius) end
+            Config.Jail.Locations[key] = {
+                mode    = 'cells',
+                label   = cells.label or ((st.label or key) .. ' (Zellen)'),
+                enabled = true,
+                center  = mid,
+                radius  = r,
+                spawn   = vector4(list[1].center.x, list[1].center.y, list[1].center.z, list[1].heading),
+                release = toVec4(cells.release),
+                work    = {},
+                cells   = list,
+            }
+            for idx, c in ipairs(list) do addDoor(st, key, c.door, c.doorCoords, c.label, idx) end
+        end
+    end
+
+    -- weitere abschliessbare Tueren (Zellentrakt o.ae.)
+    for i, d in ipairs(type(st.doors) == 'table' and st.doors or {}) do
+        if type(d) == 'table' and d.enabled ~= false then
+            local hash = tonumber(d.door)
+            if hash and isPos(d.doorCoords) then
+                addDoor(st, key, hash, vector3(d.doorCoords.x, d.doorCoords.y, d.doorCoords.z), d.label or ('Tuer ' .. i), nil, d.locked)
+            else
+                warn('%s.doors[%d]: door (Tuer-Hash) und doorCoords (vector3) fehlen - Tuer ist aus', key, i)
+            end
         end
     end
 
@@ -242,11 +343,15 @@ for key, loc in pairs(Config.Jail.StationLocation) do
         warn('%s.jailTo = "%s" - diesen Knast-Ort gibt es nicht oder er ist aus (es gilt %s)',
             key, tostring(loc), tostring(Config.Jail.DefaultLocation))
         Config.Jail.StationLocation[key] = nil
+    elseif l.mode == 'cells' then
+        warn('%s.jailTo = "%s" - das sind Zellen mit Tueren (dort wird an der Zellentuer eingebucht). Am Pult gilt %s',
+            key, tostring(loc), tostring(Config.Jail.DefaultLocation))
+        Config.Jail.StationLocation[key] = nil
     end
 end
 
 local def = Config.Jail.DefaultLocation and Config.Jail.Locations[Config.Jail.DefaultLocation]
-if not def or def.enabled == false then
+if not def or def.enabled == false or def.mode == 'cells' then
     warn('Config.Jail.DefaultLocation = "%s" ist nicht vorhanden oder aus - bitte config/stations/sisika.lua pruefen',
         tostring(Config.Jail.DefaultLocation))
 end

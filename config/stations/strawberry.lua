@@ -21,7 +21,7 @@ Config.Stations.strawberry = {
     enabled = true,                -- false = Station komplett aus (Punkte, Blip, Zellen, Schuesse-Alarm)
     label   = 'Strawberry',        -- Name im Spiel (Prompts, Formulare, Eskort-Bueros)
     jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'sheriff', 'marshal' }
-    jailTo  = 'sisika',            -- Vorauswahl beim Einbuchen: Schluessel eines Knast-Orts ('sisika' oder 'strawberry' fuer eigene Zellen)
+    jailTo  = 'sisika',            -- Gefaengnis beim Einbuchen am Pult (Transport, Teleport). Zellen hier: an der Zellentuer
 
     -- Karten-Symbol
     blip = {
@@ -59,21 +59,28 @@ Config.Stations.strawberry = {
                      radius = 25.0 },      -- Liefer-/Abholzone der Eskorten
     },
 
-    -- Eigene Zellen in dieser Station (Knast-Ort mit dem Schluessel 'strawberry').
-    -- Standard ist AUS: alle kommen nach Sisika. Zum Einschalten enabled = true
-    -- setzen, Werte im Spiel pruefen und oben jailTo = 'strawberry' eintragen.
-    -- Zellentueren laut Spieldaten (rdr3_discoveries, Tuer-Angel - Ped steht ~1 m hoeher):
-    --   vector3(-1814.40, -353.15, 160.44)
-    --   vector3(-1812.01, -351.92, 160.47)
+    -- Zellen MIT Tueren (realistisch, kein Teleport hinein):
+    --   1. Zellentuer aufschliessen (Prompt an der Tuer, Recht 'jail')
+    --   2. Haeftling geht SELBST in die Zelle, Tuer abschliessen
+    --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
+    --   4. Haft vorbei -> Teleport nach draussen (release)
+    -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
+    -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
+    -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
     cells = {
         enabled = false,
-        label   = 'Zelle Strawberry',
-        center  = vector3(-1814.40, -353.15, 161.44),   -- Mitte der Zelle (ANPASSEN)
-        radius  = 8.0,                -- weiter weg = Flucht
-        spawn   = vector4(-1814.40, -353.15, 161.44, 0.00),   -- hier steht der Haeftling (ANPASSEN)
-        release = vector4(-1805.13, -355.05, 164.14, 150.00),   -- hier kommt er bei Entlassung raus
-        work    = {},                 -- Knastarbeit-Punkte (siehe sisika.lua), leer = keine
+        label   = 'Zellen Strawberry',
+        release = vector4(-1805.13, -355.05, 164.14, 150.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
+        list = {
+            { label = 'Zelle 1', door = 902070893, doorCoords = vector3(-1814.40, -353.15, 160.44),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 2', door = 1207903970, doorCoords = vector3(-1812.01, -351.92, 160.47),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+        },
     },
+    doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }
 
     -- Schuesse-Alarm: Schuesse in diesem Gebiet meldet ein NPC-Zeuge an die Leitstelle
     shotsZone = {

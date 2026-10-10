@@ -78,6 +78,18 @@ Meldung „Items fehlen in der Tabelle items“.
 | 5.8 | A: Schmauchspurentest an B direkt nach Schuss | positiv; nach 15 Min. negativ |
 | 5.9 | B verkauft registrierte Waffe am Schalter an C („Verkaufen / umschreiben“) | C bekommt Rückfrage; nach Annahme Waffe + neuer Waffenschein bei C, Register zeigt C, alter Schein von B „UNGÜLTIG“ |
 
+## 5b. Zellen mit Türen (Valentine)
+| # | Schritt | Erwartet |
+|---|---|---|
+| 5b.1 | Admin: `/lawcells` in der Station | Türen grün (zu), blaue Kreise in den Zellen; neben einer Tür steht ihr Name |
+| 5b.2 | A an Zellentür: „Zelle 1 aufschließen" | Tür lässt sich öffnen (bei allen Spielern) |
+| 5b.3 | A führt gefesselten B in die Zelle, schließt ab, „Häftling einbuchen" | Formular; nach Absenden: B bleibt in der Zelle (**kein Teleport**), Haft-HUD läuft |
+| 5b.4 | Einbuchen mit offener Tür / B steht draußen | „Erst die Zellentür abschließen" / „Person steht nicht in der Zelle" |
+| 5b.5 | C (kein Gesetz) mit Dietrich an der Tür: „Schloss knacken" | Fortschritt, Erfolg/Fehlschlag; bei Erfolg Tür offen + Alarm an A |
+| 5b.6 | B verlässt die offene Zelle | Flucht: Haftbefehl, Alarm |
+| 5b.7 | Haftzeit läuft ab (Zeit per Dienstbuch verkürzen) | B wird nach draußen teleportiert, Tür bleibt zu |
+| 5b.8 | `restart ArA-LawSystem` | Türen wieder abgeschlossen |
+
 ## 6. Bluthund
 | # | Schritt | Erwartet |
 |---|---|---|

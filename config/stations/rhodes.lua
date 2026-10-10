@@ -19,7 +19,7 @@ Config.Stations.rhodes = {
     enabled = true,                -- false = Station komplett aus (Punkte, Blip, Zellen, Schuesse-Alarm)
     label   = 'Rhodes',            -- Name im Spiel (Prompts, Formulare, Eskort-Bueros)
     jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'sheriff', 'marshal' }
-    jailTo  = 'sisika',            -- Vorauswahl beim Einbuchen: Schluessel eines Knast-Orts ('sisika' oder 'rhodes' fuer eigene Zellen)
+    jailTo  = 'sisika',            -- Gefaengnis beim Einbuchen am Pult (Transport, Teleport). Zellen hier: an der Zellentuer
 
     -- Karten-Symbol
     blip = {
@@ -57,20 +57,26 @@ Config.Stations.rhodes = {
                      radius = 25.0 },      -- Liefer-/Abholzone der Eskorten
     },
 
-    -- Eigene Zellen in dieser Station (Knast-Ort mit dem Schluessel 'rhodes').
-    -- Standard ist AUS: alle kommen nach Sisika. Zum Einschalten enabled = true
-    -- setzen, Werte im Spiel pruefen und oben jailTo = 'rhodes' eintragen.
-    -- Zellentueren laut Spieldaten (rdr3_discoveries, Tuer-Angel - Ped steht ~1 m hoeher):
-    --   vector3(1357.33, -1302.45, 76.76)
+    -- Zellen MIT Tueren (realistisch, kein Teleport hinein):
+    --   1. Zellentuer aufschliessen (Prompt an der Tuer, Recht 'jail')
+    --   2. Haeftling geht SELBST in die Zelle, Tuer abschliessen
+    --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
+    --   4. Haft vorbei -> Teleport nach draussen (release)
+    -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
+    -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
+    -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
     cells = {
         enabled = false,
-        label   = 'Zelle Rhodes',
-        center  = vector3(1357.33, -1302.45, 77.76),   -- Mitte der Zelle (ANPASSEN)
-        radius  = 8.0,                -- weiter weg = Flucht
-        spawn   = vector4(1357.33, -1302.45, 77.76, 0.00),   -- hier steht der Haeftling (ANPASSEN)
-        release = vector4(1354.90, -1306.85, 76.94, 330.00),   -- hier kommt er bei Entlassung raus
-        work    = {},                 -- Knastarbeit-Punkte (siehe sisika.lua), leer = keine
+        label   = 'Zellen Rhodes',
+        release = vector4(1354.90, -1306.85, 76.94, 330.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
+        list = {
+            { label = 'Zelle 1', door = 1878514758, doorCoords = vector3(1357.33, -1302.45, 76.76),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+        },
     },
+    doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }
 
     -- Schuesse-Alarm: Schuesse in diesem Gebiet meldet ein NPC-Zeuge an die Leitstelle
     shotsZone = {

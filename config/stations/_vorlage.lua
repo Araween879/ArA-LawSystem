@@ -50,10 +50,10 @@ Config.Stations.vorlage = {
     -- Jobs: sheriff, marshal, police, pinkerton, prisonguard, judge (config/main.lua -> Config.Departments)
     jobs = nil,
 
-    -- Wohin wird hier eingebucht? (Vorauswahl im Haft-Formular, Ziel bei Kopfgeld-Abgabe)
-    --   'sisika'   = Sisika-Gefaengnis
-    --   'vorlage'  = eigene Zellen dieser Station (siehe cells unten, Schluessel = Stationsname)
+    -- Gefaengnis beim Einbuchen am Pult (jail-Punkt) und bei Kopfgeld-Abgabe:
+    --   'sisika'   = Sisika-Gefaengnis (Transport per Teleport)
     --   nil        = Standard aus config/justice.lua (Config.Jail.DefaultLocation)
+    -- Eigene Zellen mit Tueren werden NICHT hier gewaehlt, sondern an der Zellentuer.
     jailTo = 'sisika',
 
     --------------------------------------------------------------------------
@@ -108,20 +108,35 @@ Config.Stations.vorlage = {
     },
 
     --------------------------------------------------------------------------
-    -- Eigene Zellen (optional). Schluessel des Knast-Orts = Schluessel der Station.
-    -- Ganz weglassen oder enabled = false, wenn alle nach Sisika sollen.
+    -- Zellen MIT Tueren (optional, realistisch - kein Teleport hinein):
+    --   1. Zellentuer aufschliessen (Prompt an der Tuer, Recht 'jail')
+    --   2. Haeftling geht SELBST hinein, Tuer abschliessen
+    --   3. an der Tuer "Haeftling einbuchen" (Strafe, Kaution, Notiz)
+    --   4. Haft vorbei -> Teleport nach draussen (release)
+    -- Wer mit einem Dietrich das Schloss knackt, oeffnet die Tuer (Alarm an die
+    -- Leitstelle). Verlaesst der Haeftling die Zelle, gilt das als Flucht.
+    --
+    -- door       = Tuer-Hash aus rdr3_discoveries (doorHashes/doorhashes.lua)
+    -- doorCoords = Position der Tuer (gleiche Datei)
+    -- center     = Mitte IN der Zelle (im Spiel hinstellen, /lawcoords), radius = Groesse
+    -- Als Admin zeigt /lawcells alle Tueren (gruen = zu, rot = offen) und Zellen (blau).
+    -- WICHTIG: diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen.
+    -- Einstellungen fuer alle Zellen (Dietrich, Reichweite ...): config/justice.lua -> Config.Jail.Cells
     --------------------------------------------------------------------------
     cells = {
         enabled = false,
-        label   = 'Zelle Neue Station',             -- Name im Haft-Formular
-        center  = vector3(0.0, 0.0, 0.0),            -- Mitte der Zelle(n)
-        radius  = 8.0,                               -- wer weiter weg ist, gilt als geflohen
-        spawn   = vector4(0.0, 0.0, 0.0, 0.0),       -- hier steht der Haeftling
-        release = vector4(0.0, 0.0, 0.0, 0.0),       -- hier kommt er bei Entlassung raus
-        work    = {                                  -- Knastarbeit (verkuerzt die Strafe), leer {} = keine
-            -- { coords = vector3(0.0, 0.0, 0.0), label = 'Hof fegen', scenario = 'WORLD_HUMAN_BROOM_WORKING' },
+        label   = 'Zellen Neue Station',                -- Name im Dienstbuch / in der Akte
+        release = vector4(0.0, 0.0, 0.0, 0.0),          -- hier kommt der Haeftling nach der Haft raus
+        list = {
+            -- { label = 'Zelle 1', door = 123456789, doorCoords = vector3(0.0, 0.0, 0.0), center = vector3(0.0, 0.0, 0.0), radius = 1.6 },
         },
     },
+    -- Weitere abschliessbare Tueren ohne Zelle (z.B. Zellentrakt):
+    doors = {
+        -- { label = 'Zellentrakt', door = 123456789, doorCoords = vector3(0.0, 0.0, 0.0) },
+    },
+    -- Gefaengnis MIT Teleport (nur fuer Orte wie Sisika, wo man nicht hinlaufen kann):
+    -- prison = { label, center, radius, spawn, release, work = { ... } } - Beispiel: sisika.lua
 
     --------------------------------------------------------------------------
     -- Schuesse-Alarm (optional): Schuesse in diesem Gebiet meldet ein NPC-Zeuge

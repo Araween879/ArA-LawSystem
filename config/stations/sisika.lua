@@ -43,8 +43,9 @@ Config.Stations.sisika = {
         counter = { coords = vector3(3339.07, -669.41, 45.83) },   -- Schalter (z.B. Kaution, Habseligkeiten)
     },
 
-    -- Das Gefaengnis selbst (Knast-Ort 'sisika')
-    cells = {
+    -- Das Gefaengnis selbst (Knast-Ort 'sisika'): Verurteilte werden hierher TRANSPORTIERT
+    -- (Teleport), weil es keinen Weg auf die Insel gibt. Zellen mit Tueren: siehe Stadt-Dateien.
+    prison = {
         enabled = true,
         label   = 'Sisika-Gefaengnis',
         center  = vector3(3339.23, -670.12, 45.83),          -- Mitte der Insel

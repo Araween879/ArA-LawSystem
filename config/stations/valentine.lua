@@ -19,7 +19,7 @@ Config.Stations.valentine = {
     enabled = true,                -- false = Station komplett aus (Punkte, Blip, Zellen, Schuesse-Alarm)
     label   = 'Valentine',         -- Name im Spiel (Prompts, Formulare, Eskort-Bueros)
     jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'sheriff', 'marshal' }
-    jailTo  = 'sisika',            -- Vorauswahl beim Einbuchen: Schluessel eines Knast-Orts ('sisika' oder 'valentine' fuer eigene Zellen)
+    jailTo  = 'sisika',            -- Gefaengnis beim Einbuchen am Pult (Transport, Teleport). Zellen hier: an der Zellentuer
 
     -- Karten-Symbol
     blip = {
@@ -61,23 +61,32 @@ Config.Stations.valentine = {
                      radius = 25.0 },      -- Liefer-/Abholzone der Eskorten
     },
 
-    -- Eigene Zellen in dieser Station (Knast-Ort mit dem Schluessel 'valentine').
-    -- Standard ist AUS: alle kommen nach Sisika. Zum Einschalten enabled = true
-    -- setzen, Werte im Spiel pruefen und oben jailTo = 'valentine' eintragen.
-    -- Zellentueren laut Spieldaten (rdr3_discoveries, Tuer-Angel - Ped steht ~1 m hoeher):
-    --   vector3(-272.05, 808.26, 118.37)
-    --   vector3(-273.46, 809.97, 118.37)
-    --   vector3(-275.02, 809.27, 118.37)
-    --   vector3(-270.77, 810.03, 118.40)
+    -- Zellen MIT Tueren (realistisch, kein Teleport hinein):
+    --   1. Zellentuer aufschliessen (Prompt an der Tuer, Recht 'jail')
+    --   2. Haeftling geht SELBST in die Zelle, Tuer abschliessen
+    --   3. an der Tuer "Haeftling einbuchen" -> Strafe, Kaution, Notiz
+    --   4. Haft vorbei -> Teleport nach draussen (release)
+    -- door/doorCoords = Tuer aus den Spieldaten (rdr3_discoveries) - NICHT aendern.
+    -- center = Mitte IN der Zelle (dort muss der Haeftling stehen), radius = Groesse in Metern.
+    -- Welche Tuer welche ist: als Admin /lawcells (zeigt Tueren + Zellen im Spiel).
+    -- Eine Tuer ist keine Zelle (z.B. Zellentrakt)? Zeile nach doors = { ... } verschieben.
+    -- WICHTIG: Diese Tueren NICHT zusaetzlich in vorp_doorlocks eintragen (sonst kaempfen zwei Scripts).
     cells = {
-        enabled = false,
-        label   = 'Zelle Valentine',
-        center  = vector3(-273.20, 810.90, 119.38),   -- Mitte der Zelle (ANPASSEN)
-        radius  = 8.0,                -- weiter weg = Flucht
-        spawn   = vector4(-273.20, 810.90, 119.38, 90.00),   -- hier steht der Haeftling (ANPASSEN)
-        release = vector4(-278.17, 814.88, 119.28, 180.00),   -- hier kommt er bei Entlassung raus
-        work    = {},                 -- Knastarbeit-Punkte (siehe sisika.lua), leer = keine
+        enabled = true,
+        label   = 'Zellen Valentine',
+        release = vector4(-278.17, 814.88, 119.28, 180.00),   -- Entlassung: hier kommt der Haeftling raus (ANPASSEN)
+        list = {
+            { label = 'Zelle 1', door = 193903155, doorCoords = vector3(-272.05, 808.26, 118.37),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 2', door = 295355979, doorCoords = vector3(-273.46, 809.97, 118.37),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 3', door = 535323366, doorCoords = vector3(-275.02, 809.27, 118.37),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+            { label = 'Zelle 4', door = 1508776842, doorCoords = vector3(-270.77, 810.03, 118.40),
+              center = nil, radius = 1.6 },   -- center ANPASSEN: in der Zelle /lawcoords
+        },
     },
+    doors = {},   -- weitere abschliessbare Tueren: { label = 'Zellentrakt', door = <hash>, doorCoords = vector3(...) }
 
     -- Schuesse-Alarm: Schuesse in diesem Gebiet meldet ein NPC-Zeuge an die Leitstelle
     shotsZone = {

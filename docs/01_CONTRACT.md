@@ -447,6 +447,11 @@ Eine Datei je Station: `config/stations/<key>.lua` (Vorlage mit allen Feldern: `
 `shared/03_stations.lua` (laedt nach allen Configs, Client + Server) baut daraus beim Start:
 Stationen/Punkte mit `enabled = false` werden entfernt (der restliche Code sieht sie nie),
 `cells` → `Config.Jail.Locations[key]`, `jailTo` → `Config.Jail.StationLocation[key]`,
+`prison` → `Config.Jail.Locations[key]` (`mode = 'prison'`, Teleport, z.B. Sisika; alte Form `cells` mit center ohne `list` gilt auch),
+`cells = { release, list = { { label, door, doorCoords, center, radius } } }` → `Config.Jail.Locations[key]` (`mode = 'cells'`, `cells = {...}`),
+jede Tuer → `Config.Jail.Doors[hash]` und Punkte `celldoor` (auf/zu, Recht jail), `cellbook` (`jail:sentenceCell`), `cellpick` (Dietrich),
+`doors` → weitere Tueren. Tuer-Zustand: Server `server/justice/doors.lua` (GlobalState `ara_law_doors`), Client setzt DoorSystem.
+Zellen-Haft: kein Teleport hinein, Flucht = Zelle (center/radius, Hoehe 3 m) verlassen, Ende = Teleport nach `release`; DB-Spalte `ara_law_jail.cell`.
 `shotsZone` → Eintrag in `Config.Dispatch.ShotsFired.Zones`. `spawn` als vector3 wird zu vector4 (Richtung 0.0).
 Stations-`jobs` landet als `st.depts` (wie bisher von `Law.Stations.AllowsDept` und dem Client geprueft).
 `jobs` am Punkt: Client zeigt den Prompt nur diesen Jobs, `Law.Stations.NearPoint` (Server) ignoriert den Punkt fuer alle anderen.
