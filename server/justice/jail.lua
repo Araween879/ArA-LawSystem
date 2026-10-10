@@ -383,6 +383,18 @@ end
 --- zuerst -> ab da ist die Haft gesichert. Faellt der Spieler waehrend eines
 --- DB-Wartens weg, endet die Funktion mit true und der naechste Login holt
 --- Beschlagnahme, Probe, Haftbefehle und Kopfgelder nach (handleLogin).
+--- Wer gesessen hat, dessen Geruch ist weg: alte Geruchstraeger (Kleidung, Blut ...)
+--- taugen nicht mehr fuer den Bluthund, die Spur im Speicher verfliegt.
+--- Ein Fehler hier (z.B. DB) darf die schon gebuchte Haft nicht abbrechen.
+local function resetScent(charId)
+    if Config.Scent and Config.Scent.ResetOnJail == false then return end
+    local okS, errS = pcall(function()
+        Law.Scent.Clear(charId)
+        Law.Citizens.SetScentReset(charId, Law.Now())
+    end)
+    if not okS then Law.Warn('Geruch zuruecksetzen fehlgeschlagen fuer #%s: %s', tostring(charId), tostring(errS)) end
+end
+
 local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
     local function gone() return GetPlayerPing(targetSrc) <= 0 end
 
@@ -413,6 +425,9 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
         'INSERT INTO ara_law_jail (charid, name, location, cell, sentence_seconds, served_seconds, reduced_seconds, reason, officer_charid, officer_name, bail, department, has_property, jailed_at, updated_at) VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?, ?, 2, ?, ?)',
         { tctx.charId, tctx.name, key, cell, seconds, reason, oc and oc.charId or nil, oc and oc.name or nil, bail, dept, now, now })
     if not okI or (affected or 0) < 1 then return false, 'failed' end
+    -- Geruch weg - gleich nach der DB-Zeile, damit es auch gilt, wenn der Haeftling
+    -- jetzt die Verbindung verliert (Nacharbeiten beim Login holen es nicht nach)
+    resetScent(tctx.charId)
     if gone() then return true end
 
     -- 2. Beschlagnahme - Handschellen bleiben dabei noch dran (H2).
@@ -431,16 +446,6 @@ local function doSentence(targetSrc, tctx, minutes, reason, officerCtx, opts)
 
     -- 4. Probe in die Akte, Haftbefehle erledigt, Kopfgelder geschlossen (mit Erstattung)
     Law.Citizens.SetSample(tctx.charId, true)
-    -- Wer gesessen hat, dessen Geruch ist weg: alte Geruchstraeger (Kleidung, Blut ...)
-    -- taugen nicht mehr fuer den Bluthund, die Spur im Speicher verfliegt.
-    -- Ein Fehler hier (z.B. DB) darf die schon gebuchte Haft nicht abbrechen.
-    if not (Config.Scent and Config.Scent.ResetOnJail == false) then
-        local okS, errS = pcall(function()
-            Law.Scent.Clear(tctx.charId)
-            Law.Citizens.SetScentReset(tctx.charId, Law.Now())
-        end)
-        if not okS then Law.Warn('Geruch zuruecksetzen fehlgeschlagen fuer #%s: %s', tostring(tctx.charId), tostring(errS)) end
-    end
     if gone() then return true end
     local served = Law.Justice.ServeWarrants(tctx.charId)
     if gone() then return true end
@@ -532,6 +537,7 @@ function Law.Justice.SentenceOffline(charId, minutes, reason, officerCtx, name)
         { charId, name or Law.GetCharName(charId), key, seconds, reason, oc and oc.charId or nil, oc and oc.name or nil,
           oc and oc.dept or nil, now, now })
     if not okI or affected ~= 1 then return false end
+    resetScent(charId)
     Law.Records.Add(charId, 'jail', L('record_jail_offline', minutes), reason, oc)
     Law.Audit(oc, 'jail.offline', charId, { minutes = minutes, reason = reason })
     return true

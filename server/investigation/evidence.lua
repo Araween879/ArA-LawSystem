@@ -148,8 +148,11 @@ end
 
 --- Obergrenze je Verursacher: bei Dauerfeuer fliegt zuerst SEINE aelteste Spur,
 --- damit ein Spieler keine fremden Tatort-Spuren aus dem Speicher draengen kann.
-local function capOwner(ownerCharId)
-    if not ownerCharId then return end
+--- noEvict (Verletzungs-Meldungen vom Client): voll -> die NEUE Spur entfaellt,
+--- es fliegt nichts Aelteres raus (sonst koennte man Tatort-Spuren wegspammen).
+--- -> false, wenn die neue Spur nicht angelegt werden darf
+local function capOwner(ownerCharId, noEvict)
+    if not ownerCharId then return true end
     local limit = Cfg.MaxPerOwner or 40
     local count, oldestId, oldestAt = 0, nil, nil
     for id, t in pairs(world) do
@@ -158,7 +161,10 @@ local function capOwner(ownerCharId)
             if older(t, id, oldestAt, oldestId) then oldestId, oldestAt = id, t.createdAt end
         end
     end
-    if count >= limit and oldestId then removeTrace(oldestId) end
+    if count < limit then return true end
+    if noEvict then return false end
+    if oldestId then removeTrace(oldestId) end
+    return true
 end
 
 local function addTrace(kind, coords, data)
@@ -166,7 +172,7 @@ local function addTrace(kind, coords, data)
     coords = Law.Vec(coords)
     if not coords then return nil end
     data = data or {}
-    capOwner(tonumber(data.ownerCharId))
+    if not capOwner(tonumber(data.ownerCharId), data.noEvict) then return nil end
     while worldCount >= (Cfg.MaxWorld or 600) do
         if not dropOldest() then worldCount = 0 break end
     end
@@ -278,7 +284,9 @@ local function roll(chance)
     return chance > 0 and math.random(1, 100) <= chance
 end
 
-Law.Net.On('evidence:wound', { rate = 300 }, function(src, ctx, kind)
+-- rate klein: der Client meldet hoechstens alle 400 ms, Netz-Schwankungen sollen
+-- keinen Messerstich verschlucken (Spuren drosseln BleedRateMs/ClothRateMs)
+Law.Net.On('evidence:wound', { rate = 100 }, function(src, ctx, kind)
     if not Cfg.Enabled then return end
     local w = (Cfg.Wounds or {})[WOUND_KEY[kind] or '']
     if not w then return end
@@ -294,7 +302,7 @@ Law.Net.On('evidence:wound', { rate = 300 }, function(src, ctx, kind)
             near.createdAt = Law.Now()
         else
             local citizen = Law.Citizens.Get(ctx.charId)
-            addTrace('blood', coords, { ownerCharId = ctx.charId, bloodType = citizen and citizen.bloodType or nil })
+            addTrace('blood', coords, { ownerCharId = ctx.charId, bloodType = citizen and citizen.bloodType or nil, noEvict = true })
         end
     end
 
@@ -303,7 +311,7 @@ Law.Net.On('evidence:wound', { rate = 300 }, function(src, ctx, kind)
         local ang = math.random() * math.pi * 2
         local r = 0.3 + math.random() * 0.7
         addTrace('cloth', vector3(coords.x + math.cos(ang) * r, coords.y + math.sin(ang) * r, coords.z),
-            { ownerCharId = ctx.charId })
+            { ownerCharId = ctx.charId, noEvict = true })
     end
 end)
 

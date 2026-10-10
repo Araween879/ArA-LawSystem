@@ -124,7 +124,8 @@ Config.Scent = {
     Cooldown       = 60,       -- Sekunden zwischen zwei Witterungen je Hundefuehrer
     UsesPerItem    = 3,        -- so oft taugt ein Geruchstraeger
     Uses           = {         -- abweichend je Item (0 = unbegrenzt)
-        law_clothscrap = 0,    -- Kleidung: der Hund findet den Traeger damit immer wieder
+        law_clothscrap  = 0,   -- Kleidung: der Hund findet den Traeger damit immer wieder
+        law_bloodsample = 0,   -- Blut: beliebig oft, aber nur 60 Min. ab Tat (ItemMinutes)
     },
     -- Wie lange nach der Tat taugt ein Geruchstraeger fuer den Hund? (Minuten, 0/fehlt = immer)
     -- Blut: 60 Min. ab dem Moment, in dem es auf den Boden gefallen ist.

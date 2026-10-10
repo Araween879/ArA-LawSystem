@@ -191,7 +191,7 @@ Spurensuche-Modus, F6 → Spurensuche):
 | Sturz, Feuer, Explosion | nichts | `Wounds.Other` |
 
 - **Blut** nimmt man mit einem **sterilen Tuch** auf (`law_sterilecloth`, in der Waffenkammer).
-  Die Blutprobe taugt **60 Minuten ab der Tat** als Geruchsträger für den Bluthund –
+  Die Blutprobe taugt **60 Minuten ab der Tat** (in der Zeit beliebig oft) als Geruchsträger für den Bluthund –
   der Hund findet den Spieler, wenn er an dessen Fährte angesetzt wird (bis 200 m von der Fährte).
 - **Kleidungsfetzen** sichert man mit einem Beweismittelbeutel. Damit findet der Hund den
   Spieler **immer wieder** (keine Zeitgrenze, beliebig oft) – **bis der Spieler im Knast saß**.
