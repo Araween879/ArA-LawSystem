@@ -40,13 +40,15 @@ Config.Stations.vorlage = {
     enabled = false,               -- true = Station an | false = komplett aus (Punkte, Blip, Zellen, Schuesse-Alarm)
     label   = 'Neue Station',      -- Name im Spiel (Prompt-Ueberschrift, Formulare, Liste der Eskort-Bueros)
 
-    -- Welche Behoerden duerfen die Dienst-Punkte (Dienst, Lager, Waffenkammer ...)
-    -- hier benutzen? Die Buerger-Punkte (Schalter, Brett, Abgabe) gehen immer fuer alle.
+    -- Welche Jobs duerfen die Dienst-Punkte (Dienst, Lager, Waffenkammer ...) der
+    -- GANZEN Station benutzen? Die Buerger-Punkte (Schalter, Brett, Abgabe) gehen
+    -- trotzdem fuer alle. Einzelne Punkte lassen sich zusaetzlich mit jobs = {...}
+    -- am Punkt einschraenken (siehe points unten).
     --   nil                        = alle Behoerden
     --   { 'sheriff' }              = nur Sheriff
     --   { 'sheriff', 'marshal' }   = Sheriff und Marshals
-    -- Behoerden-Schluessel: sheriff, marshal, police, pinkerton, prisonguard, judge (config/main.lua)
-    depts = nil,
+    -- Jobs: sheriff, marshal, police, pinkerton, prisonguard, judge (config/main.lua -> Config.Departments)
+    jobs = nil,
 
     -- Wohin wird hier eingebucht? (Vorauswahl im Haft-Formular, Ziel bei Kopfgeld-Abgabe)
     --   'sisika'   = Sisika-Gefaengnis
@@ -73,6 +75,13 @@ Config.Stations.vorlage = {
     --   Punkt nicht gewuenscht?        -> enabled = false hineinschreiben oder Zeile loeschen
     --   Mehrere Punkte gleichen Typs?  -> Liste: duty = { { coords = ... }, { coords = ... } },
     -- Mehrere Punkte duerfen dieselbe Stelle haben (dann zeigt der Prompt alle Aktionen).
+    --
+    -- Nur bestimmte Jobs an EINEM Punkt:   jobs = { 'sheriff', 'marshal' }
+    --   Beispiel: armory = { coords = vector3(...), jobs = { 'sheriff' } },
+    --   - ohne jobs gilt: Behoerden-Punkte fuer alle Behoerden (bzw. jobs der Station),
+    --     Buerger-Punkte (counter, board, dropoff, escort) fuer ALLE Spieler
+    --   - mit jobs sehen NUR diese Jobs den Punkt - auch bei Buerger-Punkten!
+    --   - jobs gibt keine Rechte: der Rang braucht trotzdem das Recht (z.B. 'armory')
     --------------------------------------------------------------------------
     points = {
         -- Fuer Behoerden (Rechte je Rang: config/main.lua -> Config.Departments)

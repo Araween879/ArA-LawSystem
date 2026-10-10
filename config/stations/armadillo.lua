@@ -20,7 +20,7 @@ Config.Stations = Config.Stations or {}
 Config.Stations.armadillo = {
     enabled = true,                -- false = Station komplett aus (Punkte, Blip, Zellen, Schuesse-Alarm)
     label   = 'Armadillo',         -- Name im Spiel (Prompts, Formulare, Eskort-Bueros)
-    depts   = nil,                 -- nil = alle Behoerden duerfen hier arbeiten | z.B. { 'sheriff', 'marshal' }
+    jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'sheriff', 'marshal' }
     jailTo  = 'sisika',            -- Vorauswahl beim Einbuchen: Schluessel eines Knast-Orts ('sisika' oder 'armadillo' fuer eigene Zellen)
 
     -- Karten-Symbol
@@ -34,6 +34,7 @@ Config.Stations.armadillo = {
     },
 
     -- Alle Punkte der Station. Jeder Punkt: coords = vector3(x, y, z)
+    -- Nur bestimmte Jobs an einem Punkt:  armory = { coords = ..., jobs = { 'sheriff' } },
     -- Mehrere Punkte vom selben Typ:  duty = { { coords = ... }, { coords = ... } },
     points = {
         -- Pult / Tresen  (ANPASSEN)

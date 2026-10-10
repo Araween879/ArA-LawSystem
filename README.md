@@ -69,7 +69,7 @@ Station gehört:
 |---|---|
 | `enabled` | `true` = Station an, `false` = komplett aus |
 | `label` | Name der Station im Spiel |
-| `depts` | Welche Behörden hier arbeiten dürfen (`nil` = alle, z. B. `{ 'sheriff' }`) |
+| `jobs` | Welche Jobs an der ganzen Station arbeiten dürfen (`nil` = alle Behörden, z. B. `{ 'sheriff' }`) |
 | `jailTo` | Wohin hier eingebucht wird (`'sisika'` oder eigene Zellen) |
 | `blip` | Kartensymbol (an/aus, Name, Symbol, Farbe, Position – ohne Angabe am Schalter bzw. Dienst-Punkt) |
 | `points` | Alle Punkte der Station (siehe unten) |
@@ -95,6 +95,11 @@ Station gehört:
 
 - **Punkt nicht gewünscht?** → `enabled = false` in den Punkt schreiben (oder die Zeile löschen).
 - **Mehrere Punkte vom gleichen Typ?** → als Liste: `duty = { { coords = ... }, { coords = ... } }`
+- **Nur bestimmte Jobs an einem Punkt?** → `jobs` in den Punkt schreiben:
+  `armory = { coords = vector3(...), jobs = { 'sheriff', 'marshal' } }`.
+  Dann sehen und benutzen **nur** diese Jobs den Punkt – auch bei Bürger-Punkten wie dem Schalter.
+  `jobs` gibt keine Rechte: der Rang braucht trotzdem das passende Recht (`config/main.lua`).
+  Jobs: `sheriff`, `marshal`, `police`, `pinkerton`, `prisonguard`, `judge`.
 - **Stadt nicht gewünscht?** → ganz oben `enabled = false`.
 
 ### Koordinaten holen

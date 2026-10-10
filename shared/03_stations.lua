@@ -58,6 +58,33 @@ local function toVec4(v)
     return nil
 end
 
+--- jobs-Angabe angleichen: 'sheriff' -> { 'sheriff' }, {} -> nil (= keine Einschraenkung).
+--- Unbekannte Jobs (Tippfehler) werden gemeldet und entfernt.
+local function cleanJobs(where, jobs)
+    if jobs == nil then return nil end
+    if type(jobs) == 'string' then jobs = { jobs } end
+    if type(jobs) ~= 'table' then
+        warn('%s.jobs muss eine Liste sein, z.B. { \'sheriff\', \'marshal\' } - wird ignoriert', where)
+        return nil
+    end
+    local out = {}
+    for _, j in ipairs(jobs) do
+        if Config.Departments and Config.Departments[j] then
+            out[#out + 1] = j
+        else
+            warn('%s.jobs: Job "%s" gibt es nicht in Config.Departments (Tippfehler?) - wird ignoriert', where, tostring(j))
+        end
+    end
+    if #out == 0 then
+        if #jobs > 0 then
+            warn('%s.jobs enthaelt keinen gueltigen Job - Punkt ist fuer NIEMANDEN freigegeben', where)
+            return { '__niemand__' }
+        end
+        return nil
+    end
+    return out
+end
+
 --- Ein Punkt oder eine Liste von Punkten -> Liste.
 --- Liste nur, wenn die Tabelle Eintraege [1], [2] ... hat - so wird auch ein
 --- einzelner Punkt mit vertipptem "coords" geprueft und gemeldet.
@@ -82,10 +109,15 @@ local function cleanPoint(key, pType, p)
         end
         p.spawn = s
     end
+    p.jobs = cleanJobs(('%s.points.%s'):format(key, pType), p.jobs)
     return p
 end
 
 local function buildStation(key, st)
+    -- Jobs der ganzen Station (jobs, alter Name: depts)
+    st.depts = cleanJobs(key, st.jobs ~= nil and st.jobs or st.depts)
+    st.jobs = nil
+
     -- Blip
     if type(st.blip) ~= 'table' or st.blip.enabled == false then
         st.blip = nil

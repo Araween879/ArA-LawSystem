@@ -20,7 +20,7 @@ Config.Stations = Config.Stations or {}
 Config.Stations.sisika = {
     enabled = true,                -- false = Station + Gefaengnis aus (siehe ACHTUNG oben)
     label   = 'Sisika-Gefaengnis', -- Name im Spiel
-    depts   = nil,                 -- nil = alle Behoerden | z.B. { 'prisonguard' } nur Waerter
+    jobs    = nil,                 -- Jobs fuer die GANZE Station: nil = alle Behoerden | z.B. { 'prisonguard' } nur Waerter
     jailTo  = 'sisika',            -- hier eingebucht -> bleibt auf Sisika
 
     -- Karten-Symbol

@@ -64,6 +64,8 @@ local function allowed(def, stationKey, point)
     if def.perm and not Law.HasPerm(def.perm) then return false end
     local st = Config.Stations[stationKey]
     if (def.law or def.perm) and st and st.depts and not Law.Contains(st.depts, Law.Me.dept) then return false end
+    -- jobs am Punkt: nur diese Jobs sehen den Prompt (gilt auch fuer Buerger-Punkte)
+    if point and point.jobs and not Law.Contains(point.jobs, Law.Me.dept) then return false end
     if def.canShow and not def.canShow(stationKey, point) then return false end
     return true
 end

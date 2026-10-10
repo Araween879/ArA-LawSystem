@@ -441,12 +441,14 @@ if affected ~= 1 then return Law.Result(false, 'already_done') end
 
 Eine Datei je Station: `config/stations/<key>.lua` (Vorlage mit allen Feldern: `config/stations/_vorlage.lua`).
 
-`Config.Stations[key] = { enabled, label, depts = { 'sheriff', ... } | nil (alle), jailTo = '<Knast-Ort>'?, blip = { enabled, name, sprite, style, color?, coords? }, points = { <typ> = { coords=vector3, heading?, radius?, spawn?, enabled? } | { {…},{…} } }, cells = { enabled, label, center, radius, spawn, release, work }?, shotsZone = { enabled, coords, radius, label? }? }`
+`Config.Stations[key] = { enabled, label, jobs = { 'sheriff', ... } | nil (alle; alter Name depts), jailTo = '<Knast-Ort>'?, blip = { enabled, name, sprite, style, color?, coords? }, points = { <typ> = { coords=vector3, heading?, radius?, spawn?, enabled?, jobs? } | { {…},{…} } }, cells = { enabled, label, center, radius, spawn, release, work }?, shotsZone = { enabled, coords, radius, label? }? }`
 
 `shared/03_stations.lua` (laedt nach allen Configs, Client + Server) baut daraus beim Start:
 Stationen/Punkte mit `enabled = false` werden entfernt (der restliche Code sieht sie nie),
 `cells` → `Config.Jail.Locations[key]`, `jailTo` → `Config.Jail.StationLocation[key]`,
 `shotsZone` → Eintrag in `Config.Dispatch.ShotsFired.Zones`. `spawn` als vector3 wird zu vector4 (Richtung 0.0).
+Stations-`jobs` landet als `st.depts` (wie bisher von `Law.Stations.AllowsDept` und dem Client geprueft).
+`jobs` am Punkt: Client zeigt den Prompt nur diesen Jobs, `Law.Stations.NearPoint` (Server) ignoriert den Punkt fuer alle anderen.
 Fehlerhafte Eintraege werden mit Warnung uebersprungen.
 
 | Punkt-Typ | Besitzer | Wer | Aktion |
