@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Tintenstempel Pinkerton (wachsames Auge). Name als Textbogen aus der NUI. -->
+  <defs>
+    <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="2" seed="6" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.3" result="m"/>
+      <feComposite in="d" in2="m" operator="in"/>
+    </filter>
+    <path id="st" d="M0,-7 L1.65,-2.27 L6.66,-2.16 L2.66,0.87 L4.11,5.66 L0,2.8 L-4.11,5.66 L-2.66,0.87 L-6.66,-2.16 L-1.65,-2.27 Z"/>
+  </defs>
+  <g filter="url(#ink)" fill="#2b1d12" stroke="#2b1d12" opacity=".9">
+    <circle cx="100" cy="100" r="92" fill="none" stroke-width="4"/>
+    <circle cx="100" cy="100" r="86.5" fill="none" stroke-width="1.2"/>
+    <circle cx="100" cy="100" r="64" fill="none" stroke-width="2.2"/>
+    <g stroke="none">
+      <use href="#st" x="100" y="178"/><use href="#st" x="61" y="167.5"/><use href="#st" x="139" y="167.5"/>
+      <circle cx="32.5" cy="139" r="2.6"/><circle cx="167.5" cy="139" r="2.6"/>
+    </g>
+    <g transform="translate(100 100) scale(.36) translate(-200 -200)">
+      <path d="M72 200 Q200 84 328 200 Q200 316 72 200 Z" fill="none" stroke-width="14"/>
+      <circle cx="200" cy="200" r="54" stroke="none"/>
+      <circle cx="200" cy="200" r="22" fill="#efe2c0" stroke="none"/>
+      <g stroke-width="10" stroke-linecap="round" fill="none">
+        <line x1="104" y1="160" x2="88" y2="134"/><line x1="146" y1="132" x2="136" y2="102"/>
+        <line x1="200" y1="120" x2="200" y2="88"/><line x1="254" y1="132" x2="264" y2="102"/><line x1="296" y1="160" x2="312" y2="134"/>
+      </g>
+    </g>
+  </g>
+</svg>

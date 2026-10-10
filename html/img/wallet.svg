@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
+  <!-- Aufgeklappte Ledermappe: links Marke, rechts Ausweiskarte. Keine Texte. -->
+  <defs>
+    <filter id="leather" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="4" seed="12"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.06  0 0 0 0 0.03  0 0 0 0.55 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.40  0 0 0 0 0.27  0 0 0 0 0.14  0 0 0 0.18 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a3419"/>
+      <stop offset="1" stop-color="#3a200e"/>
+    </linearGradient>
+    <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#000" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Leder -->
+  <rect x="6" y="6" width="988" height="548" rx="30" fill="url(#lg)"/>
+  <rect x="6" y="6" width="988" height="548" rx="30" fill="#4a2a14" filter="url(#leather)"/>
+  <rect x="470" y="6" width="60" height="548" fill="url(#fold)"/>
+  <!-- Naht -->
+  <rect x="26" y="26" width="948" height="508" rx="20" fill="none" stroke="#c9a46a" stroke-width="3" stroke-dasharray="12 9" opacity=".55"/>
+  <!-- Markenfeld links (dunkler Einsatz) -->
+  <ellipse cx="248" cy="280" rx="200" ry="222" fill="#2a170a" opacity=".55"/>
+  <ellipse cx="248" cy="280" rx="200" ry="222" fill="none" stroke="#c9a46a" stroke-width="2" stroke-dasharray="8 7" opacity=".4"/>
+  <!-- Ausweiskarte rechts -->
+  <g transform="translate(520 44)">
+    <rect x="0" y="0" width="444" height="472" rx="10" fill="#ecdfbd"/>
+    <rect x="0" y="0" width="444" height="472" rx="10" fill="#ecdfbd" filter="url(#grain)"/>
+    <rect x="14" y="14" width="416" height="444" rx="6" fill="none" stroke="#2b1d12" stroke-width="2.5" opacity=".7"/>
+    <rect x="22" y="22" width="400" height="428" rx="4" fill="none" stroke="#2b1d12" stroke-width="1" opacity=".5"/>
+    <line x1="40" y1="96" x2="404" y2="96" stroke="#2b1d12" stroke-width="1.5" opacity=".45"/>
+    <line x1="40" y1="300" x2="404" y2="300" stroke="#2b1d12" stroke-width="1" opacity=".35"/>
+  </g>
+  <!-- Eckschoner (Messing) -->
+  <g fill="#b8904a" opacity=".9">
+    <path d="M6 70 L6 36 Q6 6 36 6 L70 6 L70 18 L40 18 Q18 18 18 40 L18 70 Z"/>
+    <path d="M994 70 L994 36 Q994 6 964 6 L930 6 L930 18 L960 18 Q982 18 982 40 L982 70 Z"/>
+    <path d="M6 490 L6 524 Q6 554 36 554 L70 554 L70 542 L40 542 Q18 542 18 520 L18 490 Z"/>
+    <path d="M994 490 L994 524 Q994 554 964 554 L930 554 L930 542 L960 542 Q982 542 982 520 L982 490 Z"/>
+  </g>
+</svg>

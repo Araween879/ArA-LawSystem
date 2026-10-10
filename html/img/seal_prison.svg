@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Tintenstempel Sisika-Gefaengnis (Gitter und Schluessel). Name als Textbogen aus der NUI. -->
+  <defs>
+    <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="2" seed="13" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.3" result="m"/>
+      <feComposite in="d" in2="m" operator="in"/>
+    </filter>
+    <clipPath id="c"><circle cx="100" cy="100" r="58"/></clipPath>
+    <path id="st" d="M0,-7 L1.65,-2.27 L6.66,-2.16 L2.66,0.87 L4.11,5.66 L0,2.8 L-4.11,5.66 L-2.66,0.87 L-6.66,-2.16 L-1.65,-2.27 Z"/>
+  </defs>
+  <g filter="url(#ink)" fill="#3a3632" stroke="#3a3632" opacity=".92">
+    <circle cx="100" cy="100" r="92" fill="none" stroke-width="4"/>
+    <circle cx="100" cy="100" r="86.5" fill="none" stroke-width="1.2"/>
+    <circle cx="100" cy="100" r="64" fill="none" stroke-width="2.2"/>
+    <g stroke="none">
+      <use href="#st" x="100" y="178"/><use href="#st" x="61" y="167.5"/><use href="#st" x="139" y="167.5"/>
+      <circle cx="32.5" cy="139" r="2.6"/><circle cx="167.5" cy="139" r="2.6"/>
+    </g>
+    <g clip-path="url(#c)" stroke="none">
+      <rect x="66" y="30" width="6" height="140"/><rect x="82" y="30" width="6" height="140"/>
+      <rect x="97" y="30" width="6" height="140"/><rect x="112" y="30" width="6" height="140"/>
+      <rect x="128" y="30" width="6" height="140"/>
+      <rect x="30" y="70" width="140" height="5"/><rect x="30" y="126" width="140" height="5"/>
+    </g>
+    <g transform="rotate(-40 100 100)">
+      <circle cx="100" cy="62" r="14" fill="#efe2c0" stroke-width="6"/>
+      <rect x="96.5" y="75" width="7" height="68" stroke="none"/>
+      <rect x="103" y="124" width="14" height="6" stroke="none"/>
+      <rect x="103" y="134" width="10" height="6" stroke="none"/>
+    </g>
+  </g>
+</svg>

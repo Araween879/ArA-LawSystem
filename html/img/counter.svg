@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <!-- Behoerdenschalter: Holzvertaefelung, Messingschild, Messingleiste, Formularbogen auf dem Tresen.
+       Stationsname, Reiter und Inhalte liegen als HTML darueber. -->
+  <defs>
+    <filter id="wood" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.35" numOctaves="4" seed="5"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.10  0 0 0 0 0.05  0 0 0 0 0.02  0 0 0 0.75 -0.1"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="woodH" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.35 0.02" numOctaves="4" seed="8"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.12  0 0 0 0 0.06  0 0 0 0 0.02  0 0 0 0.7 -0.1"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="15"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.40  0 0 0 0 0.27  0 0 0 0 0.14  0 0 0 0.2 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="stain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="3" seed="27"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.50  0 0 0 0 0.33  0 0 0 0 0.14  0 0 0 0.55 -0.24"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+    <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3d98f"/>
+      <stop offset=".35" stop-color="#d0a95b"/>
+      <stop offset=".7" stop-color="#a47c36"/>
+      <stop offset="1" stop-color="#6e521f"/>
+    </linearGradient>
+    <linearGradient id="brassRail" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6e521f"/>
+      <stop offset=".3" stop-color="#e8c77a"/>
+      <stop offset=".6" stop-color="#b8904a"/>
+      <stop offset="1" stop-color="#4a3312"/>
+    </linearGradient>
+    <radialGradient id="rivet" cx="35%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#fff2c6"/>
+      <stop offset=".5" stop-color="#b8904a"/>
+      <stop offset="1" stop-color="#4a3312"/>
+    </radialGradient>
+    <linearGradient id="vign" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".35"/>
+      <stop offset=".25" stop-color="#000" stop-opacity="0"/>
+      <stop offset=".85" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Vertaefelung -->
+  <rect x="0" y="0" width="1600" height="1000" rx="16" fill="#4a2c16"/>
+  <g>
+    <rect x="0" y="0" width="160" height="1000" fill="#4f2f18"/>
+    <rect x="160" y="0" width="160" height="1000" fill="#472913"/>
+    <rect x="320" y="0" width="160" height="1000" fill="#51311a"/>
+    <rect x="480" y="0" width="160" height="1000" fill="#482a15"/>
+    <rect x="640" y="0" width="160" height="1000" fill="#4e2e17"/>
+    <rect x="800" y="0" width="160" height="1000" fill="#452812"/>
+    <rect x="960" y="0" width="160" height="1000" fill="#50301a"/>
+    <rect x="1120" y="0" width="160" height="1000" fill="#492b15"/>
+    <rect x="1280" y="0" width="160" height="1000" fill="#4d2d17"/>
+    <rect x="1440" y="0" width="160" height="1000" fill="#462913"/>
+  </g>
+  <rect x="0" y="0" width="1600" height="1000" rx="16" fill="#4a2c16" filter="url(#wood)"/>
+  <g stroke="#1f1108" stroke-width="3" opacity=".7">
+    <line x1="160" y1="0" x2="160" y2="1000"/><line x1="320" y1="0" x2="320" y2="1000"/>
+    <line x1="480" y1="0" x2="480" y2="1000"/><line x1="640" y1="0" x2="640" y2="1000"/>
+    <line x1="800" y1="0" x2="800" y2="1000"/><line x1="960" y1="0" x2="960" y2="1000"/>
+    <line x1="1120" y1="0" x2="1120" y2="1000"/><line x1="1280" y1="0" x2="1280" y2="1000"/>
+    <line x1="1440" y1="0" x2="1440" y2="1000"/>
+  </g>
+  <rect x="0" y="0" width="1600" height="1000" rx="16" fill="url(#vign)"/>
+  <rect x="3" y="3" width="1594" height="994" rx="14" fill="none" stroke="#1a0e06" stroke-width="6"/>
+
+  <!-- Messingschild -->
+  <rect x="524" y="26" width="560" height="92" rx="10" fill="#000" opacity=".5" filter="url(#shadow)"/>
+  <rect x="520" y="18" width="560" height="92" rx="10" fill="url(#brass)" stroke="#4a3312" stroke-width="3"/>
+  <rect x="534" y="30" width="532" height="68" rx="6" fill="none" stroke="#6e521f" stroke-width="2" opacity=".8"/>
+  <rect x="538" y="34" width="524" height="4" fill="#fff4cf" opacity=".35"/>
+  <circle cx="542" cy="40" r="6" fill="url(#rivet)"/><circle cx="1058" cy="40" r="6" fill="url(#rivet)"/>
+  <circle cx="542" cy="88" r="6" fill="url(#rivet)"/><circle cx="1058" cy="88" r="6" fill="url(#rivet)"/>
+
+  <!-- Messingleiste -->
+  <rect x="0" y="116" width="1600" height="14" fill="url(#brassRail)"/>
+  <g fill="url(#rivet)">
+    <circle cx="80" cy="123" r="4"/><circle cx="400" cy="123" r="4"/><circle cx="720" cy="123" r="4"/>
+    <circle cx="880" cy="123" r="4"/><circle cx="1200" cy="123" r="4"/><circle cx="1520" cy="123" r="4"/>
+  </g>
+
+  <!-- Tresenkante unten -->
+  <rect x="0" y="968" width="1600" height="32" fill="#6a4020"/>
+  <rect x="0" y="968" width="1600" height="32" fill="#6a4020" filter="url(#woodH)"/>
+  <rect x="0" y="968" width="1600" height="3" fill="#a87b4c" opacity=".7"/>
+
+  <!-- Formularbogen -->
+  <rect x="96" y="214" width="1420" height="760" fill="#000" opacity=".55" filter="url(#shadow)"/>
+  <rect x="88" y="200" width="1424" height="762" fill="#eadbb6"/>
+  <rect x="88" y="200" width="1424" height="762" fill="#eadbb6" filter="url(#stain)"/>
+  <rect x="88" y="200" width="1424" height="762" fill="#eadbb6" filter="url(#grain)"/>
+  <rect x="106" y="218" width="1388" height="726" fill="none" stroke="#2b1d12" stroke-width="2.5" opacity=".55"/>
+  <rect x="114" y="226" width="1372" height="710" fill="none" stroke="#2b1d12" stroke-width="1" opacity=".4"/>
+  <!-- Messing-Klammern -->
+  <g>
+    <rect x="150" y="946" width="70" height="30" rx="5" fill="url(#brass)" stroke="#4a3312" stroke-width="2"/>
+    <rect x="1380" y="946" width="70" height="30" rx="5" fill="url(#brass)" stroke="#4a3312" stroke-width="2"/>
+    <circle cx="185" cy="961" r="5" fill="url(#rivet)"/><circle cx="1415" cy="961" r="5" fill="url(#rivet)"/>
+  </g>
+</svg>

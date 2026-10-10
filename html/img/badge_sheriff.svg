@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <!-- Sheriff: sechszackiger Stern mit Kugelspitzen (Messing) -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbe7a6"/>
+      <stop offset=".35" stop-color="#d5ad5c"/>
+      <stop offset=".6" stop-color="#9c7431"/>
+      <stop offset=".85" stop-color="#e2c27a"/>
+      <stop offset="1" stop-color="#7a5620"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6dc96"/>
+      <stop offset=".5" stop-color="#b8904a"/>
+      <stop offset="1" stop-color="#6e4e1c"/>
+    </linearGradient>
+    <radialGradient id="ball" cx="35%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#fff3c8"/>
+      <stop offset=".5" stop-color="#c99f52"/>
+      <stop offset="1" stop-color="#5e4216"/>
+    </radialGradient>
+    <filter id="wear" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="5"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.25  0 0 0 0 0.17  0 0 0 0 0.06  0 0 0 0.35 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <g>
+    <path d="M200 35 L246 120.3 L342.9 117.5 L292 200 L342.9 282.5 L246 279.7 L200 365 L154 279.7 L57.1 282.5 L108 200 L57.1 117.5 L154 120.3 Z"
+          fill="url(#g)" stroke="#4a3312" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M200 35 L246 120.3 L342.9 117.5 L292 200 L342.9 282.5 L246 279.7 L200 365 L154 279.7 L57.1 282.5 L108 200 L57.1 117.5 L154 120.3 Z"
+          fill="#b8904a" filter="url(#wear)"/>
+    <!-- Kanten-Facetten -->
+    <g stroke="#6e4e1c" stroke-width="2" opacity=".45">
+      <line x1="200" y1="45" x2="200" y2="138"/><line x1="332" y1="123" x2="252" y2="170"/>
+      <line x1="332" y1="277" x2="252" y2="230"/><line x1="200" y1="355" x2="200" y2="262"/>
+      <line x1="68" y1="277" x2="148" y2="230"/><line x1="68" y1="123" x2="148" y2="170"/>
+    </g>
+    <g fill="url(#ball)" stroke="#4a3312" stroke-width="3">
+      <circle cx="200" cy="28" r="16"/><circle cx="349" cy="114" r="16"/><circle cx="349" cy="286" r="16"/>
+      <circle cx="200" cy="372" r="16"/><circle cx="51" cy="286" r="16"/><circle cx="51" cy="114" r="16"/>
+    </g>
+    <!-- Mittelschild -->
+    <circle cx="200" cy="200" r="66" fill="url(#g2)" stroke="#4a3312" stroke-width="4"/>
+    <circle cx="200" cy="200" r="56" fill="none" stroke="#6e4e1c" stroke-width="2" stroke-dasharray="3 5"/>
+    <path d="M200 160 L209.4 187 L238 187.6 L215.2 204.8 L223.5 232.1 L200 216 L176.5 232.1 L184.8 204.8 L162 187.6 L190.6 187 Z"
+          fill="#e9cc85" stroke="#4a3312" stroke-width="2.5"/>
+    <!-- Glanz -->
+    <path d="M110 120 Q150 100 190 110" stroke="#fff6d8" stroke-width="5" fill="none" opacity=".45" stroke-linecap="round"/>
+  </g>
+</svg>

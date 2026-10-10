@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Tintenstempel US Marshals (Stern im Kreis). Name als Textbogen aus der NUI. -->
+  <defs>
+    <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="2" seed="2" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.3" result="m"/>
+      <feComposite in="d" in2="m" operator="in"/>
+    </filter>
+    <path id="st" d="M0,-7 L1.65,-2.27 L6.66,-2.16 L2.66,0.87 L4.11,5.66 L0,2.8 L-4.11,5.66 L-2.66,0.87 L-6.66,-2.16 L-1.65,-2.27 Z"/>
+  </defs>
+  <g filter="url(#ink)" fill="#7a1c14" stroke="#7a1c14" opacity=".92">
+    <circle cx="100" cy="100" r="92" fill="none" stroke-width="4"/>
+    <circle cx="100" cy="100" r="86.5" fill="none" stroke-width="1.2"/>
+    <circle cx="100" cy="100" r="64" fill="none" stroke-width="2.2"/>
+    <g stroke="none">
+      <use href="#st" x="100" y="178"/><use href="#st" x="61" y="167.5"/><use href="#st" x="139" y="167.5"/>
+      <circle cx="32.5" cy="139" r="2.6"/><circle cx="167.5" cy="139" r="2.6"/>
+    </g>
+    <g transform="translate(100 100) scale(.31) translate(-200 -200)">
+      <circle cx="200" cy="200" r="160" fill="none" stroke-width="14"/>
+      <path stroke="none" d="M200 72 L230.1 158.6 L321.8 160.5 L248.6 215.8 L275.2 303.5 L200 251.2 L124.8 303.5 L151.4 215.8 L78.2 160.5 L169.9 158.6 Z"/>
+      <circle cx="200" cy="200" r="26" fill="#efe2c0" stroke="none"/>
+    </g>
+  </g>
+</svg>

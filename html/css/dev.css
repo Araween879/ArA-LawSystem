@@ -1,0 +1,24 @@
+/* ==========================================================================
+   Testleiste - nur im Browser-Testmodus vorhanden (mock.js baut sie nur ohne RedM)
+   ========================================================================== */
+.devbar {
+    position: fixed; top: 8px; left: 8px; z-index: 5000;
+    width: 214px; max-height: calc(100vh - 16px); overflow-y: auto;
+    font: 12px/1.3 'Segoe UI', Arial, sans-serif; color: #f1e6c8;
+    background: rgba(20, 13, 8, .92); border: 1px solid #b8904a; border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, .5);
+    user-select: none;
+}
+.devbar__head {
+    display: block; width: 100%; padding: 6px 8px; text-align: left;
+    font-weight: 600; color: #e9c77a; border-bottom: 1px solid rgba(184, 144, 74, .5);
+}
+.devbar.is-min .devbar__group, .devbar.is-min .devbar__hint { display: none; }
+.devbar__group { padding: 5px 6px 6px; border-bottom: 1px solid rgba(184, 144, 74, .2); display: flex; flex-wrap: wrap; gap: 3px; }
+.devbar__title { flex: 1 0 100%; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #b8904a; margin-bottom: 1px; }
+.devbar__btn {
+    padding: 3px 6px; font-size: 11.5px; color: #f1e6c8;
+    background: rgba(107, 74, 43, .55); border: 1px solid rgba(184, 144, 74, .45); border-radius: 3px;
+}
+.devbar__btn:hover { background: #7a1c14; }
+.devbar__hint { padding: 5px 8px 7px; font-size: 10.5px; color: #a8987a; }

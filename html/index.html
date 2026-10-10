@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>ArA-LawSystem</title>
+    <!-- Browser-Testmodus erkennen, bevor irgendetwas gezeichnet wird (Crock-Schrift nur im Spiel laden) -->
+    <script>if (typeof GetParentResourceName === 'undefined') document.documentElement.className += ' dev';</script>
+    <!-- Google Fonts nicht blockierend: offline greifen die lokalen Fallbacks (serif/monospace) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Rye&family=Special+Elite&display=swap" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/apps.css">
+    <link rel="stylesheet" href="css/ledger.css">
+    <link rel="stylesheet" href="css/counter.css">
+    <link rel="stylesheet" href="css/board.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/dev.css">
+</head>
+<body>
+
+    <!-- ============ HUDs (ohne Fokus) ============ -->
+    <div id="hud-layer">
+        <div id="hud-evidence" class="hud hud--evidence hidden"></div>
+        <div id="hud-jail" class="hud hud--jail hidden"></div>
+        <div id="hud-k9" class="hud hud--k9 hidden"></div>
+        <div id="hud-escort" class="hud hud--escort hidden"></div>
+        <div class="hud-bottom">
+            <div id="hud-robbery" class="hud hud--robbery hidden"></div>
+            <div id="hud-cuffed" class="hud hud--cuffed hidden"></div>
+        </div>
+        <div id="hud-duty" class="hud hud--duty hidden"></div>
+    </div>
+
+    <!-- ============ Dienstbuch (1600 x 1000) ============ -->
+    <section id="app-ledger" class="app app--base hidden">
+        <div class="stage stage--book" id="ledger-stage">
+            <nav class="slot lg-tabs" id="lg-tabs" style="left:6.5%; top:0.6%; width:87%; height:6.4%;"></nav>
+            <header class="slot lg-head" id="lg-head" style="left:7.5%; top:9.5%; width:40%; height:9%;"></header>
+            <div class="slot page" id="lg-left" style="left:7.5%; top:19.5%; width:40%; height:72%;"></div>
+            <header class="slot lg-rhead" style="left:52.5%; top:9.5%; width:40%; height:9%;">
+                <div class="lg-rhead__title" id="lg-right-title"></div>
+                <div class="lg-rhead__sub" id="lg-right-sub"></div>
+            </header>
+            <div class="slot page" id="lg-right" style="left:52.5%; top:19.5%; width:40%; height:72%;"></div>
+            <button class="slot xbtn" id="lg-close" type="button" style="left:94.6%; top:6.2%; width:3.4%; height:5.44%;" data-tt="ui_close"></button>
+        </div>
+    </section>
+
+    <!-- ============ Schalter (1600 x 1000) ============ -->
+    <section id="app-counter" class="app app--base hidden">
+        <div class="stage stage--counter" id="counter-stage">
+            <div class="slot ct-citizen" id="ct-citizen" style="left:5%; top:4.2%; width:26%; height:5.5%;"></div>
+            <div class="slot ct-sign" style="left:33%; top:2.2%; width:34%; height:8.6%;">
+                <span class="ct-sign__kicker" data-t="ui_ct_title"></span>
+                <span class="ct-sign__station" id="ct-station"></span>
+            </div>
+            <button class="slot xbtn xbtn--brass" id="ct-close" type="button" style="left:94.2%; top:2.8%; width:3.6%; height:5.76%;" data-tt="ui_close"></button>
+            <nav class="slot ct-tabs" id="ct-tabs" style="left:5.5%; top:13.2%; width:89%; height:6.8%;"></nav>
+            <div class="slot ct-sheet" id="ct-sheet" style="left:7%; top:22.5%; width:86%; height:71%;"></div>
+        </div>
+    </section>
+
+    <!-- ============ Steckbriefbrett (1600 x 1000) ============ -->
+    <section id="app-board" class="app app--base hidden">
+        <div class="stage stage--board" id="board-stage">
+            <div class="slot bd-plaque" style="left:32%; top:2.2%; width:36%; height:8%;">
+                <span class="bd-plaque__kicker" data-t="ui_board_title"></span>
+                <span class="bd-plaque__station" id="bd-station"></span>
+            </div>
+            <button class="slot xbtn xbtn--brass" id="bd-close" type="button" style="left:94.2%; top:2.8%; width:3.6%; height:5.76%;" data-tt="ui_close"></button>
+            <div class="slot bd-posters" id="bd-posters" style="left:4.5%; top:13%; width:57%; height:82%;"></div>
+            <div class="slot bd-side" style="left:64%; top:13%; width:31.5%; height:82%;">
+                <span class="bd-side__pin"></span>
+                <div class="bd-side__title" data-t="ui_board_side_title"></div>
+                <div id="bd-side-tabs"></div>
+                <div class="bd-side__list" id="bd-side-list"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ Menue ============ -->
+    <section id="app-menu" class="app app--overlay hidden">
+        <div class="menu panel" id="menu-panel">
+            <header class="menu__head">
+                <div class="menu__title" id="menu-title"></div>
+                <div class="menu__sub" id="menu-sub"></div>
+            </header>
+            <div class="menu__list" id="menu-list" role="listbox"></div>
+            <div class="menu__desc is-empty" id="menu-desc"></div>
+            <footer class="menu__foot" data-t="ui_menu_hint"></footer>
+        </div>
+    </section>
+
+    <!-- ============ Formular ============ -->
+    <section id="app-form" class="app app--overlay hidden">
+        <div class="form panel" id="form-panel">
+            <header class="form__head">
+                <div class="form__title" id="form-title"></div>
+                <div class="form__sub" id="form-sub"></div>
+            </header>
+            <div class="form__body" id="form-body"></div>
+            <footer class="form__foot">
+                <div class="form__summary" id="form-summary"></div>
+                <div class="form__btns" id="form-btns"></div>
+            </footer>
+        </div>
+    </section>
+
+    <!-- ============ Dokument ============ -->
+    <section id="app-document" class="app app--overlay hidden">
+        <div class="doc-holder" id="doc-holder"></div>
+        <button class="xbtn xbtn--doc" id="doc-close" type="button" data-tt="ui_close"></button>
+    </section>
+
+    <!-- ============ Marke (ohne Fokus) ============ -->
+    <section id="app-badge" class="app-badge hidden"></section>
+
+    <!-- ============ Dialoge, Hinweise ============ -->
+    <div id="modal-layer" class="hidden"></div>
+    <div id="toast-layer"></div>
+
+    <script src="js/core.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/apps.js"></script>
+    <script src="js/ledger.js"></script>
+    <script src="js/ledger_tabs.js"></script>
+    <script src="js/counter.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/hud.js"></script>
+    <script src="js/mock_data.js"></script>
+    <script src="js/mock.js"></script>
+</body>
+</html>

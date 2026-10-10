@@ -1,0 +1,221 @@
+/* ==========================================================================
+   Generische Apps: Menue, Formular (inkl. Strafkatalog), Dokument, Marke
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   MENU - links (wie im Spiel), ueber einer Grund-App mittig
+   -------------------------------------------------------------------------- */
+#app-menu:not(.is-centered) { justify-content: flex-start; padding-left: 6vw; background: linear-gradient(90deg, rgba(10, 6, 3, .55) 0%, rgba(10, 6, 3, 0) 60%); }
+.menu {
+    font-size: var(--ui);
+    width: clamp(260px, 44vh, 760px);
+    max-height: 84vh;
+    display: flex; flex-direction: column;
+    padding: 1.3em 1.1em .7em;
+    animation: stage-in .16s ease-out;
+}
+.menu__head { text-align: center; padding: 0 .4em .6em; margin-bottom: .4em; border-bottom: .1em double var(--ink-soft); }
+.menu__title { font-family: var(--f-head); font-size: 1.75em; letter-spacing: .05em; line-height: 1.1; }
+.menu__sub { font-style: italic; color: var(--ink-soft); margin-top: .2em; }
+.menu__list { overflow-y: auto; flex: 1 1 auto; padding: .2em .1em; }
+.mitem {
+    display: flex; align-items: center; gap: .6em;
+    padding: .5em .7em; margin: .08em 0; cursor: pointer;
+    border-radius: .12em; font-size: 1.08em;
+    transition: background .08s ease;
+}
+.mitem__icon { font-size: 1.2em; color: var(--sepia); }
+.mitem__bullet { width: .45em; height: .45em; transform: rotate(45deg); background: var(--sepia); flex: 0 0 auto; margin: 0 .2em; }
+.mitem__label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mitem__badge {
+    font-family: var(--f-type); font-size: .72em; text-transform: uppercase; letter-spacing: .04em;
+    padding: .08em .45em; border: .08em solid var(--blood); color: var(--blood); border-radius: .15em; white-space: nowrap;
+}
+.mitem.is-sel { background: linear-gradient(90deg, var(--blood) 0%, #8e2a1d 100%); color: var(--paper-hi); }
+.mitem.is-sel .mitem__icon, .mitem.is-sel .mitem__badge { color: var(--paper-hi); border-color: var(--paper-hi); }
+.mitem.is-sel .mitem__bullet { background: var(--paper-hi); }
+.mitem.is-disabled { opacity: .42; cursor: not-allowed; }
+.menu__desc {
+    margin-top: .5em; padding: .5em .6em; min-height: 2.8em;
+    font-style: italic; font-size: .95em; line-height: 1.3; color: var(--ink-soft);
+    border-top: .07em solid var(--ink-faint); white-space: pre-line;
+}
+.menu__desc.is-empty { visibility: hidden; }
+.menu__foot { font-family: var(--f-type); font-size: .72em; text-align: center; color: var(--ink-soft); margin-top: .35em; letter-spacing: .04em; }
+
+/* --------------------------------------------------------------------------
+   FORM
+   -------------------------------------------------------------------------- */
+.form {
+    font-size: var(--ui);
+    width: clamp(300px, 66vh, 1100px);
+    max-width: 94vw;
+    max-height: 90vh;
+    display: flex; flex-direction: column;
+    padding: 1.4em 1.5em 1em;
+    animation: stage-in .16s ease-out;
+}
+.form--wide { width: clamp(600px, 132vh, 1800px); }
+.form__head { text-align: center; margin-bottom: .7em; padding-bottom: .5em; border-bottom: .1em double var(--ink-soft); }
+.form__title { font-family: var(--f-head); font-size: 1.8em; letter-spacing: .05em; }
+.form__sub { font-style: italic; color: var(--ink-soft); margin-top: .15em; }
+.form__body { overflow-y: auto; flex: 1 1 auto; padding: .2em .3em .6em; }
+.form__foot { display: flex; align-items: center; justify-content: space-between; gap: 1em; padding-top: .7em; border-top: .07em solid var(--ink-faint); }
+.form__summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: .3em .7em; font-size: 1.02em; }
+.form__summary b { font-family: var(--f-type); font-weight: normal; color: var(--blood); font-size: 1.12em; }
+.fsum__l { color: var(--sepia); }
+.form__btns { display: flex; gap: .6em; margin-left: auto; }
+
+/* Strafkatalog */
+.penal {
+    display: grid; grid-template-columns: 1.55fr 1fr; gap: 1em;
+    height: clamp(260px, 46vh, 900px);
+    border: .08em solid var(--ink-faint); padding: .6em; border-radius: .15em;
+    background: rgba(255, 250, 235, .22);
+}
+.penal__cat-col, .penal__sel-col { display: flex; flex-direction: column; min-height: 0; }
+.penal__cats { display: flex; flex-wrap: wrap; gap: .25em; margin: .45em 0; }
+.penal__cat {
+    font-family: var(--f-type); font-size: .78em; padding: .15em .55em;
+    border: .07em solid var(--ink-faint); border-radius: .15em; color: var(--ink-soft);
+}
+.penal__cat:hover { background: rgba(122, 28, 20, .08); }
+.penal__cat.is-active { background: var(--ink); color: var(--paper-hi); border-color: var(--ink); }
+.penal__list { overflow-y: auto; flex: 1 1 auto; border-top: .07em solid var(--ink-faint); }
+.penal__row { display: flex; align-items: center; gap: .6em; padding: .35em .3em; border-bottom: .07em dashed var(--ink-faint); cursor: pointer; }
+.penal__row:hover { background: rgba(122, 28, 20, .06); }
+.penal__row.is-on { background: rgba(122, 28, 20, .12); box-shadow: inset .2em 0 0 var(--blood); }
+.penal__info { flex: 1 1 auto; min-width: 0; }
+.penal__label { font-size: 1em; }
+.penal__meta { font-family: var(--f-type); font-size: .78em; color: var(--ink-soft); }
+.step { display: inline-flex; align-items: center; gap: .3em; flex: 0 0 auto; }
+.step__b {
+    width: 1.6em; height: 1.6em; border-radius: 50%;
+    border: .08em solid var(--ink); font-family: var(--f-type); font-size: .95em; line-height: 1;
+    background: rgba(255, 250, 235, .6);
+}
+.step__b:hover:not(:disabled) { background: var(--blood); color: var(--paper-hi); border-color: var(--blood); }
+.step__b:disabled { opacity: .3; cursor: default; }
+.step__n { font-family: var(--f-type); min-width: 1.2em; text-align: center; }
+.penal__selh { font-family: var(--f-head); color: var(--sepia); letter-spacing: .05em; padding-bottom: .3em; border-bottom: .07em solid var(--ink-faint); }
+.penal__chosen { flex: 1 1 auto; overflow-y: auto; }
+.penal__pick { display: flex; align-items: center; gap: .45em; padding: .3em .1em; border-bottom: .07em dashed var(--ink-faint); font-size: .95em; }
+.penal__pickn { font-family: var(--f-type); color: var(--blood); min-width: 1.8em; }
+.penal__pickl { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.penal__pickv { font-family: var(--f-type); font-size: .9em; }
+.penal__x { width: 1.4em; height: 1.4em; color: var(--blood); display: inline-flex; align-items: center; justify-content: center; }
+.penal__x:hover { background: rgba(122, 28, 20, .12); border-radius: 50%; }
+.penal__sum {
+    display: grid; grid-template-columns: auto 1fr; gap: .15em .6em; align-items: baseline;
+    margin-top: .5em; padding-top: .5em; border-top: .12em double var(--ink-soft);
+}
+.penal__suml { color: var(--sepia); }
+.penal__sumv { font-family: var(--f-type); font-size: 1.15em; color: var(--blood); text-align: right; }
+
+/* --------------------------------------------------------------------------
+   DOCUMENT
+   -------------------------------------------------------------------------- */
+#app-document { background: rgba(10, 6, 3, .66); }
+.doc-holder { display: flex; align-items: center; justify-content: center; }
+.xbtn--doc { position: absolute; top: 3vh; right: 3vw; width: 5.2vh; height: 5.2vh; }
+
+.stage--doc    { --iw: 1000; --ih: 1300; --sw: min(92vw, calc(92vh * 1000 / 1300)); --bg: url('../img/doc.svg'); }
+.stage--poster { --iw: 900;  --ih: 1250; --sw: min(92vw, calc(93vh * 900 / 1250));  --bg: url('../img/poster.svg'); }
+.stage--card   { --iw: 1400; --ih: 900;  --sw: min(92vw, calc(72vh * 1400 / 900));  --bg: url('../img/card.svg'); }
+
+.doc .slot, .card .slot, .poster .slot { color: var(--ink); }
+.doc__kicker, .card__kicker {
+    font-family: var(--f-type); font-size: 2em; letter-spacing: .3em; text-transform: uppercase; text-align: center; color: var(--sepia);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card__kicker { text-align: left; font-size: 2.1em; letter-spacing: .2em; }
+.doc__title {
+    font-family: var(--f-head); font-size: 5.6em; line-height: 1.05; text-align: center; letter-spacing: .03em;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.doc--warrant .doc__title { color: var(--blood); font-size: 6.2em; text-transform: uppercase; letter-spacing: .06em; }
+.doc--ticket .doc__title { font-size: 5em; }
+.doc__sub { font-style: italic; font-size: 2.6em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc__content { overflow-y: auto; font-size: 2.35em; line-height: 1.4; padding-right: .3em; }
+.doc--report .doc__content, .doc--report .doc__body, .doc--evidence .doc__body { font-family: var(--f-type); }
+.doc__body { margin-top: .7em; white-space: pre-line; text-align: justify; }
+.doc__footer { font-family: var(--f-type); font-size: 2em; text-align: center; color: var(--sepia); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc__seal .seal, .card__seal .seal, .poster__seal .seal { width: 100%; height: 100%; }
+.doc__seal { transform: rotate(-8deg); }
+
+.dfields { display: grid; grid-template-columns: auto 1fr; gap: .2em .8em; }
+.dfield { display: contents; }
+.dfield__k { color: var(--sepia); white-space: nowrap; font-style: italic; }
+.dfield__v { font-family: var(--f-type); border-bottom: .06em dotted var(--ink-faint); overflow-wrap: anywhere; }
+
+.doc__sig, .card__sig { display: flex; flex-direction: column; justify-content: flex-end; text-align: center; }
+.dsig__name {
+    font-family: var(--f-body); font-style: italic; font-size: 3.6em; line-height: 1.1; color: #1f2a44;
+    transform: rotate(-3deg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border-bottom: .03em solid var(--ink); padding: 0 .2em .05em;
+}
+.dsig__label { font-family: var(--f-type); font-size: 1.7em; letter-spacing: .2em; text-transform: uppercase; color: var(--sepia); margin-top: .2em; }
+
+/* Karte (Lizenz, Waffenschein) */
+.card__title { font-family: var(--f-head); font-size: 4.4em; line-height: 1.05; display: flex; align-items: center; overflow: hidden; }
+.card__sub { font-style: italic; font-size: 2.3em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card__content { overflow-y: auto; font-size: 2.15em; line-height: 1.4; }
+.card__footer { font-family: var(--f-type); font-size: 1.7em; color: var(--sepia); display: flex; align-items: flex-end; }
+.card__icon { display: flex; align-items: center; justify-content: center; color: var(--sepia); opacity: .55; }
+.card__glyph { width: 100%; height: 100%; stroke-width: 1.2; }
+.card__sig .dsig__name { font-size: 3.2em; }
+.card__sig .dsig__label { font-size: 1.5em; }
+
+/* WANTED-Plakat */
+.poster .slot { text-align: center; }
+.poster__wanted {
+    font-family: var(--f-deco); font-size: 15.5em; line-height: 1; letter-spacing: .04em; color: var(--ink);
+    display: flex; align-items: center; justify-content: center; text-shadow: .02em .02em 0 rgba(43, 29, 18, .25);
+}
+.poster__doa { font-family: var(--f-head); font-size: 4.4em; letter-spacing: .18em; color: var(--blood); display: flex; align-items: center; justify-content: center; border-top: .06em solid var(--ink); border-bottom: .06em solid var(--ink); }
+.poster__frame { border: .5em double var(--ink); background: rgba(80, 55, 30, .12); padding: .6em; }
+.poster__portrait { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+.poster__portrait img { height: 100%; opacity: .82; mix-blend-mode: multiply; }
+.poster__name { font-family: var(--f-head); font-size: 6.4em; line-height: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; text-transform: uppercase; }
+.poster__reason { font-style: italic; font-size: 3.2em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.poster__crimes { font-size: 2.5em; line-height: 1.3; overflow-y: auto; }
+.dfields--poster { grid-template-columns: 1fr; text-align: center; }
+.dfields--poster .dfield__k { font-family: var(--f-head); font-style: normal; letter-spacing: .1em; }
+.dfields--poster .dfield__v { border: none; }
+.poster__body { margin-top: .3em; font-style: italic; }
+.poster__reward { display: flex; align-items: center; justify-content: center; gap: .5em; border-top: .35em double var(--ink); }
+.poster__rewardl { font-family: var(--f-deco); font-size: 6em; letter-spacing: .06em; }
+.poster__rewardv { font-family: var(--f-deco); font-size: 7.5em; color: var(--blood); }
+.poster__footer { font-family: var(--f-type); font-size: 2.3em; color: var(--sepia); }
+.poster__seal { transform: rotate(12deg); opacity: .9; }
+
+/* Siegel */
+.seal { position: relative; display: block; }
+.seal__img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; mix-blend-mode: multiply; }
+.seal__ring { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; mix-blend-mode: multiply; opacity: .9; }
+.seal__text { font-family: var(--f-type); font-size: 14px; letter-spacing: 1.5px; fill: #7a1c14; }
+.seal--police .seal__text { fill: #2b3f5c; }
+.seal--pinkerton .seal__text { fill: #2b1d12; }
+.seal--prison .seal__text { fill: #3a3632; }
+.seal--court .seal__text { fill: #5c1f1f; }
+
+/* --------------------------------------------------------------------------
+   BADGE (Marke) - ohne Fokus, unten mittig
+   -------------------------------------------------------------------------- */
+.app-badge {
+    position: fixed; left: 50%; bottom: 11vh; z-index: 15; pointer-events: none;
+    transform: translateX(-50%) translateY(2vh); opacity: 0;
+    transition: opacity .4s ease, transform .4s ease;
+}
+.app-badge.is-in { opacity: 1; transform: translateX(-50%); }
+.app-badge.is-out { opacity: 0; transform: translateX(-50%) translateY(2vh); }
+.stage--wallet { --iw: 1000; --ih: 560; --sw: clamp(280px, 56vh, 1000px); --bg: url('../img/wallet.svg'); animation: none; filter: drop-shadow(0 1.2em 1.6em rgba(0, 0, 0, .6)); }
+.wallet__badge { display: flex; align-items: center; justify-content: center; }
+.wallet__badge .badge-img { max-width: 100%; max-height: 100%; filter: drop-shadow(0 .6em .6em rgba(0, 0, 0, .55)); }
+.wallet .slot { color: var(--ink); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.wallet__dept { font-family: var(--f-type); font-size: 3.1em; letter-spacing: .12em; text-transform: uppercase; color: var(--sepia); }
+.wallet__name { font-family: var(--f-head); font-size: 6.2em; line-height: 1.15; }
+.wallet__grade { font-style: italic; font-size: 3.6em; }
+.wallet__nol { font-family: var(--f-type); font-size: 2.5em; letter-spacing: .2em; text-transform: uppercase; color: var(--sepia); }
+.wallet__no { font-family: var(--f-type); font-size: 5.4em; letter-spacing: .08em; color: var(--blood); }
+.badge-img { display: block; }

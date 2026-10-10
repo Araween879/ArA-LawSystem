@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Tintenstempel Gericht (Waage). Name als Textbogen aus der NUI. -->
+  <defs>
+    <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="13" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.3" numOctaves="2" seed="17" result="s"/>
+      <feColorMatrix in="s" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.3" result="m"/>
+      <feComposite in="d" in2="m" operator="in"/>
+    </filter>
+    <path id="st" d="M0,-7 L1.65,-2.27 L6.66,-2.16 L2.66,0.87 L4.11,5.66 L0,2.8 L-4.11,5.66 L-2.66,0.87 L-6.66,-2.16 L-1.65,-2.27 Z"/>
+  </defs>
+  <g filter="url(#ink)" fill="#5c1f1f" stroke="#5c1f1f" opacity=".92">
+    <circle cx="100" cy="100" r="92" fill="none" stroke-width="4"/>
+    <circle cx="100" cy="100" r="86.5" fill="none" stroke-width="1.2"/>
+    <circle cx="100" cy="100" r="64" fill="none" stroke-width="2.2"/>
+    <g stroke="none">
+      <use href="#st" x="100" y="178"/><use href="#st" x="61" y="167.5"/><use href="#st" x="139" y="167.5"/>
+      <circle cx="32.5" cy="139" r="2.6"/><circle cx="167.5" cy="139" r="2.6"/>
+    </g>
+    <g transform="translate(100 100) scale(.3) translate(-200 -202)" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="200" y1="108" x2="200" y2="290"/>
+      <line x1="100" y1="140" x2="300" y2="140"/>
+      <line x1="100" y1="140" x2="74" y2="220"/><line x1="100" y1="140" x2="126" y2="220"/>
+      <line x1="300" y1="140" x2="274" y2="220"/><line x1="300" y1="140" x2="326" y2="220"/>
+      <path d="M64 220 Q100 262 136 220 Z" fill="#5c1f1f"/>
+      <path d="M264 220 Q300 262 336 220 Z" fill="#5c1f1f"/>
+      <path d="M160 300 L240 300 L226 282 L174 282 Z" fill="#5c1f1f"/>
+      <circle cx="200" cy="100" r="12" fill="#5c1f1f"/>
+    </g>
+  </g>
+</svg>

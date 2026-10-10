@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="440" viewBox="0 0 400 440">
+  <!-- Kohle-Skizze: Unbekannter mit Hut und Halstuch (Platzhalter fuer das Gesicht) -->
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="17" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="6"/>
+    </filter>
+    <pattern id="hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#2b1d12" stroke-width="2.4" opacity=".55"/>
+    </pattern>
+  </defs>
+  <g filter="url(#rough)">
+    <!-- Schultern -->
+    <path d="M30 440 C38 372 92 336 150 322 L250 322 C308 336 362 372 370 440 Z" fill="#3a2716"/>
+    <path d="M30 440 C38 372 92 336 150 322 L250 322 C308 336 362 372 370 440 Z" fill="url(#hatch)"/>
+    <!-- Halstuch -->
+    <path d="M142 300 L258 300 L276 336 L200 392 L124 336 Z" fill="#5a1a12" opacity=".92"/>
+    <path d="M200 392 L186 430 L200 424 L214 432 Z" fill="#5a1a12" opacity=".9"/>
+    <!-- Hals -->
+    <path d="M166 262 L234 262 L240 306 L160 306 Z" fill="#4a3220"/>
+    <!-- Kopf -->
+    <path d="M128 170 C126 110 160 96 200 96 C240 96 274 110 272 170 C272 232 244 282 200 286 C156 282 128 232 128 170 Z" fill="#4a3220"/>
+    <path d="M128 170 C126 110 160 96 200 96 C240 96 274 110 272 170 C272 232 244 282 200 286 C156 282 128 232 128 170 Z" fill="url(#hatch)" opacity=".8"/>
+    <!-- Schatten unter der Krempe -->
+    <path d="M130 150 C170 168 230 168 270 150 L272 176 C230 192 170 192 128 176 Z" fill="#20140a" opacity=".85"/>
+    <!-- Hut -->
+    <path d="M40 140 C90 118 150 112 200 112 C250 112 310 118 360 140 C330 156 270 160 200 160 C130 160 70 156 40 140 Z" fill="#241710"/>
+    <path d="M132 124 C130 76 150 38 200 36 C250 38 270 76 268 124 C240 132 160 132 132 124 Z" fill="#241710"/>
+    <path d="M200 40 C192 60 192 84 200 104" stroke="#4a3220" stroke-width="5" fill="none"/>
+    <path d="M134 110 C170 118 230 118 266 110 L266 124 C230 132 170 132 134 124 Z" fill="#5a3a22"/>
+  </g>
+  <!-- Fragezeichen-artige Augenschatten -->
+  <g fill="#1a0f07" opacity=".8">
+    <ellipse cx="172" cy="196" rx="14" ry="6"/>
+    <ellipse cx="228" cy="196" rx="14" ry="6"/>
+  </g>
+</svg>

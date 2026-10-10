@@ -1,0 +1,93 @@
+/* ==========================================================================
+   HUDs (ohne Fokus) - dunkles Leder mit Messingkante, Texte in Papierfarbe
+   ========================================================================== */
+.hud {
+    position: absolute;
+    font-size: var(--ui);
+    color: #efe0bd;
+    background: linear-gradient(180deg, rgba(44, 29, 17, .9) 0%, rgba(26, 17, 10, .9) 100%);
+    border: .1em solid rgba(184, 144, 74, .85);
+    border-radius: .25em;
+    box-shadow: 0 .3em .9em rgba(0, 0, 0, .55), inset 0 0 0 .16em rgba(20, 12, 6, .8), inset 0 0 1.2em rgba(0, 0, 0, .4);
+    opacity: 0; transform: translateY(-.6em);
+    transition: opacity .25s ease, transform .25s ease;
+}
+.hud.is-in { opacity: 1; transform: none; }
+.hud .icon { color: var(--gold-hi); }
+.hud .kv__k { color: #cdb487; }
+.hud .kv__dots { border-bottom-color: rgba(239, 224, 189, .25); }
+.hud .kv__v { color: #f6ead0; }
+.kv--warn .kv__v { color: #e0806e; }
+
+.hbar { height: .5em; border-radius: .25em; background: rgba(0, 0, 0, .45); border: .06em solid rgba(184, 144, 74, .6); overflow: hidden; }
+.hbar__fill { height: 100%; background: linear-gradient(90deg, #8e6a2c, var(--gold-hi)); transition: width .4s ease; }
+.hbar--iron .hbar__fill { background: repeating-linear-gradient(90deg, #6d665c 0 .45em, #8c847a .45em .9em); }
+.hbar--blood .hbar__fill { background: linear-gradient(90deg, #5a120c, #b23a2c); }
+
+/* Spurensuche - oben links */
+.hud--evidence { top: 2.5vh; left: 1.6vw; display: flex; align-items: center; gap: .7em; padding: .55em 1em .55em .8em; }
+.hud-ev__icon { font-size: 1.7em; animation: ev-scan 2.4s ease-in-out infinite; }
+@keyframes ev-scan { 50% { transform: rotate(-12deg) scale(1.08); } }
+.hud-ev__title { font-family: var(--f-head); letter-spacing: .05em; }
+.hud-ev__count { font-family: var(--f-type); font-size: .82em; color: #cdb487; }
+
+/* Haft - oben mittig */
+.hud--jail {
+    top: 2vh; left: 50%; margin-left: calc(clamp(240px, 34vh, 600px) / -2); width: clamp(240px, 34vh, 600px);
+    display: flex; align-items: stretch; gap: .8em; padding: .7em 1em;
+}
+.hud-jail__bars { display: flex; align-items: center; }
+.hud-jail__icon { font-size: 2.6em; }
+.hud-jail__main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: .25em; }
+.hud-jail__label { font-family: var(--f-type); font-size: .78em; letter-spacing: .3em; text-transform: uppercase; color: #cdb487; }
+.hud-jail__time { font-family: var(--f-deco); font-size: 2.1em; line-height: 1; color: #f6ead0; }
+.hud-jail__meta { display: flex; flex-wrap: wrap; gap: .1em .9em; font-family: var(--f-type); font-size: .76em; color: #cdb487; }
+
+/* Bluthund - links mittig */
+.hud--k9 { top: 36vh; left: 1.6vw; width: clamp(200px, 30vh, 520px); display: flex; gap: .7em; padding: .7em .9em; }
+.hud-k9__icon { font-size: 2.2em; flex: 0 0 auto; }
+.hud-k9__main { min-width: 0; flex: 1 1 auto; }
+.hud-k9__title { font-family: var(--f-type); font-size: .76em; letter-spacing: .25em; text-transform: uppercase; color: #cdb487; }
+.hud-k9__state { font-family: var(--f-head); font-size: 1.3em; line-height: 1.15; }
+.hud-k9__scent { display: flex; align-items: center; gap: .45em; margin-top: .3em; font-size: .85em; }
+.hud-k9__scentl { color: #cdb487; }
+.hud-k9__scentv { font-family: var(--f-type); }
+.hud-k9__text { margin-top: .3em; font-style: italic; font-size: .9em; color: #e3d2ad; line-height: 1.25; }
+.scent { display: inline-flex; gap: .2em; }
+.scent__dot { width: .65em; height: .65em; border-radius: 50%; border: .08em solid var(--gold); background: transparent; }
+.scent__dot.is-on { background: var(--gold-hi); box-shadow: 0 0 .35em rgba(217, 181, 106, .7); }
+.k9--tracking .hud-k9__icon, .k9--sniffing .hud-k9__icon { animation: ev-scan 1.2s ease-in-out infinite; }
+.k9--found { border-color: #7fb069; }
+.k9--found .hud-k9__state { color: #b8e0a0; }
+.k9--lost .hud-k9__state { color: #e0806e; }
+
+/* Eskorte - rechts mittig */
+.hud--escort { top: 36vh; right: 1.6vw; width: clamp(220px, 32vh, 560px); padding: .7em .9em; }
+.hud-escort__head { display: flex; align-items: center; gap: .5em; margin-bottom: .25em; }
+.hud-escort__icon { font-size: 1.6em; }
+.hud-escort__title { font-family: var(--f-head); font-size: 1.1em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.hud-escort__status { font-family: var(--f-type); font-size: .8em; color: var(--gold-hi); letter-spacing: .08em; text-transform: uppercase; margin-bottom: .3em; }
+.kv--hud { font-size: .92em; }
+
+/* unten mittig: Ueberfall + Handschellen */
+.hud-bottom {
+    position: absolute; left: 50%; bottom: 8vh; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: .8vh;
+}
+.hud-bottom .hud { position: relative; }
+.hud--robbery { width: clamp(240px, 40vh, 700px); padding: .6em .9em .7em; }
+.hud-rob__head { display: flex; align-items: center; gap: .5em; margin-bottom: .4em; }
+.hud-rob__icon { font-size: 1.4em; }
+.hud-rob__text { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.hud-rob__pct { font-family: var(--f-type); color: var(--gold-hi); }
+.hud--cuffed { display: flex; align-items: center; gap: .7em; padding: .55em 1.1em .55em .8em; border-color: rgba(178, 58, 44, .9); }
+.hud-cuffed__icon { font-size: 2em; color: #e0806e !important; }
+.hud-cuffed__title { font-family: var(--f-head); font-size: 1.15em; letter-spacing: .06em; }
+.hud-cuffed__by { font-style: italic; font-size: .88em; color: #cdb487; }
+
+/* Dienst - unten rechts */
+.hud--duty { bottom: 2.5vh; right: 1.6vw; display: flex; align-items: center; gap: .55em; padding: .4em .8em .4em .55em; font-size: calc(var(--ui) * .85); opacity: 0; }
+.hud--duty.is-in { opacity: .88; }
+.hud-duty__icon { font-size: 1.7em; }
+.hud-duty__dept { font-family: var(--f-head); letter-spacing: .04em; }
+.hud-duty__grade { font-family: var(--f-type); font-size: .82em; color: #cdb487; }

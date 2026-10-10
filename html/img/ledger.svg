@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <!-- Dienstbuch: aufgeschlagenes Buch mit Ledereinband, zwei Seiten, Lesebaendchen.
+       Reiter, Kopfzeilen und Inhalte liegen als HTML darueber (Prozent-Slots). -->
+  <defs>
+    <filter id="leather" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="4" seed="7"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.04  0 0 0 0 0.02  0 0 0 0.6 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="scuff" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="19"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.55  0 0 0 0 0.38  0 0 0 0 0.22  0 0 0 0.7 -0.32"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" seed="4"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.40  0 0 0 0 0.27  0 0 0 0 0.14  0 0 0 0.2 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="stain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.005" numOctaves="3" seed="23"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.50  0 0 0 0 0.33  0 0 0 0 0.14  0 0 0 0.6 -0.26"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <linearGradient id="cover" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b2f19"/>
+      <stop offset=".5" stop-color="#4a2512"/>
+      <stop offset="1" stop-color="#351a0b"/>
+    </linearGradient>
+    <linearGradient id="pageL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e3d1a6"/>
+      <stop offset=".08" stop-color="#ecdcb6"/>
+      <stop offset=".86" stop-color="#e9d8b0"/>
+      <stop offset="1" stop-color="#b99c6a"/>
+    </linearGradient>
+    <linearGradient id="pageR" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b99c6a"/>
+      <stop offset=".14" stop-color="#e9d8b0"/>
+      <stop offset=".92" stop-color="#ecdcb6"/>
+      <stop offset="1" stop-color="#e3d1a6"/>
+    </linearGradient>
+    <linearGradient id="gutter" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a2410" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#3a2410" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#3a2410" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1d58e"/>
+      <stop offset=".45" stop-color="#b8904a"/>
+      <stop offset="1" stop-color="#6e521f"/>
+    </linearGradient>
+    <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a0f09"/>
+      <stop offset=".5" stop-color="#9a2a1e"/>
+      <stop offset="1" stop-color="#5a0f09"/>
+    </linearGradient>
+    <pattern id="rule" width="10" height="38" patternUnits="userSpaceOnUse" y="190">
+      <line x1="0" y1="37.5" x2="10" y2="37.5" stroke="#6b4a2b" stroke-width="1" opacity=".13"/>
+    </pattern>
+  </defs>
+
+  <!-- Schatten unter dem Buch -->
+  <rect x="40" y="80" width="1520" height="905" rx="30" fill="#000" opacity=".55" filter="url(#soft)"/>
+
+  <!-- Ledereinband -->
+  <rect x="14" y="46" width="1572" height="940" rx="26" fill="url(#cover)"/>
+  <rect x="14" y="46" width="1572" height="940" rx="26" fill="#4a2512" filter="url(#leather)"/>
+  <rect x="14" y="46" width="1572" height="940" rx="26" fill="#4a2512" filter="url(#scuff)"/>
+  <rect x="28" y="60" width="1544" height="912" rx="18" fill="none" stroke="#c9a46a" stroke-width="2" stroke-dasharray="10 8" opacity=".35"/>
+
+  <!-- Seitenblock (Blattkanten) -->
+  <g fill="#cdb88c" stroke="#8f7650" stroke-width="1">
+    <path d="M50 74 L800 80 L800 972 L50 966 Z"/>
+    <path d="M1550 74 L800 80 L800 972 L1550 966 Z"/>
+  </g>
+  <g stroke="#9c8358" stroke-width="1" opacity=".7" fill="none">
+    <path d="M54 956 L800 962 L1546 956"/>
+    <path d="M56 948 L800 954 L1544 948"/>
+    <path d="M58 940 L800 946 L1542 940"/>
+    <path d="M52 86 L52 960 M1548 86 L1548 960"/>
+    <path d="M55 84 L55 958 M1545 84 L1545 958"/>
+  </g>
+
+  <!-- Linke Seite -->
+  <path d="M62 70 Q430 58 800 76 L800 936 Q430 922 62 934 Z" fill="url(#pageL)"/>
+  <path d="M62 70 Q430 58 800 76 L800 936 Q430 922 62 934 Z" fill="#e9d8b0" filter="url(#stain)"/>
+  <path d="M62 70 Q430 58 800 76 L800 936 Q430 922 62 934 Z" fill="#e9d8b0" filter="url(#grain)"/>
+  <!-- Rechte Seite -->
+  <path d="M800 76 Q1170 58 1538 70 L1538 934 Q1170 922 800 936 Z" fill="url(#pageR)"/>
+  <path d="M800 76 Q1170 58 1538 70 L1538 934 Q1170 922 800 936 Z" fill="#e9d8b0" filter="url(#stain)"/>
+  <path d="M800 76 Q1170 58 1538 70 L1538 934 Q1170 922 800 936 Z" fill="#e9d8b0" filter="url(#grain)"/>
+
+  <!-- Linierung (sehr zart) -->
+  <rect x="112" y="195" width="660" height="730" fill="url(#rule)"/>
+  <rect x="832" y="195" width="660" height="730" fill="url(#rule)"/>
+  <!-- rote Randlinie -->
+  <g stroke="#7a1c14" opacity=".28" stroke-width="1.5">
+    <line x1="104" y1="96" x2="104" y2="926"/>
+    <line x1="1496" y1="96" x2="1496" y2="926"/>
+  </g>
+
+  <!-- Falz -->
+  <rect x="740" y="70" width="120" height="870" fill="url(#gutter)"/>
+  <line x1="800" y1="76" x2="800" y2="936" stroke="#4a2e14" stroke-width="2" opacity=".6"/>
+
+  <!-- Lesebaendchen -->
+  <path d="M1506 60 L1528 60 L1528 990 L1517 976 L1506 990 Z" fill="url(#ribbon)" opacity=".95"/>
+
+  <!-- Messing-Ecken -->
+  <g fill="url(#brass)" stroke="#4a3312" stroke-width="1.5">
+    <path d="M14 140 L14 72 Q14 46 40 46 L108 46 L108 58 L46 58 Q26 58 26 78 L26 140 Z"/>
+    <path d="M1586 140 L1586 72 Q1586 46 1560 46 L1492 46 L1492 58 L1554 58 Q1574 58 1574 78 L1574 140 Z"/>
+    <path d="M14 892 L14 960 Q14 986 40 986 L108 986 L108 974 L46 974 Q26 974 26 954 L26 892 Z"/>
+    <path d="M1586 892 L1586 960 Q1586 986 1560 986 L1492 986 L1492 974 L1554 974 Q1574 974 1574 954 L1574 892 Z"/>
+  </g>
+</svg>

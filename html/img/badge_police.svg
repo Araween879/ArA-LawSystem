@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <!-- Saint Denis Police: Schild mit Stern und Band (Nickel mit Messingmitte) -->
+  <defs>
+    <linearGradient id="s" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f6f0"/>
+      <stop offset=".35" stop-color="#bdbab2"/>
+      <stop offset=".6" stop-color="#7b7872"/>
+      <stop offset=".85" stop-color="#dcdad2"/>
+      <stop offset="1" stop-color="#5f5c56"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6dc96"/>
+      <stop offset=".5" stop-color="#b8904a"/>
+      <stop offset="1" stop-color="#6e4e1c"/>
+    </linearGradient>
+    <filter id="wear" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 0.3 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <path d="M200 30 C250 55 300 60 350 50 L350 170 C350 270 280 330 200 372 C120 330 50 270 50 170 L50 50 C100 60 150 55 200 30 Z"
+        fill="url(#s)" stroke="#2b3f5c" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M200 30 C250 55 300 60 350 50 L350 170 C350 270 280 330 200 372 C120 330 50 270 50 170 L50 50 C100 60 150 55 200 30 Z"
+        fill="#9a978f" filter="url(#wear)"/>
+  <path d="M200 58 C242 78 285 83 322 76 L322 172 C322 254 263 305 200 340 C137 305 78 254 78 172 L78 76 C115 83 158 78 200 58 Z"
+        fill="none" stroke="#4a4741" stroke-width="3"/>
+  <!-- Mittelscheibe -->
+  <circle cx="200" cy="190" r="62" fill="url(#b)" stroke="#2b3f5c" stroke-width="4"/>
+  <circle cx="200" cy="190" r="52" fill="none" stroke="#6e4e1c" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M200 145 L210.6 175.4 L242.8 176.1 L217.1 195.6 L226.4 226.4 L200 208 L173.6 226.4 L182.9 195.6 L157.2 176.1 L189.4 175.4 Z"
+        fill="#2b3f5c" stroke="#1b2a40" stroke-width="2"/>
+  <!-- Band -->
+  <path d="M96 262 L304 262 L292 282 L304 302 L96 302 L108 282 Z" fill="#2b3f5c" stroke="#1b2a40" stroke-width="3"/>
+  <line x1="118" y1="282" x2="282" y2="282" stroke="#c9c7bf" stroke-width="3" stroke-dasharray="8 6" opacity=".7"/>
+  <!-- Nieten oben -->
+  <g fill="#4a4741"><circle cx="90" cy="92" r="5"/><circle cx="310" cy="92" r="5"/><circle cx="200" cy="72" r="5"/></g>
+  <path d="M85 80 Q120 70 160 70" stroke="#fff" stroke-width="5" fill="none" opacity=".45" stroke-linecap="round"/>
+</svg>
