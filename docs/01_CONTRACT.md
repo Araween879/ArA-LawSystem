@@ -458,7 +458,7 @@ Fehlerhafte Eintraege werden mit Warnung uebersprungen.
 | `boss` | Kern | `boss_*` | Dienstbuch Tab „Behörde" |
 | `storage` | Kern | `storage` | vorp-Lager `ara_law_storage_<dept>` |
 | `armory` | Kern | `armory` | Menü Waffen/Ausrüstung (Kasse zahlt) |
-| `garage` | Kern | `garage` | Gefangenenwagen/Pferd ausparken/einparken; `spawn = vector4` |
+| `garage` | Kern | `garage` | Dienstwagen-Menue (Kategorie → Wagen aus `Config.Garage.Categories/Vehicles`, Filter `jobs`/`stations`/`minGrade`) ausparken/einparken; `spawn = vector4` |
 | `counter` | Kern öffnet (`core:counterOpen`), Tab-Daten A/B | alle | Schalter-NUI |
 | `board` | Kern öffnet (`core:boardOpen`), Daten A (`bounty:board`, `npc:accept`) | alle | Steckbriefbrett-NUI |
 | `jail` | A | `jail` | Einbuchen (Formular Haftstrafe) |

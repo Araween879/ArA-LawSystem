@@ -106,7 +106,7 @@ Config.Departments = {
             [3] = { label = 'Undersheriff',  salary = 18, perms = { 'warrant_approve', 'jail_release', 'bounty_manage', 'license_manage', 'boss_hire', 'boss_logs' } },
             [4] = { label = 'Sheriff',       salary = 22, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'county',
+        armory = 'lawman',
     },
     marshal = {
         label = 'US Marshals', short = 'Marshal', badgePrefix = 'USM', color = '#6b6b6b',
@@ -117,7 +117,7 @@ Config.Departments = {
             [2] = { label = 'Marshal',        salary = 17, perms = { 'warrant_approve', 'bounty_manage', 'jail_release', 'evidence_analyze', 'license_manage', 'fine_cancel', 'boss_logs' } },
             [3] = { label = 'Chief Marshal',  salary = 22, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'federal',
+        armory = 'lawman',
     },
     police = {
         label = 'Saint Denis Police', short = 'Police', badgePrefix = 'SDPD', color = '#2b3f5c',
@@ -128,7 +128,7 @@ Config.Departments = {
             [2] = { label = 'Sergeant', salary = 16, perms = { 'k9', 'scent_sample', 'evidence_analyze', 'fine_cancel', 'escort_contracts', 'boss_logs' } },
             [3] = { label = 'Captain',  salary = 21, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'city',
+        armory = 'lawman',
     },
     pinkerton = {
         label = 'Pinkerton-Detektei', short = 'Pinkerton', badgePrefix = 'PNK', color = '#3a2e22',
@@ -139,7 +139,7 @@ Config.Departments = {
             [2] = { label = 'Senior Agent', salary = 17, perms = { 'warrant_create', 'jail', 'fine', 'boss_logs' } },
             [3] = { label = 'Direktor',     salary = 22, perms = { 'all' } },
         },
-        armory = 'detective', garage = 'federal',
+        armory = 'detective',
     },
     prisonguard = {
         label = 'Sisika-Gefaengnis', short = 'Waerter', badgePrefix = 'SIS', color = '#4a4a3a',
@@ -149,7 +149,7 @@ Config.Departments = {
             [1] = { label = 'Oberwaerter', salary = 12, perms = { 'jail_release', 'records_edit', 'armory', 'garage', 'k9', 'scent_sample', 'boss_logs' } },
             [2] = { label = 'Direktor',   salary = 18, perms = { 'all' } },
         },
-        armory = 'lawman', garage = 'county',
+        armory = 'lawman',
     },
     judge = {
         label = 'Gericht', short = 'Richter', badgePrefix = 'CRT', color = '#5c1f1f',
@@ -158,7 +158,7 @@ Config.Departments = {
             [0] = { label = 'Richter',     salary = 15, perms = { 'duty', 'badge', 'records_view', 'records_edit', 'warrant_create', 'warrant_approve', 'jail_release', 'fine_cancel', 'bounty_manage', 'license_manage' } },
             [1] = { label = 'Oberrichter', salary = 20, perms = { 'all' } },
         },
-        armory = nil, garage = nil,
+        armory = nil,
     },
 }
 
@@ -200,17 +200,66 @@ Config.Armory = {
 }
 
 --------------------------------------------------------------------------
--- Dienstwagen (Gefangenentransport)
+-- Dienstwagen (Garage-Punkt jeder Station)
+-- Menue im Spiel:  1. Kategorie waehlen (Gefangene, Personen, Streife ...)
+--                  2. Wagen waehlen
 --------------------------------------------------------------------------
 Config.Garage = {
     MaxPerOfficer    = 1,
     Cooldown         = 60,     -- Sekunden zwischen zwei Ausparkvorgaengen
-    DespawnOnDutyOff = true,
-    Sets = {
-        county  = { { model = 'wagonprison01x', label = 'Gefangenenwagen', minGrade = 0 } },
-        city    = { { model = 'policewagon01x', label = 'Polizeiwagen', minGrade = 0 }, { model = 'wagonprison01x', label = 'Gefangenenwagen', minGrade = 1 } },
-        federal = { { model = 'wagonprison01x', label = 'Gefangenenwagen', minGrade = 0 } },
+    DespawnOnDutyOff = true,   -- Dienst aus -> Wagen verschwindet
+
+    -- Kategorien = erste Seite im Menue (Reihenfolge = Reihenfolge im Menue).
+    -- Kategorien ohne freigegebenen Wagen werden automatisch ausgeblendet.
+    -- icon: jail, people, badge, box, shield, wagon, horse, star, gun, doc
+    Categories = {
+        { id = 'prisoner',  label = 'Gefangenentransport',   icon = 'jail',   desc = 'Wagen mit Zelle oder Kaefig fuer Festgenommene' },
+        { id = 'transport', label = 'Personentransport',     icon = 'people', desc = 'Kutschen fuer Zeugen, Richter und Begleitschutz' },
+        { id = 'patrol',    label = 'Streife',               icon = 'badge',  desc = 'Leichte, schnelle Wagen fuer die Streife' },
+        { id = 'supply',    label = 'Material & Versorgung', icon = 'box',    desc = 'Lastwagen fuer Ausruestung und Beweismittel' },
+        { id = 'special',   label = 'Sonderfahrzeuge',       icon = 'shield', desc = 'Panzer- und Gatlingwagen - nur hohe Raenge' },
     },
+
+    -- Alle Wagen. Felder:
+    --   category  Kategorie-id von oben
+    --   model     Wagen-Modell (Liste gueltiger Modelle ganz unten)
+    --   label     Name im Menue
+    --   desc      kurze Beschreibung (optional)
+    --   minGrade  ab welchem Rang:  0 = alle  |  { sheriff = 2, police = 1 } je Job (fehlender Job = 0)
+    --   jobs      nil = alle Behoerden mit Garagen-Recht  |  { 'sheriff', 'marshal' } nur diese Jobs
+    --   stations  nil = an jeder Garage  |  { 'saintdenis' } nur an diesen Stationen
+    --   enabled   false = Wagen ausblenden
+    -- Raenge je Behoerde stehen oben in Config.Departments (0 = niedrigster).
+    Vehicles = {
+        -- Gefangenentransport
+        { category = 'prisoner',  model = 'wagonprison01x',        label = 'Gefangenenwagen',         desc = 'Geschlossene Zelle hinten',              minGrade = { police = 1 } },
+        { category = 'prisoner',  model = 'policewagon01x',        label = 'Polizei-Gefangenenwagen', desc = 'Wagen der Saint Denis Police',           minGrade = 0, jobs = { 'police' } },
+        { category = 'prisoner',  model = 'bountywagon01x',        label = 'Kaefigwagen',             desc = 'Offener Kaefig fuer Kopfgeld-Gefangene', minGrade = 1 },
+
+        -- Personentransport
+        { category = 'transport', model = 'coach2',                label = 'Kutsche',                 desc = 'Geschlossene Kutsche',                   minGrade = 1 },
+        { category = 'transport', model = 'coach3',                label = 'Reisekutsche',            desc = 'Fuer laengere Strecken',                 minGrade = 1 },
+        { category = 'transport', model = 'stagecoach001x',        label = 'Postkutsche',             desc = 'Viele Sitzplaetze',                      minGrade = 2 },
+
+        -- Streife
+        { category = 'patrol',    model = 'buggy01',               label = 'Einspaenner',             desc = 'Schnell und wendig',                     minGrade = 0 },
+
+        -- Material & Versorgung
+        { category = 'supply',    model = 'supplywagon',           label = 'Versorgungswagen',        desc = 'Ladeflaeche fuer Ausruestung',           minGrade = 1 },
+        { category = 'supply',    model = 'chuckwagon000x',        label = 'Planwagen',               desc = 'Ueberdachte Ladeflaeche',                minGrade = 1 },
+
+        -- Sonderfahrzeuge
+        { category = 'special',   model = 'wagonarmoured01x',      label = 'Panzerwagen',             desc = 'Gepanzert, fuer gefaehrliche Transporte', minGrade = 2,
+          jobs = { 'sheriff', 'marshal', 'police', 'pinkerton' } },
+        { category = 'special',   model = 'policewagongatling01x', label = 'Gatling-Wagen',           desc = 'Mit Gatling-Geschuetz',                  minGrade = { sheriff = 4, marshal = 3, police = 3 },
+          jobs = { 'sheriff', 'marshal', 'police' } },
+    },
+    -- Weitere gueltige Modelle (rdr3_discoveries):
+    --   Kutschen:  coach2 - coach6, stagecoach001x - stagecoach006x
+    --   Leicht:    buggy01, buggy02, buggy03, cart01 - cart08
+    --   Wagen:     wagon02x - wagon06x, wagontraveller01x, wagondoc01x (Arztwagen)
+    --   Last:      supplywagon, supplywagon2, armysupplywagon, chuckwagon000x, chuckwagon002x, logwagon, oilwagon01x
+    --   Gesetz:    wagonprison01x, policewagon01x, bountywagon01x, wagonarmoured01x, policewagongatling01x
 }
 
 --------------------------------------------------------------------------

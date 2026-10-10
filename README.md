@@ -146,6 +146,26 @@ Die Positionen der Zellentüren aus den Spieldaten stehen als Hilfe schon in jed
 
 ---
 
+## Dienstwagen-Menü
+
+Am Garagen-Punkt (`garage`) jeder Station öffnet sich ein Menü:
+**1. Kategorie** (Gefangenentransport, Personentransport, Streife, Material & Versorgung, Sonderfahrzeuge)
+→ **2. Wagen**. Wagen, für die der Rang noch nicht reicht, stehen ausgegraut mit „Ab Rang: …“ da.
+
+Eingestellt wird in `config/main.lua` → `Config.Garage`:
+
+| Feld | Bedeutung |
+|---|---|
+| `Categories` | Kategorien im Menü (Name, Symbol, Beschreibung, Reihenfolge) |
+| `Vehicles` | Alle Wagen: `category`, `model`, `label`, `desc` |
+| `minGrade` | Ab welchem Rang: `0` = alle, oder je Job `{ sheriff = 2, police = 1 }` |
+| `jobs` | Nur für bestimmte Jobs: `{ 'police' }` (leer = alle Behörden mit Garagen-Recht) |
+| `stations` | Nur an bestimmten Stationen: `{ 'saintdenis' }` (leer = überall) |
+
+Eine Liste gültiger Wagen-Modelle steht direkt unter `Vehicles` in der Config.
+
+---
+
 ## Befehle
 
 | Befehl | Wer | Zweck |

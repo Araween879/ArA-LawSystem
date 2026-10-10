@@ -84,6 +84,13 @@ Law.LocaleAdd('en', {
     garage_stored         = 'Service wagon stored.',
     garage_spawned        = 'Service wagon is ready.',
     garage_model_failed   = 'Wagon could not be loaded.',
+    garage_back           = '<< Back',
+    garage_need_grade     = 'From rank: %s',
+    garage_active_desc    = 'Out: %s',
+    garage_store_first    = 'Store your current service wagon first',
+    garage_none_available = 'No wagons are available to you here.',
+    garage_cat_other      = 'Other',
+    garage_cat_count      = '%d/%d',
 
     dispatch_title_citizen      = 'Emergency call',
     dispatch_title_panic        = 'PANIC - officer in need',

@@ -92,6 +92,13 @@ Law.LocaleAdd('de', {
     garage_stored         = 'Dienstwagen eingeparkt.',
     garage_spawned        = 'Dienstwagen steht bereit.',
     garage_model_failed   = 'Wagen konnte nicht geladen werden.',
+    garage_back           = '<< Zurueck',
+    garage_need_grade     = 'Ab Rang: %s',
+    garage_active_desc    = 'Draussen: %s',
+    garage_store_first    = 'Erst den aktuellen Dienstwagen einparken',
+    garage_none_available = 'Hier sind fuer dich keine Wagen freigegeben.',
+    garage_cat_other      = 'Sonstige',
+    garage_cat_count      = '%d/%d',
 
     -- Leitstelle
     dispatch_title_citizen      = 'Notruf',

@@ -23,7 +23,7 @@ Meldung „Items fehlen in der Tabelle items“.
 | 1.6 | A: Behörde → Einstellen → B wählen, Rang 0 | **B bekommt Rückfrage**, nach „Annehmen“ ist B Anwärter |
 | 1.7 | A: Rang von B ändern, dann entlassen | Rang-Anzeige bei B aktuell, danach arbeitslos |
 | 1.8 | A: Kasse einzahlen / auszahlen | Kassenbuch zeigt beide Buchungen |
-| 1.9 | A: Dienstwagen ausparken, einparken | Wagen steht am Spawn, verschwindet beim Einparken |
+| 1.9 | A: Dienstwagen ausparken, einparken | Menü zeigt Kategorien (Gefangene, Personen, Streife …), gesperrte Wagen mit „Ab Rang: …“; Wagen steht am Spawn, verschwindet beim Einparken |
 | 1.10 | B: `/sheriff Hilfe` | A: Toast + Blip, `/einsatz <Nr>` setzt Route |
 | 1.11 | A: `/panik` | Alarm an alle im Dienst |
 | 1.12 | B schießt in Valentine in die Luft | Nach 5–15 s Einsatz „Schüsse gemeldet“ bei A |

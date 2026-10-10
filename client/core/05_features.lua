@@ -112,25 +112,86 @@ Law.On('garage:rejected', function(netId)
     Law.Notify(L('garage_rejected'))
 end)
 
+--- Wagen nach Kategorie sortieren (Reihenfolge wie Config.Garage.Categories)
+local function garageGroups(vehicles)
+    local byCat, known = {}, {}
+    for _, c in ipairs(Config.Garage.Categories or {}) do known[c.id] = c end
+    for _, v in ipairs(vehicles) do
+        local cid = known[v.category] and v.category or '_other'
+        byCat[cid] = byCat[cid] or {}
+        table.insert(byCat[cid], v)
+    end
+    local cats = {}
+    for _, c in ipairs(Config.Garage.Categories or {}) do
+        if byCat[c.id] then cats[#cats + 1] = c end
+    end
+    if byCat._other then cats[#cats + 1] = { id = '_other', label = L('garage_cat_other'), icon = 'wagon' } end
+    return cats, byCat
+end
+
+--- Seite 2: Wagen einer Kategorie. Rueckgabe: Index, 'back' oder nil (abgebrochen)
+local function garageVehicleMenu(cat, list, d)
+    local items = {}
+    for _, v in ipairs(list) do
+        local desc = v.desc
+        if not v.allowed and v.needGrade then
+            desc = L('garage_need_grade', v.needGrade) .. (v.desc and (' - ' .. v.desc) or '')
+        elseif d.hasActive then
+            desc = L('garage_store_first')
+        end
+        items[#items + 1] = {
+            id = v.index, label = v.label, icon = cat.icon or 'wagon', desc = desc,
+            disabled = not v.allowed or d.hasActive,
+        }
+    end
+    items[#items + 1] = { id = 'back', label = L('garage_back') }
+    return Law.UI.Menu({ title = cat.label, subtitle = d.stationLabel, items = items })
+end
+
 Law.Stations.RegisterPoint('garage', {
     perm = 'garage', duty = true,
     label = L('prompt_garage'),
     onUse = function()
         local res = Law.Cb.Await('garage:list')
         if not res or not res.ok then return Law.Notify(res and res.msg or L('err_failed')) end
-        local items = {}
-        if res.data.hasActive then
-            items[#items + 1] = { id = 'store', label = L('garage_store') }
+        local d = res.data
+        local cats, byCat = garageGroups(d.vehicles or {})
+        if #cats == 0 and not d.hasActive then return Law.Notify(L('garage_none_available')) end
+
+        while true do
+            -- Seite 1: einparken + Kategorien
+            local items = {}
+            if d.hasActive then
+                items[#items + 1] = {
+                    id = 'store', label = L('garage_store'), icon = 'wagon',
+                    desc = d.activeLabel and L('garage_active_desc', d.activeLabel) or nil,
+                }
+            end
+            for _, c in ipairs(cats) do
+                local free = 0
+                for _, v in ipairs(byCat[c.id]) do if v.allowed then free = free + 1 end end
+                items[#items + 1] = {
+                    id = 'cat:' .. c.id, label = c.label, icon = c.icon or 'wagon', desc = c.desc,
+                    badge = L('garage_cat_count', free, #byCat[c.id]),
+                }
+            end
+            local choice = Law.UI.Menu({ title = L('garage_title'), subtitle = d.stationLabel, items = items })
+            if not choice then return end
+            if choice == 'store' then return Law.Net.Send('garage:store') end
+
+            local cid = type(choice) == 'string' and choice:match('^cat:(.+)$')
+            local cat
+            for _, c in ipairs(cats) do if c.id == cid then cat = c end end
+            if not cat then return end
+
+            local pick = garageVehicleMenu(cat, byCat[cid], d)
+            if pick == nil then return end
+            if pick ~= 'back' then
+                local r = Law.Cb.Await('garage:request', pick)
+                if not r or not r.ok then return Law.Notify(r and r.msg or L('err_failed')) end
+                return spawnVehicle(r.data.model, r.data.spawn)
+            end
         end
-        for _, v in ipairs(res.data.vehicles) do
-            items[#items + 1] = { id = v.index, label = v.label, disabled = not v.allowed or res.data.hasActive }
-        end
-        local choice = Law.UI.Menu({ title = L('garage_title'), items = items })
-        if not choice then return end
-        if choice == 'store' then return Law.Net.Send('garage:store') end
-        local r = Law.Cb.Await('garage:request', choice)
-        if not r or not r.ok then return Law.Notify(r and r.msg or L('err_failed')) end
-        spawnVehicle(r.data.model, r.data.spawn)
     end,
 })
 
