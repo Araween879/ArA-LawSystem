@@ -40,8 +40,8 @@ body.is-layout-editing .app-badge { z-index: 4; }
 
 .lay-bar {
     position: fixed; left: 50%; top: 42vh; transform: translateX(-50%);
-    width: clamp(300px, 46vh, 720px);
-    font-size: var(--ui);
+    width: calc(clamp(300px, 46vh, 720px) * .8);     /* Grundgroesse 80 % */
+    font-size: calc(var(--ui) * .8);
     color: #efe0bd;
     background: linear-gradient(180deg, rgba(44, 29, 17, .96) 0%, rgba(26, 17, 10, .96) 100%);
     border: .1em solid rgba(184, 144, 74, .9);
